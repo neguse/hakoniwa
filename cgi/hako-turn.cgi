@@ -1,103 +1,103 @@
 #----------------------------------------------------------------------
-# È¢Äí½ôÅç ver2.30
-# ¥¿¡¼¥ó¿Ê¹Ô¥â¥¸¥å¡¼¥ë(ver1.02)
-# »ÈÍÑ¾ò·ï¡¢»ÈÍÑÊıË¡Åù¤Ï¡¢hako-readme.txt¥Õ¥¡¥¤¥ë¤ò»²¾È
+# ç®±åº­è«¸å³¶ ver2.30
+# ã‚¿ãƒ¼ãƒ³é€²è¡Œãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«(ver1.02)
+# ä½¿ç”¨æ¡ä»¶ã€ä½¿ç”¨æ–¹æ³•ç­‰ã¯ã€hako-readme.txtãƒ•ã‚¡ã‚¤ãƒ«ã‚’å‚ç…§
 #
-# È¢Äí½ôÅç¤Î¥Ú¡¼¥¸: http://www.bekkoame.ne.jp/~tokuoka/hakoniwa.html
+# ç®±åº­è«¸å³¶ã®ãƒšãƒ¼ã‚¸: http://www.bekkoame.ne.jp/~tokuoka/hakoniwa.html
 #----------------------------------------------------------------------
 
 
-#¼ş°Ï2¥Ø¥Ã¥¯¥¹¤ÎºÂÉ¸
+#å‘¨å›²2ãƒ˜ãƒƒã‚¯ã‚¹ã®åº§æ¨™
 my(@ax) = (0, 1, 1, 1, 0,-1, 0, 1, 2, 2, 2, 1, 0,-1,-1,-2,-1,-1, 0);
 my(@ay) = (0,-1, 0, 1, 1, 0,-1,-2,-1, 0, 1, 2, 2, 2, 1, 0,-1,-2,-2);
 
 #----------------------------------------------------------------------
-# Åç¤Î¿·µ¬ºîÀ®¥â¡¼¥É
+# å³¶ã®æ–°è¦ä½œæˆãƒ¢ãƒ¼ãƒ‰
 #----------------------------------------------------------------------
-# ¥á¥¤¥ó
+# ãƒ¡ã‚¤ãƒ³
 sub newIslandMain {
-    # Åç¤¬¤¤¤Ã¤Ñ¤¤¤Ç¤Ê¤¤¤«¥Á¥§¥Ã¥¯
+    # å³¶ãŒã„ã£ã±ã„ã§ãªã„ã‹ãƒã‚§ãƒƒã‚¯
     if($HislandNumber >= $HmaxIsland) {
 	unlock();
 	tempNewIslandFull();
 	return;
     }
 
-    # Ì¾Á°¤¬¤¢¤ë¤«¥Á¥§¥Ã¥¯
+    # åå‰ãŒã‚ã‚‹ã‹ãƒã‚§ãƒƒã‚¯
     if($HcurrentName eq '') {
 	unlock();
 	tempNewIslandNoName();
 	return;
     }
 
-    # Ì¾Á°¤¬ÀµÅö¤«¥Á¥§¥Ã¥¯
-    if($HcurrentName =~ /[,\?\(\)\<\>\$]|^Ìµ¿Í$/) {
-	# »È¤¨¤Ê¤¤Ì¾Á°
+    # åå‰ãŒæ­£å½“ã‹ãƒã‚§ãƒƒã‚¯
+    if($HcurrentName =~ /[,\?\(\)\<\>\$]|^ç„¡äºº$/) {
+	# ä½¿ãˆãªã„åå‰
 	unlock();
 	tempNewIslandBadName();
 	return;
     }
 
-    # Ì¾Á°¤Î½ÅÊ£¥Á¥§¥Ã¥¯
+    # åå‰ã®é‡è¤‡ãƒã‚§ãƒƒã‚¯
     if(nameToNumber($HcurrentName) != -1) {
-	# ¤¹¤Ç¤ËÈ¯¸«¤º¤ß
+	# ã™ã§ã«ç™ºè¦‹ãšã¿
 	unlock();
 	tempNewIslandAlready();
 	return;
     }
 
-    # password¤ÎÂ¸ºßÈ½Äê
+    # passwordã®å­˜åœ¨åˆ¤å®š
     if($HinputPassword eq '') {
-	# passwordÌµ¤·
+	# passwordç„¡ã—
 	unlock();
 	tempNewIslandNoPassword();
 	return;
     }
 
-    # ³ÎÇ§ÍÑ¥Ñ¥¹¥ï¡¼¥É
+    # ç¢ºèªç”¨ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰
     if($HinputPassword2 ne $HinputPassword) {
-	# password´Ö°ã¤¤
+	# passwordé–“é•ã„
 	unlock();
 	tempWrongPassword();
 	return;
     }
 
-    # ¿·¤·¤¤Åç¤ÎÈÖ¹æ¤ò·è¤á¤ë
+    # æ–°ã—ã„å³¶ã®ç•ªå·ã‚’æ±ºã‚ã‚‹
     $HcurrentNumber = $HislandNumber;
     $HislandNumber++;
     $Hislands[$HcurrentNumber] = makeNewIsland();
     my($island) = $Hislands[$HcurrentNumber];
 
-    # ³Æ¼ï¤ÎÃÍ¤òÀßÄê
+    # å„ç¨®ã®å€¤ã‚’è¨­å®š
     $island->{'name'} = $HcurrentName;
     $island->{'id'} = $HislandNextID;
     $HislandNextID ++;
     $island->{'absent'} = $HgiveupTurn - 3;
-    $island->{'comment'} = '(Ì¤ÅĞÏ¿)';
+    $island->{'comment'} = '(æœªç™»éŒ²)';
     $island->{'password'} = encode($HinputPassword);
     
-    # ¿Í¸ı¤½¤ÎÂ¾»»½Ğ
+    # äººå£ãã®ä»–ç®—å‡º
     estimate($HcurrentNumber);
 
-    # ¥Ç¡¼¥¿½ñ¤­½Ğ¤·
+    # ãƒ‡ãƒ¼ã‚¿æ›¸ãå‡ºã—
     writeIslandsFile($island->{'id'});
-    logDiscover($HcurrentName); # ¥í¥°
+    logDiscover($HcurrentName); # ãƒ­ã‚°
 
-    # ³«Êü
+    # é–‹æ”¾
     unlock();
 
-    # È¯¸«²èÌÌ
-    tempNewIslandHead($HcurrentName); # È¯¸«¤·¤Ş¤·¤¿!!
-    islandInfo(); # Åç¤Î¾ğÊó
-    islandMap(1); # Åç¤ÎÃÏ¿Ş¡¢owner¥â¡¼¥É
+    # ç™ºè¦‹ç”»é¢
+    tempNewIslandHead($HcurrentName); # ç™ºè¦‹ã—ã¾ã—ãŸ!!
+    islandInfo(); # å³¶ã®æƒ…å ±
+    islandMap(1); # å³¶ã®åœ°å›³ã€ownerãƒ¢ãƒ¼ãƒ‰
 }
 
-# ¿·¤·¤¤Åç¤òºîÀ®¤¹¤ë
+# æ–°ã—ã„å³¶ã‚’ä½œæˆã™ã‚‹
 sub makeNewIsland {
-    # ÃÏ·Á¤òºî¤ë
+    # åœ°å½¢ã‚’ä½œã‚‹
     my($land, $landValue) = makeNewLand();
 
-    # ½é´ü¥³¥Ş¥ó¥É¤òÀ¸À®
+    # åˆæœŸã‚³ãƒãƒ³ãƒ‰ã‚’ç”Ÿæˆ
     my(@command, $i);
     for($i = 0; $i < $HcommandMax; $i++) {
 	 $command[$i] = {
@@ -109,13 +109,13 @@ sub makeNewIsland {
 	 };
     }
 
-    # ½é´ü·Ç¼¨ÈÄ¤òºîÀ®
+    # åˆæœŸæ²ç¤ºæ¿ã‚’ä½œæˆ
     my(@lbbs);
     for($i = 0; $i < $HlbbsMax; $i++) {
 	 $lbbs[$i] = "0>>";
     }
 
-    # Åç¤Ë¤·¤ÆÊÖ¤¹
+    # å³¶ã«ã—ã¦è¿”ã™
     return {
 	'land' => $land,
 	'landValue' => $landValue,
@@ -127,12 +127,12 @@ sub makeNewIsland {
     };
 }
 
-# ¿·¤·¤¤Åç¤ÎÃÏ·Á¤òºîÀ®¤¹¤ë
+# æ–°ã—ã„å³¶ã®åœ°å½¢ã‚’ä½œæˆã™ã‚‹
 sub makeNewLand {
-    # ´ğËÜ·Á¤òºîÀ®
+    # åŸºæœ¬å½¢ã‚’ä½œæˆ
     my(@land, @landValue, $x, $y, $i);
 
-    # ³¤¤Ë½é´ü²½
+    # æµ·ã«åˆæœŸåŒ–
     for($y = 0; $y < $HislandSize; $y++) {
 	 for($x = 0; $x < $HislandSize; $x++) {
 	     $land[$x][$y] = $HlandSea;
@@ -140,7 +140,7 @@ sub makeNewLand {
 	 }
     }
 
-    # Ãæ±û¤Î4*4¤Ë¹ÓÃÏ¤òÇÛÃÖ
+    # ä¸­å¤®ã®4*4ã«è’åœ°ã‚’é…ç½®
     my($center) = $HislandSize / 2 - 1;
     for($y = $center - 1; $y < $center + 3; $y++) {
 	 for($x = $center - 1; $x < $center + 3; $x++) {
@@ -148,17 +148,17 @@ sub makeNewLand {
 	 }
     }
 
-    # 8*8ÈÏ°ÏÆâ¤ËÎ¦ÃÏ¤òÁı¿£
+    # 8*8ç¯„å›²å†…ã«é™¸åœ°ã‚’å¢—æ®–
     for($i = 0; $i < 120; $i++) {
-	 # ¥é¥ó¥À¥àºÂÉ¸
+	 # ãƒ©ãƒ³ãƒ€ãƒ åº§æ¨™
 	 $x = random(8) + $center - 3;
 	 $y = random(8) + $center - 3;
 
 	 my($tmp) = countAround(\@land, $x, $y, $HlandSea, 7);
 	 if(countAround(\@land, $x, $y, $HlandSea, 7) != 7){
-	     # ¼ş¤ê¤ËÎ¦ÃÏ¤¬¤¢¤ë¾ì¹ç¡¢ÀõÀ¥¤Ë¤¹¤ë
-	     # ÀõÀ¥¤Ï¹ÓÃÏ¤Ë¤¹¤ë
-	     # ¹ÓÃÏ¤ÏÊ¿ÃÏ¤Ë¤¹¤ë
+	     # å‘¨ã‚Šã«é™¸åœ°ãŒã‚ã‚‹å ´åˆã€æµ…ç€¬ã«ã™ã‚‹
+	     # æµ…ç€¬ã¯è’åœ°ã«ã™ã‚‹
+	     # è’åœ°ã¯å¹³åœ°ã«ã™ã‚‹
 	     if($land[$x][$y] == $HlandWaste) {
 		 $land[$x][$y] = $HlandPlains;
 		 $landValue[$x][$y] = 0;
@@ -173,61 +173,61 @@ sub makeNewLand {
 	 }
     }
 
-    # ¿¹¤òºî¤ë
+    # æ£®ã‚’ä½œã‚‹
     my($count) = 0;
     while($count < 4) {
-	 # ¥é¥ó¥À¥àºÂÉ¸
+	 # ãƒ©ãƒ³ãƒ€ãƒ åº§æ¨™
 	 $x = random(4) + $center - 1;
 	 $y = random(4) + $center - 1;
 
-	 # ¤½¤³¤¬¤¹¤Ç¤Ë¿¹¤Ç¤Ê¤±¤ì¤Ğ¡¢¿¹¤òºî¤ë
+	 # ãã“ãŒã™ã§ã«æ£®ã§ãªã‘ã‚Œã°ã€æ£®ã‚’ä½œã‚‹
 	 if($land[$x][$y] != $HlandForest) {
 	     $land[$x][$y] = $HlandForest;
-	     $landValue[$x][$y] = 5; # ºÇ½é¤Ï500ËÜ
+	     $landValue[$x][$y] = 5; # æœ€åˆã¯500æœ¬
 	     $count++;
 	 }
     }
 
-    # Ä®¤òºî¤ë
+    # ç”ºã‚’ä½œã‚‹
     $count = 0;
     while($count < 2) {
-	 # ¥é¥ó¥À¥àºÂÉ¸
+	 # ãƒ©ãƒ³ãƒ€ãƒ åº§æ¨™
 	 $x = random(4) + $center - 1;
 	 $y = random(4) + $center - 1;
 
-	 # ¤½¤³¤¬¿¹¤«Ä®¤Ç¤Ê¤±¤ì¤Ğ¡¢Ä®¤òºî¤ë
+	 # ãã“ãŒæ£®ã‹ç”ºã§ãªã‘ã‚Œã°ã€ç”ºã‚’ä½œã‚‹
 	 if(($land[$x][$y] != $HlandTown) &&
 	    ($land[$x][$y] != $HlandForest)) {
 	     $land[$x][$y] = $HlandTown;
-	     $landValue[$x][$y] = 5; # ºÇ½é¤Ï500¿Í
+	     $landValue[$x][$y] = 5; # æœ€åˆã¯500äºº
 	     $count++;
 	 }
     }
 
-    # »³¤òºî¤ë
+    # å±±ã‚’ä½œã‚‹
     $count = 0;
     while($count < 1) {
-	 # ¥é¥ó¥À¥àºÂÉ¸
+	 # ãƒ©ãƒ³ãƒ€ãƒ åº§æ¨™
 	 $x = random(4) + $center - 1;
 	 $y = random(4) + $center - 1;
 
-	 # ¤½¤³¤¬¿¹¤«Ä®¤Ç¤Ê¤±¤ì¤Ğ¡¢Ä®¤òºî¤ë
+	 # ãã“ãŒæ£®ã‹ç”ºã§ãªã‘ã‚Œã°ã€ç”ºã‚’ä½œã‚‹
 	 if(($land[$x][$y] != $HlandTown) &&
 	    ($land[$x][$y] != $HlandForest)) {
 	     $land[$x][$y] = $HlandMountain;
-	     $landValue[$x][$y] = 0; # ºÇ½é¤ÏºÎ·¡¾ì¤Ê¤·
+	     $landValue[$x][$y] = 0; # æœ€åˆã¯æ¡æ˜å ´ãªã—
 	     $count++;
 	 }
     }
 
-    # ´ğÃÏ¤òºî¤ë
+    # åŸºåœ°ã‚’ä½œã‚‹
     $count = 0;
     while($count < 1) {
-	 # ¥é¥ó¥À¥àºÂÉ¸
+	 # ãƒ©ãƒ³ãƒ€ãƒ åº§æ¨™
 	 $x = random(4) + $center - 1;
 	 $y = random(4) + $center - 1;
 
-	 # ¤½¤³¤¬¿¹¤«Ä®¤«»³¤Ç¤Ê¤±¤ì¤Ğ¡¢´ğÃÏ
+	 # ãã“ãŒæ£®ã‹ç”ºã‹å±±ã§ãªã‘ã‚Œã°ã€åŸºåœ°
 	 if(($land[$x][$y] != $HlandTown) &&
 	    ($land[$x][$y] != $HlandForest) &&
 	    ($land[$x][$y] != $HlandMountain)) {
@@ -241,102 +241,102 @@ sub makeNewLand {
 }
 
 #----------------------------------------------------------------------
-# ¾ğÊóÊÑ¹¹¥â¡¼¥É
+# æƒ…å ±å¤‰æ›´ãƒ¢ãƒ¼ãƒ‰
 #----------------------------------------------------------------------
-# ¥á¥¤¥ó
+# ãƒ¡ã‚¤ãƒ³
 sub changeMain {
-    # id¤«¤éÅç¤ò¼èÆÀ
+    # idã‹ã‚‰å³¶ã‚’å–å¾—
     $HcurrentNumber = $HidToNumber{$HcurrentID};
     my($island) = $Hislands[$HcurrentNumber];
     my($flag) = 0;
 
-    # ¥Ñ¥¹¥ï¡¼¥É¥Á¥§¥Ã¥¯
+    # ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãƒã‚§ãƒƒã‚¯
     if($HoldPassword eq $HspecialPassword) {
-	# ÆÃ¼ì¥Ñ¥¹¥ï¡¼¥É
+	# ç‰¹æ®Šãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰
 	$island->{'money'} = 9999;
 	$island->{'food'} = 9999;
     } elsif(!checkPassword($island->{'password'},$HoldPassword)) {
-	# password´Ö°ã¤¤
+	# passwordé–“é•ã„
 	unlock();
 	tempWrongPassword();
 	return;
     }
 
-    # ³ÎÇ§ÍÑ¥Ñ¥¹¥ï¡¼¥É
+    # ç¢ºèªç”¨ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰
     if($HinputPassword2 ne $HinputPassword) {
-	# password´Ö°ã¤¤
+	# passwordé–“é•ã„
 	unlock();
 	tempWrongPassword();
 	return;
     }
 
     if($HcurrentName ne '') {
-	# Ì¾Á°ÊÑ¹¹¤Î¾ì¹ç	
-	# Ì¾Á°¤¬ÀµÅö¤«¥Á¥§¥Ã¥¯
-	if($HcurrentName =~ /[,\?\(\)\<\>]|^Ìµ¿Í$/) {
-	    # »È¤¨¤Ê¤¤Ì¾Á°
+	# åå‰å¤‰æ›´ã®å ´åˆ	
+	# åå‰ãŒæ­£å½“ã‹ãƒã‚§ãƒƒã‚¯
+	if($HcurrentName =~ /[,\?\(\)\<\>]|^ç„¡äºº$/) {
+	    # ä½¿ãˆãªã„åå‰
 	    unlock();
 	    tempNewIslandBadName();
 	    return;
 	}
 
-	# Ì¾Á°¤Î½ÅÊ£¥Á¥§¥Ã¥¯
+	# åå‰ã®é‡è¤‡ãƒã‚§ãƒƒã‚¯
 	if(nameToNumber($HcurrentName) != -1) {
-	    # ¤¹¤Ç¤ËÈ¯¸«¤º¤ß
+	    # ã™ã§ã«ç™ºè¦‹ãšã¿
 	    unlock();
 	    tempNewIslandAlready();
 	    return;
 	}
 
 	if($island->{'money'} < $HcostChangeName) {
-	    # ¶â¤¬Â­¤ê¤Ê¤¤
+	    # é‡‘ãŒè¶³ã‚Šãªã„
 	    unlock();
 	    tempChangeNoMoney();
 	    return;
 	}
 
-	# Âå¶â
+	# ä»£é‡‘
 	if($HoldPassword ne $HspecialPassword) {
 	    $island->{'money'} -= $HcostChangeName;
 	}
 
-	# Ì¾Á°¤òÊÑ¹¹
+	# åå‰ã‚’å¤‰æ›´
 	logChangeName($island->{'name'}, $HcurrentName);
 	$island->{'name'} = $HcurrentName;
 	$flag = 1;
     }
 
-    # passwordÊÑ¹¹¤Î¾ì¹ç
+    # passwordå¤‰æ›´ã®å ´åˆ
     if($HinputPassword ne '') {
-	# ¥Ñ¥¹¥ï¡¼¥É¤òÊÑ¹¹
+	# ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’å¤‰æ›´
 	$island->{'password'} = encode($HinputPassword);
 	$flag = 1;
     }
 
     if(($flag == 0) && ($HoldPassword ne $HspecialPassword)) {
-	# ¤É¤Á¤é¤âÊÑ¹¹¤µ¤ì¤Æ¤¤¤Ê¤¤
+	# ã©ã¡ã‚‰ã‚‚å¤‰æ›´ã•ã‚Œã¦ã„ãªã„
 	unlock();
 	tempChangeNothing();
 	return;
     }
 
-    # ¥Ç¡¼¥¿½ñ¤­½Ğ¤·
+    # ãƒ‡ãƒ¼ã‚¿æ›¸ãå‡ºã—
     writeIslandsFile($HcurrentID);
     unlock();
 
-    # ÊÑ¹¹À®¸ù
+    # å¤‰æ›´æˆåŠŸ
     tempChange();
 }
 
 #----------------------------------------------------------------------
-# ¥¿¡¼¥ó¿Ê¹Ô¥â¡¼¥É
+# ã‚¿ãƒ¼ãƒ³é€²è¡Œãƒ¢ãƒ¼ãƒ‰
 #----------------------------------------------------------------------
-# ¥á¥¤¥ó
+# ãƒ¡ã‚¤ãƒ³
 sub turnMain {
-    # ºÇ½ª¹¹¿·»ş´Ö¤ò¹¹¿·
+    # æœ€çµ‚æ›´æ–°æ™‚é–“ã‚’æ›´æ–°
     $HislandLastTime += $HunitTime;
 
-    # ¥í¥°¥Õ¥¡¥¤¥ë¤ò¸å¤í¤Ë¤º¤é¤¹
+    # ãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«ã‚’å¾Œã‚ã«ãšã‚‰ã™
     my($i, $j, $s, $d);
     for($i = ($HlogMax - 1); $i >= 0; $i--) {
 	$j = $i + 1;
@@ -346,72 +346,72 @@ sub turnMain {
 	rename($s, $d);
     }
 
-    # ºÂÉ¸ÇÛÎó¤òºî¤ë
+    # åº§æ¨™é…åˆ—ã‚’ä½œã‚‹
     makeRandomPointArray();
 
-    # ¥¿¡¼¥óÈÖ¹æ
+    # ã‚¿ãƒ¼ãƒ³ç•ªå·
     $HislandTurn++;
 
-    # ½çÈÖ·è¤á
+    # é †ç•ªæ±ºã‚
     my(@order) = randomArray($HislandNumber);
 
-    # ¼ıÆş¡¢¾ÃÈñ¥Õ¥§¥¤¥º
+    # åå…¥ã€æ¶ˆè²»ãƒ•ã‚§ã‚¤ã‚º
     for($i = 0; $i < $HislandNumber; $i++) {
 	estimate($order[$i]);
 	income($Hislands[$order[$i]]);
 
-	# ¥¿¡¼¥ó³«»ÏÁ°¤Î¿Í¸ı¤ò¥á¥â¤ë
+	# ã‚¿ãƒ¼ãƒ³é–‹å§‹å‰ã®äººå£ã‚’ãƒ¡ãƒ¢ã‚‹
 	$Hislands[$order[$i]]->{'oldPop'} = $Hislands[$order[$i]]->{'pop'};
     }
 
-    # ¥³¥Ş¥ó¥É½èÍı
+    # ã‚³ãƒãƒ³ãƒ‰å‡¦ç†
     for($i = 0; $i < $HislandNumber; $i++) {
-	# Ìá¤êÃÍ1¤Ë¤Ê¤ë¤Ş¤Ç·«¤êÊÖ¤·
+	# æˆ»ã‚Šå€¤1ã«ãªã‚‹ã¾ã§ç¹°ã‚Šè¿”ã—
 	while(doCommand($Hislands[$order[$i]]) == 0){};
     }
 
-    # À®Ä¹¤ª¤è¤ÓÃ±¥Ø¥Ã¥¯¥¹ºÒ³²
+    # æˆé•·ãŠã‚ˆã³å˜ãƒ˜ãƒƒã‚¯ã‚¹ç½å®³
     for($i = 0; $i < $HislandNumber; $i++) {
 	doEachHex($Hislands[$order[$i]]);
     }
 
-    # ÅçÁ´ÂÎ½èÍı
+    # å³¶å…¨ä½“å‡¦ç†
     my($remainNumber) = $HislandNumber;
     my($island);
     for($i = 0; $i < $HislandNumber; $i++) {
 	$island = $Hislands[$order[$i]];
 	doIslandProcess($order[$i], $island); 
 
-	# »àÌÇÈ½Äê
+	# æ­»æ»…åˆ¤å®š
 	if($island->{'dead'} == 1) {
 	    $island->{'pop'} = 0;
 	    $remainNumber--;
 	} elsif($island->{'pop'} == 0) {
 	    $island->{'dead'} = 1;
 	    $remainNumber--;
-	    # »àÌÇ¥á¥Ã¥»¡¼¥¸
+	    # æ­»æ»…ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
 	    my($tmpid) = $island->{'id'};
 	    logDead($tmpid, $island->{'name'});
 	    unlink("island.$tmpid");
 	}
     }
 
-    # ¿Í¸ı½ç¤Ë¥½¡¼¥È
+    # äººå£é †ã«ã‚½ãƒ¼ãƒˆ
     islandSort();
 
 	
 
-    # ¥¿¡¼¥óÇÕÂĞ¾İ¥¿¡¼¥ó¤À¤Ã¤¿¤é¡¢¤½¤Î½èÍı
+    # ã‚¿ãƒ¼ãƒ³æ¯å¯¾è±¡ã‚¿ãƒ¼ãƒ³ã ã£ãŸã‚‰ã€ãã®å‡¦ç†
     if(($HislandTurn % $HturnPrizeUnit) == 0) {
 	my($island) = $Hislands[0];
 	logPrize($island->{'id'}, $island->{'name'}, "$HislandTurn${Hprize[0]}");
 	$island->{'prize'} .= "${HislandTurn},";
     }
 
-    # Åç¿ô¥«¥Ã¥È
+    # å³¶æ•°ã‚«ãƒƒãƒˆ
     $HislandNumber = $remainNumber;
 
-    # ¥Ğ¥Ã¥¯¥¢¥Ã¥×¥¿¡¼¥ó¤Ç¤¢¤ì¤Ğ¡¢½ñ¤¯Á°¤Ërename
+    # ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—ã‚¿ãƒ¼ãƒ³ã§ã‚ã‚Œã°ã€æ›¸ãå‰ã«rename
     if(($HislandTurn % $HbackupTurn) == 0) {
 	my($i);
 	my($tmp) = $HbackupTimes - 1;
@@ -423,7 +423,7 @@ sub turnMain {
 	rename("${HdirName}", "${HdirName}.bak0");
 	mkdir("${HdirName}", $HdirMode);
 
-	# ¥í¥°¥Õ¥¡¥¤¥ë¤À¤±Ìá¤¹
+	# ãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«ã ã‘æˆ»ã™
 	for($i = 0; $i <= $HlogMax; $i++) {
 	    rename("${HdirName}.bak0/hakojima.log$i",
 		   "${HdirName}/hakojima.log$i");
@@ -432,20 +432,20 @@ sub turnMain {
 	       "${HdirName}/hakojima.his");
     }
 
-    # ¥Õ¥¡¥¤¥ë¤Ë½ñ¤­½Ğ¤·
+    # ãƒ•ã‚¡ã‚¤ãƒ«ã«æ›¸ãå‡ºã—
     writeIslandsFile(-1);
 
-    # ¥í¥°½ñ¤­½Ğ¤·
+    # ãƒ­ã‚°æ›¸ãå‡ºã—
     logFlush();
 
-    # µ­Ï¿¥í¥°Ä´À°
+    # è¨˜éŒ²ãƒ­ã‚°èª¿æ•´
     logHistoryTrim();
 
-    # ¥È¥Ã¥×¤Ø
+    # ãƒˆãƒƒãƒ—ã¸
     topPageMain();
 }
 
-# ¥Ç¥£¥ì¥¯¥È¥ê¾Ã¤·
+# ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªæ¶ˆã—
 sub myrmtree {
     my($dn) = @_;
     opendir(DIN, "$dn/");
@@ -457,7 +457,7 @@ sub myrmtree {
     rmdir($dn);
 }
 
-# ¼ıÆş¡¢¾ÃÈñ¥Õ¥§¥¤¥º
+# åå…¥ã€æ¶ˆè²»ãƒ•ã‚§ã‚¤ã‚º
 sub income {
     my($island) = @_;
     my($pop, $farm, $factory, $mountain) = 
@@ -468,34 +468,34 @@ sub income {
 	 $island->{'mountain'}
 	 );
 
-    # ¼ıÆş
+    # åå…¥
     if($pop > $farm) {
-	# ÇÀ¶È¤À¤±¤¸¤ã¼ê¤¬Í¾¤ë¾ì¹ç
-	$island->{'food'} += $farm; # ÇÀ¾ì¥Õ¥ë²ÔÆ¯
+	# è¾²æ¥­ã ã‘ã˜ã‚ƒæ‰‹ãŒä½™ã‚‹å ´åˆ
+	$island->{'food'} += $farm; # è¾²å ´ãƒ•ãƒ«ç¨¼åƒ
 	$island->{'money'} +=
 	    min(int(($pop - $farm) / 10),
 		 $factory + $mountain);
     } else {
-	# ÇÀ¶È¤À¤±¤Ç¼ê°ìÇÕ¤Î¾ì¹ç
-	$island->{'food'} += $pop; # Á´°÷ÌîÎÉ»Å»ö
+	# è¾²æ¥­ã ã‘ã§æ‰‹ä¸€æ¯ã®å ´åˆ
+	$island->{'food'} += $pop; # å…¨å“¡é‡è‰¯ä»•äº‹
     }
 
-    # ¿©ÎÁ¾ÃÈñ
+    # é£Ÿæ–™æ¶ˆè²»
     $island->{'food'} = int(($island->{'food'}) - ($pop * $HeatenFood));
 }
 
 
-# ¥³¥Ş¥ó¥É¥Õ¥§¥¤¥º
+# ã‚³ãƒãƒ³ãƒ‰ãƒ•ã‚§ã‚¤ã‚º
 sub doCommand {
     my($island) = @_;
 
-    # ¥³¥Ş¥ó¥É¼è¤ê½Ğ¤·
+    # ã‚³ãƒãƒ³ãƒ‰å–ã‚Šå‡ºã—
     my($comArray, $command);
     $comArray = $island->{'command'};
-    $command = $comArray->[0]; # ºÇ½é¤Î¤ò¼è¤ê½Ğ¤·
-    slideFront($comArray, 0); # °Ê¹ß¤òµÍ¤á¤ë
+    $command = $comArray->[0]; # æœ€åˆã®ã‚’å–ã‚Šå‡ºã—
+    slideFront($comArray, 0); # ä»¥é™ã‚’è©°ã‚ã‚‹
 
-    # ³ÆÍ×ÁÇ¤Î¼è¤ê½Ğ¤·
+    # å„è¦ç´ ã®å–ã‚Šå‡ºã—
     my($kind, $target, $x, $y, $arg) = 
 	(
 	 $command->{'kind'},
@@ -505,7 +505,7 @@ sub doCommand {
 	 $command->{'arg'}
 	 );
 
-    # Æ³½ĞÃÍ
+    # å°å‡ºå€¤
     my($name) = $island->{'name'};
     my($id) = $island->{'id'};
     my($land) = $island->{'land'};
@@ -518,12 +518,12 @@ sub doCommand {
     my($landName) = landName($landKind, $lv);
 
     if($kind == $HcomDoNothing) {
-	# »ñ¶â·«¤ê
+	# è³‡é‡‘ç¹°ã‚Š
 	logDoNothing($id, $name, $comName);
 	$island->{'money'} += 10;
 	$island->{'absent'} ++;
 	
-	# ¼«Æ°Êü´ş
+	# è‡ªå‹•æ”¾æ£„
 	if($island->{'absent'} >= $HgiveupTurn) {
 	    $comArray->[0] = {
 		'kind' => $HcomGiveup,
@@ -538,51 +538,51 @@ sub doCommand {
 
     $island->{'absent'} = 0;
 
-    # ¥³¥¹¥È¥Á¥§¥Ã¥¯
+    # ã‚³ã‚¹ãƒˆãƒã‚§ãƒƒã‚¯
     if($cost > 0) {
-	# ¶â¤Î¾ì¹ç
+	# é‡‘ã®å ´åˆ
 	if($island->{'money'} < $cost) {
 	    logNoMoney($id, $name, $comName);
 	    return 0;
 	}
     } elsif($cost < 0) {
-	# ¿©ÎÁ¤Î¾ì¹ç
+	# é£Ÿæ–™ã®å ´åˆ
 	if($island->{'food'} < (-$cost)) {
 	    logNoFood($id, $name, $comName);
 	    return 0;
 	}
     }
 
-    # ¥³¥Ş¥ó¥É¤ÇÊ¬´ô
+    # ã‚³ãƒãƒ³ãƒ‰ã§åˆ†å²
     if(($kind == $HcomPrepare) ||
        ($kind == $HcomPrepare2)) {
-	# À°ÃÏ¡¢ÃÏ¤Ê¤é¤·
+	# æ•´åœ°ã€åœ°ãªã‚‰ã—
 	if(($landKind == $HlandSea) || 
 	   ($landKind == $HlandSbase) ||
 	   ($landKind == $HlandOil) ||
 	   ($landKind == $HlandMountain) ||
 	   ($landKind == $HlandMonster)) {
-	    # ³¤¡¢³¤Äì´ğÃÏ¡¢ÌıÅÄ¡¢»³¡¢²ø½Ã¤ÏÀ°ÃÏ¤Ç¤­¤Ê¤¤
+	    # æµ·ã€æµ·åº•åŸºåœ°ã€æ²¹ç”°ã€å±±ã€æ€ªç£ã¯æ•´åœ°ã§ããªã„
 	    logLandFail($id, $name, $comName, $landName, $point);
 	    return 0;
 	}
 
-	# ÌÜÅª¤Î¾ì½ê¤òÊ¿ÃÏ¤Ë¤¹¤ë
+	# ç›®çš„ã®å ´æ‰€ã‚’å¹³åœ°ã«ã™ã‚‹
 	$land->[$x][$y] = $HlandPlains;
 	$landValue->[$x][$y] = 0;
-	logLandSuc($id, $name, 'À°ÃÏ', $point);
+	logLandSuc($id, $name, 'æ•´åœ°', $point);
 
-	# ¶â¤òº¹¤·°ú¤¯
+	# é‡‘ã‚’å·®ã—å¼•ã
 	$island->{'money'} -= $cost;
 
 	if($kind == $HcomPrepare2) {
-	    # ÃÏ¤Ê¤é¤·
+	    # åœ°ãªã‚‰ã—
 	    $island->{'prepare2'}++;
 	    
-	    # ¥¿¡¼¥ó¾ÃÈñ¤»¤º
+	    # ã‚¿ãƒ¼ãƒ³æ¶ˆè²»ã›ãš
 	    return 0;
 	} else {
-	    # À°ÃÏ¤Ê¤é¡¢ËäÂ¢¶â¤Î²ÄÇ½À­¤¢¤ê
+	    # æ•´åœ°ãªã‚‰ã€åŸ‹è”µé‡‘ã®å¯èƒ½æ€§ã‚ã‚Š
 	    if(random(1000) < $HdisMaizo) {
 		my($v) = 100 + random(901);
 		$island->{'money'} += $v;
@@ -591,44 +591,44 @@ sub doCommand {
 	    return 1;
 	}
     } elsif($kind == $HcomReclaim) {
-	# Ëä¤áÎ©¤Æ
+	# åŸ‹ã‚ç«‹ã¦
 	if(($landKind != $HlandSea) &&
 	   ($landKind != $HlandOil) &&
 	   ($landKind != $HlandSbase)) {
-	    # ³¤¡¢³¤Äì´ğÃÏ¡¢ÌıÅÄ¤·¤«Ëä¤áÎ©¤Æ¤Ç¤­¤Ê¤¤
+	    # æµ·ã€æµ·åº•åŸºåœ°ã€æ²¹ç”°ã—ã‹åŸ‹ã‚ç«‹ã¦ã§ããªã„
 	    logLandFail($id, $name, $comName, $landName, $point);
 	    return 0;
 	}
 
-	# ¼ş¤ê¤ËÎ¦¤¬¤¢¤ë¤«¥Á¥§¥Ã¥¯
+	# å‘¨ã‚Šã«é™¸ãŒã‚ã‚‹ã‹ãƒã‚§ãƒƒã‚¯
 	my($seaCount) =
 	    countAround($land, $x, $y, $HlandSea, 7) +
 	    countAround($land, $x, $y, $HlandOil, 7) +
             countAround($land, $x, $y, $HlandSbase, 7);
 
         if($seaCount == 7) {
-	    # Á´Éô³¤¤À¤«¤éËä¤áÎ©¤ÆÉÔÇ½
+	    # å…¨éƒ¨æµ·ã ã‹ã‚‰åŸ‹ã‚ç«‹ã¦ä¸èƒ½
 	    logNoLandAround($id, $name, $comName, $point);
 	    return 0;
 	}
 
 	if(($landKind == $HlandSea) && ($lv == 1)) {
-	    # ÀõÀ¥¤Î¾ì¹ç
-	    # ÌÜÅª¤Î¾ì½ê¤ò¹ÓÃÏ¤Ë¤¹¤ë
+	    # æµ…ç€¬ã®å ´åˆ
+	    # ç›®çš„ã®å ´æ‰€ã‚’è’åœ°ã«ã™ã‚‹
 	    $land->[$x][$y] = $HlandWaste;
 	    $landValue->[$x][$y] = 0;
 	    logLandSuc($id, $name, $comName, $point);
 	    $island->{'area'}++;
 
 	    if($seaCount <= 4) {
-		# ¼ş¤ê¤Î³¤¤¬3¥Ø¥Ã¥¯¥¹°ÊÆâ¤Ê¤Î¤Ç¡¢ÀõÀ¥¤Ë¤¹¤ë
+		# å‘¨ã‚Šã®æµ·ãŒ3ãƒ˜ãƒƒã‚¯ã‚¹ä»¥å†…ãªã®ã§ã€æµ…ç€¬ã«ã™ã‚‹
 		my($i, $sx, $sy);
 
 		for($i = 1; $i < 7; $i++) {
 		    $sx = $x + $ax[$i];
 		    $sy = $y + $ay[$i];
 
-		    # ¹Ô¤Ë¤è¤ë°ÌÃÖÄ´À°
+		    # è¡Œã«ã‚ˆã‚‹ä½ç½®èª¿æ•´
 		    if((($sy % 2) == 0) && (($y % 2) == 1)) {
 			$sx--;
 		    }
@@ -636,7 +636,7 @@ sub doCommand {
 		    if(($sx < 0) || ($sx >= $HislandSize) ||
 		       ($sy < 0) || ($sy >= $HislandSize)) {
 		    } else {
-			# ÈÏ°ÏÆâ¤Î¾ì¹ç
+			# ç¯„å›²å†…ã®å ´åˆ
 			if($land->[$sx][$sy] == $HlandSea) {
 			    $landValue->[$sx][$sy] = 1;
 			}
@@ -644,28 +644,28 @@ sub doCommand {
 		}
 	    }
 	} else {
-	    # ³¤¤Ê¤é¡¢ÌÜÅª¤Î¾ì½ê¤òÀõÀ¥¤Ë¤¹¤ë
+	    # æµ·ãªã‚‰ã€ç›®çš„ã®å ´æ‰€ã‚’æµ…ç€¬ã«ã™ã‚‹
 	    $land->[$x][$y] = $HlandSea;
 	    $landValue->[$x][$y] = 1;
 	    logLandSuc($id, $name, $comName, $point);
 	}
 	
-	# ¶â¤òº¹¤·°ú¤¯
+	# é‡‘ã‚’å·®ã—å¼•ã
 	$island->{'money'} -= $cost;
 	return 1;
     } elsif($kind == $HcomDestroy) {
-	# ·¡ºï
+	# æ˜å‰Š
 	if(($landKind == $HlandSbase) ||
 	   ($landKind == $HlandOil) ||
 	   ($landKind == $HlandMonster)) {
-	    # ³¤Äì´ğÃÏ¡¢ÌıÅÄ¡¢²ø½Ã¤Ï·¡ºï¤Ç¤­¤Ê¤¤
+	    # æµ·åº•åŸºåœ°ã€æ²¹ç”°ã€æ€ªç£ã¯æ˜å‰Šã§ããªã„
 	    logLandFail($id, $name, $comName, $landName, $point);
 	    return 0;
 	}
 
 	if(($landKind == $HlandSea) && ($lv == 0)) {
-	    # ³¤¤Ê¤é¡¢ÌıÅÄÃµ¤·
-	    # Åê»ñ³Û·èÄê
+	    # æµ·ãªã‚‰ã€æ²¹ç”°æ¢ã—
+	    # æŠ•è³‡é¡æ±ºå®š
 	    if($arg == 0) { $arg = 1; }
 	    my($value, $str, $p);
 	    $value = min($arg * ($cost), $island->{'money'});
@@ -673,20 +673,20 @@ sub doCommand {
 	    $p = int($value / $cost);
 	    $island->{'money'} -= $value;
 
-	    # ¸«¤Ä¤«¤ë¤«È½Äê
+	    # è¦‹ã¤ã‹ã‚‹ã‹åˆ¤å®š
 	    if($p > random(100)) {
-		# ÌıÅÄ¸«¤Ä¤«¤ë
+		# æ²¹ç”°è¦‹ã¤ã‹ã‚‹
 		logOilFound($id, $name, $point, $comName, $str);
 		$land->[$x][$y] = $HlandOil;
 		$landValue->[$x][$y] = 0;
 	    } else {
-		# ÌµÂÌ·â¤Á¤Ë½ª¤ï¤ë
+		# ç„¡é§„æ’ƒã¡ã«çµ‚ã‚ã‚‹
 		logOilFail($id, $name, $point, $comName, $str);
 	    }
 	    return 1;
 	}
 
-	# ÌÜÅª¤Î¾ì½ê¤ò³¤¤Ë¤¹¤ë¡£»³¤Ê¤é¹ÓÃÏ¤Ë¡£ÀõÀ¥¤Ê¤é³¤¤Ë¡£
+	# ç›®çš„ã®å ´æ‰€ã‚’æµ·ã«ã™ã‚‹ã€‚å±±ãªã‚‰è’åœ°ã«ã€‚æµ…ç€¬ãªã‚‰æµ·ã«ã€‚
 	if($landKind == $HlandMountain) {
 	    $land->[$x][$y] = $HlandWaste;
 	    $landValue->[$x][$y] = 0;
@@ -699,23 +699,23 @@ sub doCommand {
 	}
 	logLandSuc($id, $name, $comName, $point);
 
-	# ¶â¤òº¹¤·°ú¤¯
+	# é‡‘ã‚’å·®ã—å¼•ã
 	$island->{'money'} -= $cost;
 	return 1;
     } elsif($kind == $HcomSellTree) {
-	# È²ºÎ
+	# ä¼æ¡
 	if($landKind != $HlandForest) {
-	    # ¿¹°Ê³°¤ÏÈ²ºÎ¤Ç¤­¤Ê¤¤
+	    # æ£®ä»¥å¤–ã¯ä¼æ¡ã§ããªã„
 	    logLandFail($id, $name, $comName, $landName, $point);
 	    return 0;
 	}
 
-	# ÌÜÅª¤Î¾ì½ê¤òÊ¿ÃÏ¤Ë¤¹¤ë
+	# ç›®çš„ã®å ´æ‰€ã‚’å¹³åœ°ã«ã™ã‚‹
 	$land->[$x][$y] = $HlandPlains;
 	$landValue->[$x][$y] = 0;
 	logLandSuc($id, $name, $comName, $point);
 
-	# ÇäµÑ¶â¤òÆÀ¤ë
+	# å£²å´é‡‘ã‚’å¾—ã‚‹
 	$island->{'money'} += $HtreeValue * $lv;
 	return 1;
     } elsif(($kind == $HcomPlant) ||
@@ -726,7 +726,7 @@ sub doCommand {
 	    ($kind == $HcomHaribote) ||
 	    ($kind == $HcomDbase)) {
 
-	# ÃÏ¾å·úÀß·Ï
+	# åœ°ä¸Šå»ºè¨­ç³»
 	if(!
 	   (($landKind == $HlandPlains) ||
 	    ($landKind == $HlandTown) ||
@@ -734,87 +734,87 @@ sub doCommand {
 	    (($landKind == $HlandFarm) && ($kind == $HcomFarm)) ||
 	    (($landKind == $HlandFactory) && ($kind == $HcomFactory)) ||
 	    (($landKind == $HlandDefence) && ($kind == $HcomDbase)))) {
-	    # ÉÔÅ¬Åö¤ÊÃÏ·Á
+	    # ä¸é©å½“ãªåœ°å½¢
 	    logLandFail($id, $name, $comName, $landName, $point);
 	    return 0;
 	}
 
-	# ¼ïÎà¤ÇÊ¬´ô
+	# ç¨®é¡ã§åˆ†å²
 	if($kind == $HcomPlant) {
-	    # ÌÜÅª¤Î¾ì½ê¤ò¿¹¤Ë¤¹¤ë¡£
+	    # ç›®çš„ã®å ´æ‰€ã‚’æ£®ã«ã™ã‚‹ã€‚
 	    $land->[$x][$y] = $HlandForest;
-	    $landValue->[$x][$y] = 1; # ÌÚ¤ÏºÇÄãÃ±°Ì
+	    $landValue->[$x][$y] = 1; # æœ¨ã¯æœ€ä½å˜ä½
 	    logPBSuc($id, $name, $comName, $point);
 	} elsif($kind == $HcomBase) {
-	    # ÌÜÅª¤Î¾ì½ê¤ò¥ß¥µ¥¤¥ë´ğÃÏ¤Ë¤¹¤ë¡£
+	    # ç›®çš„ã®å ´æ‰€ã‚’ãƒŸã‚µã‚¤ãƒ«åŸºåœ°ã«ã™ã‚‹ã€‚
 	    $land->[$x][$y] = $HlandBase;
-	    $landValue->[$x][$y] = 0; # ·Ğ¸³ÃÍ0
+	    $landValue->[$x][$y] = 0; # çµŒé¨“å€¤0
 	    logPBSuc($id, $name, $comName, $point);
 	} elsif($kind == $HcomHaribote) {
-	    # ÌÜÅª¤Î¾ì½ê¤ò¥Ï¥ê¥Ü¥Æ¤Ë¤¹¤ë
+	    # ç›®çš„ã®å ´æ‰€ã‚’ãƒãƒªãƒœãƒ†ã«ã™ã‚‹
 	    $land->[$x][$y] = $HlandHaribote;
 	    $landValue->[$x][$y] = 0;
 	    logHariSuc($id, $name, $comName, $HcomName[$HcomDbase], $point);
 	} elsif($kind == $HcomFarm) {
-	    # ÇÀ¾ì
+	    # è¾²å ´
 	    if($landKind == $HlandFarm) {
-		# ¤¹¤Ç¤ËÇÀ¾ì¤Î¾ì¹ç
-		$landValue->[$x][$y] += 2; # µ¬ÌÏ + 2000¿Í
+		# ã™ã§ã«è¾²å ´ã®å ´åˆ
+		$landValue->[$x][$y] += 2; # è¦æ¨¡ + 2000äºº
 		if($landValue->[$x][$y] > 50) {
-		    $landValue->[$x][$y] = 50; # ºÇÂç 50000¿Í
+		    $landValue->[$x][$y] = 50; # æœ€å¤§ 50000äºº
 		}
 	    } else {
-		# ÌÜÅª¤Î¾ì½ê¤òÇÀ¾ì¤Ë
+		# ç›®çš„ã®å ´æ‰€ã‚’è¾²å ´ã«
 		$land->[$x][$y] = $HlandFarm;
-		$landValue->[$x][$y] = 10; # µ¬ÌÏ = 10000¿Í
+		$landValue->[$x][$y] = 10; # è¦æ¨¡ = 10000äºº
 	    }
 	    logLandSuc($id, $name, $comName, $point);
 	} elsif($kind == $HcomFactory) {
-	    # ¹©¾ì
+	    # å·¥å ´
 	    if($landKind == $HlandFactory) {
-		# ¤¹¤Ç¤Ë¹©¾ì¤Î¾ì¹ç
-		$landValue->[$x][$y] += 10; # µ¬ÌÏ + 10000¿Í
+		# ã™ã§ã«å·¥å ´ã®å ´åˆ
+		$landValue->[$x][$y] += 10; # è¦æ¨¡ + 10000äºº
 		if($landValue->[$x][$y] > 100) {
-		    $landValue->[$x][$y] = 100; # ºÇÂç 100000¿Í
+		    $landValue->[$x][$y] = 100; # æœ€å¤§ 100000äºº
 		}
 	    } else {
-		# ÌÜÅª¤Î¾ì½ê¤ò¹©¾ì¤Ë
+		# ç›®çš„ã®å ´æ‰€ã‚’å·¥å ´ã«
 		$land->[$x][$y] = $HlandFactory;
-		$landValue->[$x][$y] = 30; # µ¬ÌÏ = 10000¿Í
+		$landValue->[$x][$y] = 30; # è¦æ¨¡ = 10000äºº
 	    }
 	    logLandSuc($id, $name, $comName, $point);
 	} elsif($kind == $HcomDbase) {
-	    # ËÉ±Ò»ÜÀß
+	    # é˜²è¡›æ–½è¨­
 	    if($landKind == $HlandDefence) {
-		# ¤¹¤Ç¤ËËÉ±Ò»ÜÀß¤Î¾ì¹ç
-		$landValue->[$x][$y] = 1; # ¼«ÇúÁõÃÖ¥»¥Ã¥È
+		# ã™ã§ã«é˜²è¡›æ–½è¨­ã®å ´åˆ
+		$landValue->[$x][$y] = 1; # è‡ªçˆ†è£…ç½®ã‚»ãƒƒãƒˆ
 		logBombSet($id, $name, $landName, $point);
 	    } else {
-		# ÌÜÅª¤Î¾ì½ê¤òËÉ±Ò»ÜÀß¤Ë
+		# ç›®çš„ã®å ´æ‰€ã‚’é˜²è¡›æ–½è¨­ã«
 		$land->[$x][$y] = $HlandDefence;
 		$landValue->[$x][$y] = 0;
 		logLandSuc($id, $name, $comName, $point);
 	    }
 	} elsif($kind == $HcomMonument) {
-	    # µ­Ç°Èê
+	    # è¨˜å¿µç¢‘
 	    if($landKind == $HlandMonument) {
-		# ¤¹¤Ç¤Ëµ­Ç°Èê¤Î¾ì¹ç
-		# ¥¿¡¼¥²¥Ã¥È¼èÆÀ
+		# ã™ã§ã«è¨˜å¿µç¢‘ã®å ´åˆ
+		# ã‚¿ãƒ¼ã‚²ãƒƒãƒˆå–å¾—
 		my($tn) = $HidToNumber{$target};
 		if($tn eq '') {
-		    # ¥¿¡¼¥²¥Ã¥È¤¬¤¹¤Ç¤Ë¤Ê¤¤
-		    # ²¿¤â¸À¤ï¤º¤ËÃæ»ß
+		    # ã‚¿ãƒ¼ã‚²ãƒƒãƒˆãŒã™ã§ã«ãªã„
+		    # ä½•ã‚‚è¨€ã‚ãšã«ä¸­æ­¢
 		    return 0;
 		}
 		my($tIsland) = $Hislands[$tn];
 		$tIsland->{'bigmissile'}++;
 
-		# ¤½¤Î¾ì½ê¤Ï¹ÓÃÏ¤Ë
+		# ãã®å ´æ‰€ã¯è’åœ°ã«
 		$land->[$x][$y] = $HlandWaste;
 		$landValue->[$x][$y] = 0;
 		logMonFly($id, $name, $landName, $point);
 	    } else {
-		# ÌÜÅª¤Î¾ì½ê¤òµ­Ç°Èê¤Ë
+		# ç›®çš„ã®å ´æ‰€ã‚’è¨˜å¿µç¢‘ã«
 		$land->[$x][$y] = $HlandMonument;
 		if($arg >= $HmonumentNumber) {
 		    $arg = 0;
@@ -824,10 +824,10 @@ sub doCommand {
 	    }
 	}
 
-	# ¶â¤òº¹¤·°ú¤¯
+	# é‡‘ã‚’å·®ã—å¼•ã
 	$island->{'money'} -= $cost;
 
-	# ²ó¿ôÉÕ¤­¤Ê¤é¡¢¥³¥Ş¥ó¥É¤òÌá¤¹
+	# å›æ•°ä»˜ããªã‚‰ã€ã‚³ãƒãƒ³ãƒ‰ã‚’æˆ»ã™
 	if(($kind == $HcomFarm) ||
 	   ($kind == $HcomFactory)) {
 	    if($arg > 1) {
@@ -846,20 +846,20 @@ sub doCommand {
 
 	return 1;
     } elsif($kind == $HcomMountain) {
-	# ºÎ·¡¾ì
+	# æ¡æ˜å ´
 	if($landKind != $HlandMountain) {
-	    # »³°Ê³°¤Ë¤Ïºî¤ì¤Ê¤¤
+	    # å±±ä»¥å¤–ã«ã¯ä½œã‚Œãªã„
 	    logLandFail($id, $name, $comName, $landName, $point);
 	    return 0;
 	}
 
-	$landValue->[$x][$y] += 5; # µ¬ÌÏ + 5000¿Í
+	$landValue->[$x][$y] += 5; # è¦æ¨¡ + 5000äºº
 	if($landValue->[$x][$y] > 200) {
-	    $landValue->[$x][$y] = 200; # ºÇÂç 200000¿Í
+	    $landValue->[$x][$y] = 200; # æœ€å¤§ 200000äºº
 	}
 	logLandSuc($id, $name, $comName, $point);
 
-	# ¶â¤òº¹¤·°ú¤¯
+	# é‡‘ã‚’å·®ã—å¼•ã
 	$island->{'money'} -= $cost;
 	if($arg > 1) {
 	    my($command);
@@ -875,61 +875,61 @@ sub doCommand {
 	}
 	return 1;
     } elsif($kind == $HcomSbase) {
-	# ³¤Äì´ğÃÏ
+	# æµ·åº•åŸºåœ°
 	if(($landKind != $HlandSea) || ($lv != 0)){
-	    # ³¤°Ê³°¤Ë¤Ïºî¤ì¤Ê¤¤
+	    # æµ·ä»¥å¤–ã«ã¯ä½œã‚Œãªã„
 	    logLandFail($id, $name, $comName, $landName, $point);
 	    return 0;
 	}
 
 	$land->[$x][$y] = $HlandSbase;
-	$landValue->[$x][$y] = 0; # ·Ğ¸³ÃÍ0
+	$landValue->[$x][$y] = 0; # çµŒé¨“å€¤0
 	logLandSuc($id, $name, $comName, '(?, ?)');
 
-	# ¶â¤òº¹¤·°ú¤¯
+	# é‡‘ã‚’å·®ã—å¼•ã
 	$island->{'money'} -= $cost;
 	return 1;
     } elsif(($kind == $HcomMissileNM) ||
 	    ($kind == $HcomMissilePP) ||
 	    ($kind == $HcomMissileST) ||
 	    ($kind == $HcomMissileLD)) {
-	# ¥ß¥µ¥¤¥ë·Ï
-	# ¥¿¡¼¥²¥Ã¥È¼èÆÀ
+	# ãƒŸã‚µã‚¤ãƒ«ç³»
+	# ã‚¿ãƒ¼ã‚²ãƒƒãƒˆå–å¾—
 	my($tn) = $HidToNumber{$target};
 	if($tn eq '') {
-	    # ¥¿¡¼¥²¥Ã¥È¤¬¤¹¤Ç¤Ë¤Ê¤¤
+	    # ã‚¿ãƒ¼ã‚²ãƒƒãƒˆãŒã™ã§ã«ãªã„
 	    logMsNoTarget($id, $name, $comName);
 	    return 0;
 	}
 
 	my($flag) = 0;
 	if($arg == 0) {
-	    # 0¤Î¾ì¹ç¤Ï·â¤Æ¤ë¤À¤±
+	    # 0ã®å ´åˆã¯æ’ƒã¦ã‚‹ã ã‘
 	    $arg = 10000;
 	}
 
-	# »öÁ°½àÈ÷
+	# äº‹å‰æº–å‚™
 	my($tIsland) = $Hislands[$tn];
 	my($tName) = $tIsland->{'name'};
 	my($tLand) = $tIsland->{'land'};
 	my($tLandValue) = $tIsland->{'landValue'};
 	my($tx, $ty, $err);
 
-	# ÆñÌ±¤Î¿ô
+	# é›£æ°‘ã®æ•°
 	my($boat) = 0;
 
-	# ¸íº¹
+	# èª¤å·®
 	if($kind == $HcomMissilePP) {
 	    $err = 7;
 	} else {
 	    $err = 19;
 	}
 
-	# ¶â¤¬¿Ô¤­¤ë¤«»ØÄê¿ô¤ËÂ­¤ê¤ë¤«´ğÃÏÁ´Éô¤¬·â¤Ä¤Ş¤Ç¥ë¡¼¥×
+	# é‡‘ãŒå°½ãã‚‹ã‹æŒ‡å®šæ•°ã«è¶³ã‚Šã‚‹ã‹åŸºåœ°å…¨éƒ¨ãŒæ’ƒã¤ã¾ã§ãƒ«ãƒ¼ãƒ—
 	my($bx, $by, $count) = (0,0,0);
 	while(($arg > 0) &&
 	      ($island->{'money'} >= $cost)) {
-	    # ´ğÃÏ¤ò¸«¤Ä¤±¤ë¤Ş¤Ç¥ë¡¼¥×
+	    # åŸºåœ°ã‚’è¦‹ã¤ã‘ã‚‹ã¾ã§ãƒ«ãƒ¼ãƒ—
 	    while($count < $HpointNumber) {
 		$bx = $Hrpx[$count];
 		$by = $Hrpy[$count];
@@ -940,24 +940,24 @@ sub doCommand {
 		$count++;
 	    }
 	    if($count >= $HpointNumber) {
-		# ¸«¤Ä¤«¤é¤Ê¤«¤Ã¤¿¤é¤½¤³¤Ş¤Ç
+		# è¦‹ã¤ã‹ã‚‰ãªã‹ã£ãŸã‚‰ãã“ã¾ã§
 		last;
 	    }
-	    # ºÇÄã°ì¤Ä´ğÃÏ¤¬¤¢¤Ã¤¿¤Î¤Ç¡¢flag¤òÎ©¤Æ¤ë
+	    # æœ€ä½ä¸€ã¤åŸºåœ°ãŒã‚ã£ãŸã®ã§ã€flagã‚’ç«‹ã¦ã‚‹
 	    $flag = 1;	   
 
-	    # ´ğÃÏ¤Î¥ì¥Ù¥ë¤ò»»½Ğ
+	    # åŸºåœ°ã®ãƒ¬ãƒ™ãƒ«ã‚’ç®—å‡º
 	    my($level) = expToLevel($land->[$bx][$by], $landValue->[$bx][$by]);
-	    # ´ğÃÏÆâ¤Ç¥ë¡¼¥×
+	    # åŸºåœ°å†…ã§ãƒ«ãƒ¼ãƒ—
 	    while(($level > 0) &&
 		  ($arg > 0) &&
 		  ($island->{'money'} > $cost)) {
-		# ·â¤Ã¤¿¤Î¤¬³ÎÄê¤Ê¤Î¤Ç¡¢³ÆÃÍ¤ò¾ÃÌ×¤µ¤»¤ë
+		# æ’ƒã£ãŸã®ãŒç¢ºå®šãªã®ã§ã€å„å€¤ã‚’æ¶ˆè€—ã•ã›ã‚‹
 		$level--;
 		$arg--;
 		$island->{'money'} -= $cost;
 
-		# ÃåÃÆÅÀ»»½Ğ
+		# ç€å¼¾ç‚¹ç®—å‡º
 		my($r) = random($err);
 		$tx = $x + $ax[$r];
 		$ty = $y + $ay[$r];
@@ -965,29 +965,29 @@ sub doCommand {
 		    $tx--;
 		}
 
-		# ÃåÃÆÅÀÈÏ°ÏÆâ³°¥Á¥§¥Ã¥¯
+		# ç€å¼¾ç‚¹ç¯„å›²å†…å¤–ãƒã‚§ãƒƒã‚¯
 		if(($tx < 0) || ($tx >= $HislandSize) ||
 		   ($ty < 0) || ($ty >= $HislandSize)) {
-		    # ÈÏ°Ï³°
+		    # ç¯„å›²å¤–
 		    if($kind == $HcomMissileST) {
-			# ¥¹¥Æ¥ë¥¹
+			# ã‚¹ãƒ†ãƒ«ã‚¹
 			logMsOutS($id, $target, $name, $tName,
 				   $comName, $point);
 		    } else {
-			# ÄÌ¾ï·Ï
+			# é€šå¸¸ç³»
 			logMsOut($id, $target, $name, $tName,
 				  $comName, $point);
 		    }
 		    next;
 		}
 
-		# ÃåÃÆÅÀ¤ÎÃÏ·ÁÅù»»½Ğ
+		# ç€å¼¾ç‚¹ã®åœ°å½¢ç­‰ç®—å‡º
 		my($tL) = $tLand->[$tx][$ty];
 		my($tLv) = $tLandValue->[$tx][$ty];
 		my($tLname) = landName($tL, $tLv);
 		my($tPoint) = "($tx, $ty)";
 
-		# ËÉ±Ò»ÜÀßÈ½Äê
+		# é˜²è¡›æ–½è¨­åˆ¤å®š
 		my($defence) = 0;
 		if($HdefenceHex[$id][$tx][$ty] == 1) {
 		    $defence = 1;
@@ -995,23 +995,23 @@ sub doCommand {
 		    $defence = 0;
 		} else {
 		    if($tL == $HlandDefence) {
-			# ËÉ±Ò»ÜÀß¤ËÌ¿Ãæ
-			# ¥Õ¥é¥°¤ò¥¯¥ê¥¢
+			# é˜²è¡›æ–½è¨­ã«å‘½ä¸­
+			# ãƒ•ãƒ©ã‚°ã‚’ã‚¯ãƒªã‚¢
 			my($i, $count, $sx, $sy);
 			for($i = 0; $i < 19; $i++) {
 			    $sx = $tx + $ax[$i];
 			    $sy = $ty + $ay[$i];
 
-			    # ¹Ô¤Ë¤è¤ë°ÌÃÖÄ´À°
+			    # è¡Œã«ã‚ˆã‚‹ä½ç½®èª¿æ•´
 			    if((($sy % 2) == 0) && (($ty % 2) == 1)) {
 				$sx--;
 			    }
 
 			    if(($sx < 0) || ($sx >= $HislandSize) ||
 			       ($sy < 0) || ($sy >= $HislandSize)) {
-				# ÈÏ°Ï³°¤Î¾ì¹ç²¿¤â¤·¤Ê¤¤
+				# ç¯„å›²å¤–ã®å ´åˆä½•ã‚‚ã—ãªã„
 			    } else {
-				# ÈÏ°ÏÆâ¤Î¾ì¹ç
+				# ç¯„å›²å†…ã®å ´åˆ
 				$HdefenceHex[$id][$sx][$sy] = 0;
 			    }
 			}
@@ -1025,79 +1025,79 @@ sub doCommand {
 		}
 		
 		if($defence == 1) {
-		    # ¶õÃæÇúÇË
+		    # ç©ºä¸­çˆ†ç ´
 		    if($kind == $HcomMissileST) {
-			# ¥¹¥Æ¥ë¥¹
+			# ã‚¹ãƒ†ãƒ«ã‚¹
 			logMsCaughtS($id, $target, $name, $tName,
 				      $comName, $point, $tPoint);
 		    } else {
-			# ÄÌ¾ï·Ï
+			# é€šå¸¸ç³»
 			logMsCaught($id, $target, $name, $tName,
 				     $comName, $point, $tPoint);
 		    }
 		    next;
 		}
 
-		# ¡Ö¸ú²Ì¤Ê¤·¡×hex¤òºÇ½é¤ËÈ½Äê
-		if((($tL == $HlandSea) && ($tLv == 0))|| # ¿¼¤¤³¤
-		   ((($tL == $HlandSea) ||   # ³¤¤Ş¤¿¤Ï¡¦¡¦¡¦
-		     ($tL == $HlandSbase) ||   # ³¤Äì´ğÃÏ¤Ş¤¿¤Ï¡¦¡¦¡¦
-		     ($tL == $HlandMountain)) # »³¤Ç¡¦¡¦¡¦
-		    && ($kind != $HcomMissileLD))) { # Î¦ÇËÃÆ°Ê³°
-		    # ³¤Äì´ğÃÏ¤Î¾ì¹ç¡¢³¤¤Î¥Õ¥ê
+		# ã€ŒåŠ¹æœãªã—ã€hexã‚’æœ€åˆã«åˆ¤å®š
+		if((($tL == $HlandSea) && ($tLv == 0))|| # æ·±ã„æµ·
+		   ((($tL == $HlandSea) ||   # æµ·ã¾ãŸã¯ãƒ»ãƒ»ãƒ»
+		     ($tL == $HlandSbase) ||   # æµ·åº•åŸºåœ°ã¾ãŸã¯ãƒ»ãƒ»ãƒ»
+		     ($tL == $HlandMountain)) # å±±ã§ãƒ»ãƒ»ãƒ»
+		    && ($kind != $HcomMissileLD))) { # é™¸ç ´å¼¾ä»¥å¤–
+		    # æµ·åº•åŸºåœ°ã®å ´åˆã€æµ·ã®ãƒ•ãƒª
 		    if($tL == $HlandSbase) {
 			$tL = $HlandSea;
 		    }
 		    $tLname = landName($tL, $tLv);
 
-		    # Ìµ¸ú²½
+		    # ç„¡åŠ¹åŒ–
 		    if($kind == $HcomMissileST) {
-			# ¥¹¥Æ¥ë¥¹
+			# ã‚¹ãƒ†ãƒ«ã‚¹
 			logMsNoDamageS($id, $target, $name, $tName,
 					$comName, $tLname, $point, $tPoint);
 		    } else {
-			# ÄÌ¾ï·Ï
+			# é€šå¸¸ç³»
 			logMsNoDamage($id, $target, $name, $tName,
 				       $comName, $tLname, $point, $tPoint);
 		    }
 		    next;
 		}
 
-		# ÃÆ¤Î¼ïÎà¤ÇÊ¬´ô
+		# å¼¾ã®ç¨®é¡ã§åˆ†å²
 		if($kind == $HcomMissileLD) {
-		    # Î¦ÃÏÇË²õÃÆ
+		    # é™¸åœ°ç ´å£Šå¼¾
 		    if($tL == $HlandMountain) {
-			# »³(¹ÓÃÏ¤Ë¤Ê¤ë)
+			# å±±(è’åœ°ã«ãªã‚‹)
 			logMsLDMountain($id, $target, $name, $tName,
 					 $comName, $tLname, $point, $tPoint);
-			# ¹ÓÃÏ¤Ë¤Ê¤ë
+			# è’åœ°ã«ãªã‚‹
 			$tLand->[$tx][$ty] = $HlandWaste;
 			$tLandValue->[$tx][$ty] = 0;
 			next;
 
 		    } elsif($tL == $HlandSbase) {
-			# ³¤Äì´ğÃÏ
+			# æµ·åº•åŸºåœ°
 			logMsLDSbase($id, $target, $name, $tName,
 				      $comName, $tLname, $point, $tPoint);
 		    } elsif($tL == $HlandMonster) {
-			# ²ø½Ã
+			# æ€ªç£
 			logMsLDMonster($id, $target, $name, $tName,
 					$comName, $tLname, $point, $tPoint);
 		    } elsif($tL == $HlandSea) {
-			# ÀõÀ¥
+			# æµ…ç€¬
 			logMsLDSea1($id, $target, $name, $tName,
 				    $comName, $tLname, $point, $tPoint);
 		    } else {
-			# ¤½¤ÎÂ¾
+			# ãã®ä»–
 			logMsLDLand($id, $target, $name, $tName,
 				     $comName, $tLname, $point, $tPoint);
 		    }
 		    
-		    # ·Ğ¸³ÃÍ
+		    # çµŒé¨“å€¤
 		    if($tL == $HlandTown) {
 			if(($land->[$bx][$by] == $HlandBase) ||
 			   ($land->[$bx][$by] == $HlandSbase)) {
-			    # ¤Ş¤À´ğÃÏ¤Î¾ì¹ç¤Î¤ß
+			    # ã¾ã åŸºåœ°ã®å ´åˆã®ã¿
 			    $landValue->[$bx][$by] += int($tLv / 20);
 			    if($landValue->[$bx][$by] > $HmaxExpPoint) {
 				$landValue->[$bx][$by] = $HmaxExpPoint;
@@ -1105,58 +1105,58 @@ sub doCommand {
 			}
 		    }
 
-		    # ÀõÀ¥¤Ë¤Ê¤ë
+		    # æµ…ç€¬ã«ãªã‚‹
 		    $tLand->[$tx][$ty] = $HlandSea;
 		    $tIsland->{'area'}--;
 		    $tLandValue->[$tx][$ty] = 1;
 
-		    # ¤Ç¤âÌıÅÄ¡¢ÀõÀ¥¡¢³¤Äì´ğÃÏ¤À¤Ã¤¿¤é³¤
+		    # ã§ã‚‚æ²¹ç”°ã€æµ…ç€¬ã€æµ·åº•åŸºåœ°ã ã£ãŸã‚‰æµ·
 		    if(($tL == $HlandOil) ||
 			($tL == $HlandSea) ||
 		       ($tL == $HlandSbase)) {
 			$tLandValue->[$tx][$ty] = 0;
 		    }
 		} else {
-		    # ¤½¤ÎÂ¾¥ß¥µ¥¤¥ë
+		    # ãã®ä»–ãƒŸã‚µã‚¤ãƒ«
 		    if($tL == $HlandWaste) {
-			# ¹ÓÃÏ(Èï³²¤Ê¤·)
+			# è’åœ°(è¢«å®³ãªã—)
 			if($kind == $HcomMissileST) {
-			    # ¥¹¥Æ¥ë¥¹
+			    # ã‚¹ãƒ†ãƒ«ã‚¹
 			    logMsWasteS($id, $target, $name, $tName,
 					 $comName, $tLname, $point, $tPoint);
 			} else {
-			    # ÄÌ¾ï
+			    # é€šå¸¸
 			    logMsWaste($id, $target, $name, $tName,
 					$comName, $tLname, $point, $tPoint);
 			}
 		    } elsif($tL == $HlandMonster) {
-			# ²ø½Ã
+			# æ€ªç£
 			my($mKind, $mName, $mHp) = monsterSpec($tLv);
 			my($special) = $HmonsterSpecial[$mKind];
 
-			# ¹Å²½Ãæ?
+			# ç¡¬åŒ–ä¸­?
 			if((($special == 3) && (($HislandTurn % 2) == 1)) ||
 			   (($special == 4) && (($HislandTurn % 2) == 0))) {
-			    # ¹Å²½Ãæ
+			    # ç¡¬åŒ–ä¸­
 			    if($kind == $HcomMissileST) {
-				# ¥¹¥Æ¥ë¥¹
+				# ã‚¹ãƒ†ãƒ«ã‚¹
 				logMsMonNoDamageS($id, $target, $name, $tName,
 					     $comName, $mName, $point,
 					     $tPoint);
 			    } else {
-				# ÄÌ¾ïÃÆ
+				# é€šå¸¸å¼¾
 				logMsMonNoDamage($id, $target, $name, $tName,
 					     $comName, $mName, $point,
 					     $tPoint);
 			    }
 			    next;
 			} else {
-			    # ¹Å²½Ãæ¤¸¤ã¤Ê¤¤
+			    # ç¡¬åŒ–ä¸­ã˜ã‚ƒãªã„
 			    if($mHp == 1) {
-				# ²ø½Ã¤·¤È¤á¤¿
+				# æ€ªç£ã—ã¨ã‚ãŸ
 				if(($land->[$bx][$by] == $HlandBase) ||
 				   ($land->[$bx][$by] == $HlandSbase)) {
-				    # ·Ğ¸³ÃÍ
+				    # çµŒé¨“å€¤
 				    $landValue->[$bx][$by] += $HmonsterExp[$mKind];
 				    if($landValue->[$bx][$by] > $HmaxExpPoint) {
 					$landValue->[$bx][$by] = $HmaxExpPoint;
@@ -1164,25 +1164,25 @@ sub doCommand {
 				}
 
 				if($kind == $HcomMissileST) {
-				    # ¥¹¥Æ¥ë¥¹
+				    # ã‚¹ãƒ†ãƒ«ã‚¹
 				    logMsMonKillS($id, $target, $name, $tName,
 						  $comName, $mName, $point,
 						  $tPoint);
 				} else {
-				    # ÄÌ¾ï
+				    # é€šå¸¸
 				    logMsMonKill($id, $target, $name, $tName,
 						 $comName, $mName, $point,
 						 $tPoint);
 				}
 
-				# ¼ıÆş
+				# åå…¥
 				my($value) = $HmonsterValue[$mKind];
 				if($value > 0) {
 				    $tIsland->{'money'} += $value;
 				    logMsMonMoney($target, $mName, $value);
 				}
 
-				# ¾Ş´Ø·¸
+				# è³é–¢ä¿‚
 				my($prize) = $island->{'prize'};
 				$prize =~ /([0-9]*),([0-9]*),(.*)/;
 				my($flags) = $1;
@@ -1192,55 +1192,55 @@ sub doCommand {
 				$monsters |= $v;
 				$island->{'prize'} = "$flags,$monsters,$turns";
 			    } else {
-				# ²ø½ÃÀ¸¤­¤Æ¤ë
+				# æ€ªç£ç”Ÿãã¦ã‚‹
 				if($kind == $HcomMissileST) {
-				    # ¥¹¥Æ¥ë¥¹
+				    # ã‚¹ãƒ†ãƒ«ã‚¹
 				    logMsMonsterS($id, $target, $name, $tName,
 						  $comName, $mName, $point,
 						  $tPoint);
 				} else {
-				    # ÄÌ¾ï
+				    # é€šå¸¸
 				    logMsMonster($id, $target, $name, $tName,
 						 $comName, $mName, $point,
 						 $tPoint);
 				}
-				# HP¤¬1¸º¤ë
+				# HPãŒ1æ¸›ã‚‹
 				$tLandValue->[$tx][$ty]--;
 				next;
 			    }
 
 			}
 		    } else {
-			# ÄÌ¾ïÃÏ·Á
+			# é€šå¸¸åœ°å½¢
 			if($kind == $HcomMissileST) {
-			    # ¥¹¥Æ¥ë¥¹
+			    # ã‚¹ãƒ†ãƒ«ã‚¹
 			    logMsNormalS($id, $target, $name, $tName,
 					   $comName, $tLname, $point,
 					   $tPoint);
 			} else {
-			    # ÄÌ¾ï
+			    # é€šå¸¸
 			    logMsNormal($id, $target, $name, $tName,
 					 $comName, $tLname, $point,
 					 $tPoint);
 			}
 		    }
-		    # ·Ğ¸³ÃÍ
+		    # çµŒé¨“å€¤
 		    if($tL == $HlandTown) {
 			if(($land->[$bx][$by] == $HlandBase) ||
 			    ($land->[$bx][$by] == $HlandSbase)) {
 			    $landValue->[$bx][$by] += int($tLv / 20);
-			    $boat += $tLv; # ÄÌ¾ï¥ß¥µ¥¤¥ë¤Ê¤Î¤ÇÆñÌ±¤Ë¥×¥é¥¹
+			    $boat += $tLv; # é€šå¸¸ãƒŸã‚µã‚¤ãƒ«ãªã®ã§é›£æ°‘ã«ãƒ—ãƒ©ã‚¹
 			    if($landValue->[$bx][$by] > $HmaxExpPoint) {
 				$landValue->[$bx][$by] = $HmaxExpPoint;
 			    }
 			}
 		    }
 		    
-                    # ¹ÓÃÏ¤Ë¤Ê¤ë
+                    # è’åœ°ã«ãªã‚‹
 		    $tLand->[$tx][$ty] = $HlandWaste;
-		    $tLandValue->[$tx][$ty] = 1; # ÃåÃÆÅÀ
+		    $tLandValue->[$tx][$ty] = 1; # ç€å¼¾ç‚¹
 
-		    # ¤Ç¤âÌıÅÄ¤À¤Ã¤¿¤é³¤
+		    # ã§ã‚‚æ²¹ç”°ã ã£ãŸã‚‰æµ·
 		    if($tL == $HlandOil) {
 			$tLand->[$tx][$ty] = $HlandSea;
 			$tLandValue->[$tx][$ty] = 0;
@@ -1248,28 +1248,28 @@ sub doCommand {
 		} 
 	    }
 
-	    # ¥«¥¦¥ó¥ÈÁı¤ä¤·¤È¤¯
+	    # ã‚«ã‚¦ãƒ³ãƒˆå¢—ã‚„ã—ã¨ã
 	    $count++;
 	}
 
 
 	if($flag == 0) {
-	    # ´ğÃÏ¤¬°ì¤Ä¤âÌµ¤«¤Ã¤¿¾ì¹ç
+	    # åŸºåœ°ãŒä¸€ã¤ã‚‚ç„¡ã‹ã£ãŸå ´åˆ
 	    logMsNoBase($id, $name, $comName);
 	    return 0;
 	}
 
-	# ÆñÌ±È½Äê
+	# é›£æ°‘åˆ¤å®š
 	$boat = int($boat / 2);
 	if(($boat > 0) && ($id != $target) && ($kind != $HcomMissileST)) {
-	    # ÆñÌ±ÉºÃå
-	    my($achive); # ÅşÃ£ÆñÌ±
+	    # é›£æ°‘æ¼‚ç€
+	    my($achive); # åˆ°é”é›£æ°‘
 	    my($i);
 	    for($i = 0; ($i < $HpointNumber && $boat > 0); $i++) {
 		$bx = $Hrpx[$i];
 		$by = $Hrpy[$i];
 		if($land->[$bx][$by] == $HlandTown) {
-		    # Ä®¤Î¾ì¹ç
+		    # ç”ºã®å ´åˆ
 		    my($lv) = $landValue->[$bx][$by];
 		    if($boat > 50) {
 			$lv += 50;
@@ -1287,7 +1287,7 @@ sub doCommand {
 		    }
 		    $landValue->[$bx][$by] = $lv;
 		} elsif($land->[$bx][$by] == $HlandPlains) {
-		    # Ê¿ÃÏ¤Î¾ì¹ç
+		    # å¹³åœ°ã®å ´åˆ
 		    $land->[$bx][$by] = $HlandTown;;
 		    if($boat > 10) {
 			$landValue->[$bx][$by] = 5;
@@ -1304,10 +1304,10 @@ sub doCommand {
 		}
 	    }
 	    if($achive > 0) {
-		# ¾¯¤·¤Ç¤âÅşÃå¤·¤¿¾ì¹ç¡¢¥í¥°¤òÅÇ¤¯
+		# å°‘ã—ã§ã‚‚åˆ°ç€ã—ãŸå ´åˆã€ãƒ­ã‚°ã‚’åã
 		logMsBoatPeople($id, $name, $achive);
 
-		# ÆñÌ±¤Î¿ô¤¬°ìÄê¿ô°Ê¾å¤Ê¤é¡¢Ê¿ÏÂ¾Ş¤Î²ÄÇ½À­¤¢¤ê
+		# é›£æ°‘ã®æ•°ãŒä¸€å®šæ•°ä»¥ä¸Šãªã‚‰ã€å¹³å’Œè³ã®å¯èƒ½æ€§ã‚ã‚Š
 		if($achive >= 200) {
 		    my($prize) = $island->{'prize'};
 		    $prize =~ /([0-9]*),([0-9]*),(.*)/;
@@ -1331,43 +1331,43 @@ sub doCommand {
 	}
 	return 1;
     } elsif($kind == $HcomSendMonster) {
-	# ²ø½ÃÇÉ¸¯
-	# ¥¿¡¼¥²¥Ã¥È¼èÆÀ
+	# æ€ªç£æ´¾é£
+	# ã‚¿ãƒ¼ã‚²ãƒƒãƒˆå–å¾—
 	my($tn) = $HidToNumber{$target};
 	my($tIsland) = $Hislands[$tn];
 	my($tName) = $tIsland->{'name'};
 
 	if($tn eq '') {
-	    # ¥¿¡¼¥²¥Ã¥È¤¬¤¹¤Ç¤Ë¤Ê¤¤
+	    # ã‚¿ãƒ¼ã‚²ãƒƒãƒˆãŒã™ã§ã«ãªã„
 	    logMsNoTarget($id, $name, $comName);
 	    return 0;
 	}
 
-	# ¥á¥Ã¥»¡¼¥¸
+	# ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
 	logMonsSend($id, $target, $name, $tName);
 	$tIsland->{'monstersend'}++;
 
 	$island->{'money'} -= $cost;
 	return 1;
     } elsif($kind == $HcomSell) {
-	# Í¢½ĞÎÌ·èÄê
+	# è¼¸å‡ºé‡æ±ºå®š
 	if($arg == 0) { $arg = 1; }
 	my($value) = min($arg * (-$cost), $island->{'food'});
 
-	# Í¢½Ğ¥í¥°
+	# è¼¸å‡ºãƒ­ã‚°
 	logSell($id, $name, $comName, $value);
 	$island->{'food'} -=  $value;
 	$island->{'money'} += ($value / 10);
 	return 0;
     } elsif(($kind == $HcomFood) ||
 	    ($kind == $HcomMoney)) {
-	# ±ç½õ·Ï
-	# ¥¿¡¼¥²¥Ã¥È¼èÆÀ
+	# æ´åŠ©ç³»
+	# ã‚¿ãƒ¼ã‚²ãƒƒãƒˆå–å¾—
 	my($tn) = $HidToNumber{$target};
 	my($tIsland) = $Hislands[$tn];
 	my($tName) = $tIsland->{'name'};
 
-	# ±ç½õÎÌ·èÄê
+	# æ´åŠ©é‡æ±ºå®š
 	if($arg == 0) { $arg = 1; }
 	my($value, $str);
 	if($cost < 0) {
@@ -1378,7 +1378,7 @@ sub doCommand {
 	    $str = "$value$HunitMoney";
 	}
 
-	# ±ç½õ¥í¥°
+	# æ´åŠ©ãƒ­ã‚°
 	logAid($id, $target, $name, $tName, $comName, $str);
 
 	if($cost < 0) {
@@ -1390,13 +1390,13 @@ sub doCommand {
 	}
 	return 0;
     } elsif($kind == $HcomPropaganda) {
-	# Í¶Ã×³èÆ°
+	# èª˜è‡´æ´»å‹•
 	logPropaganda($id, $name, $comName);
 	$island->{'propaganda'} = 1;
 	$island->{'money'} -= $cost;
 	return 1;
     } elsif($kind == $HcomGiveup) {
-	# Êü´ş
+	# æ”¾æ£„
 	logGiveup($id, $name);
 	$island->{'dead'} = 1;
 	unlink("island.$id");
@@ -1407,30 +1407,30 @@ sub doCommand {
 }
 
 
-# À®Ä¹¤ª¤è¤ÓÃ±¥Ø¥Ã¥¯¥¹ºÒ³²
+# æˆé•·ãŠã‚ˆã³å˜ãƒ˜ãƒƒã‚¯ã‚¹ç½å®³
 sub doEachHex {
     my($island) = @_;
     my(@monsterMove);
 
-    # Æ³½ĞÃÍ
+    # å°å‡ºå€¤
     my($name) = $island->{'name'};
     my($id) = $island->{'id'};
     my($land) = $island->{'land'};
     my($landValue) = $island->{'landValue'};
 
-    # Áı¤¨¤ë¿Í¸ı¤Î¥¿¥ÍÃÍ
-    my($addpop)  = 10;  # Â¼¡¢Ä®
-    my($addpop2) = 0; # ÅÔ»Ô
+    # å¢—ãˆã‚‹äººå£ã®ã‚¿ãƒå€¤
+    my($addpop)  = 10;  # æ‘ã€ç”º
+    my($addpop2) = 0; # éƒ½å¸‚
     if($island->{'food'} < 0) {
-	# ¿©ÎÁÉÔÂ­
+	# é£Ÿæ–™ä¸è¶³
 	$addpop = -30;
     } elsif($island->{'propaganda'} == 1) {
-	# Í¶Ã×³èÆ°Ãæ
+	# èª˜è‡´æ´»å‹•ä¸­
 	$addpop = 30;
 	$addpop2 = 3;
     }
 
-    # ¥ë¡¼¥×
+    # ãƒ«ãƒ¼ãƒ—
     my($x, $y, $i);
     for($i = 0; $i < $HpointNumber; $i++) {
 	$x = $Hrpx[$i];
@@ -1439,25 +1439,25 @@ sub doEachHex {
 	my($lv) = $landValue->[$x][$y];
 
 	if($landKind == $HlandTown) {
-	    # Ä®·Ï
+	    # ç”ºç³»
 	    if($addpop < 0) {
-		# ÉÔÂ­
+		# ä¸è¶³
 		$lv -= (random(-$addpop) + 1);
 		if($lv <= 0) {
-		    # Ê¿ÃÏ¤ËÌá¤¹
+		    # å¹³åœ°ã«æˆ»ã™
 		    $land->[$x][$y] = $HlandPlains;
 		    $landValue->[$x][$y] = 0;
 		    next;
 		}
 	    } else {
-		# À®Ä¹
+		# æˆé•·
 		if($lv < 100) {
 		    $lv += random($addpop) + 1;
 		    if($lv > 100) {
 			$lv = 100;
 		    }
 		} else {
-		    # ÅÔ»Ô¤Ë¤Ê¤ë¤ÈÀ®Ä¹ÃÙ¤¤
+		    # éƒ½å¸‚ã«ãªã‚‹ã¨æˆé•·é…ã„
 		    if($addpop2 > 0) {
 			$lv += random($addpop2) + 1;
 		    }
@@ -1468,67 +1468,67 @@ sub doEachHex {
 	    }
 	    $landValue->[$x][$y] = $lv;
 	} elsif($landKind == $HlandPlains) {
-	    # Ê¿ÃÏ
+	    # å¹³åœ°
 	    if(random(5) == 0) {
-		# ¼ş¤ê¤ËÇÀ¾ì¡¢Ä®¤¬¤¢¤ì¤Ğ¡¢¤³¤³¤âÄ®¤Ë¤Ê¤ë
+		# å‘¨ã‚Šã«è¾²å ´ã€ç”ºãŒã‚ã‚Œã°ã€ã“ã“ã‚‚ç”ºã«ãªã‚‹
 	        if(countGrow($land, $landValue, $x, $y)){
 		    $land->[$x][$y] = $HlandTown;
 		    $landValue->[$x][$y] = 1;
 		}
 	    }
 	} elsif($landKind == $HlandForest) {
-	    # ¿¹
+	    # æ£®
 	    if($lv < 200) {
-		# ÌÚ¤òÁı¤ä¤¹
+		# æœ¨ã‚’å¢—ã‚„ã™
 		$landValue->[$x][$y]++;
 	    }
 	} elsif($landKind == $HlandDefence) {
 	    if($lv == 1) {
-		# ËÉ±Ò»ÜÀß¼«Çú
+		# é˜²è¡›æ–½è¨­è‡ªçˆ†
 		my($lName) = &landName($landKind, $lv);
 		logBombFire($id, $name, $lName, "($x, $y)");
 
-		# ¹­°èÈï³²¥ë¡¼¥Á¥ó
+		# åºƒåŸŸè¢«å®³ãƒ«ãƒ¼ãƒãƒ³
 		wideDamage($id, $name, $land, $landValue, $x, $y);
 	    }
 	} elsif($landKind == $HlandOil) {
-	    # ³¤ÄìÌıÅÄ
+	    # æµ·åº•æ²¹ç”°
 	    my($value, $str, $lName);
 	    $lName = landName($landKind, $lv);
 	    $value = $HoilMoney;
 	    $island->{'money'} += $value;
 	    $str = "$value$HunitMoney";
 
-	    # ¼ıÆş¥í¥°
+	    # åå…¥ãƒ­ã‚°
 	    logOilMoney($id, $name, $lName, "($x, $y)", $str);
 
-	    # ¸Ï³éÈ½Äê
+	    # æ¯æ¸‡åˆ¤å®š
 	    if(random(1000) < $HoilRatio) {
-		# ¸Ï³é
+		# æ¯æ¸‡
 		logOilEnd($id, $name, $lName, "($x, $y)");
 		$land->[$x][$y] = $HlandSea;
 		$landValue->[$x][$y] = 0;
 	    }
 
 	} elsif($landKind == $HlandMonster) {
-	    # ²ø½Ã
+	    # æ€ªç£
 	    if($monsterMove[$x][$y] == 2) {
-		# ¤¹¤Ç¤ËÆ°¤¤¤¿¸å
+		# ã™ã§ã«å‹•ã„ãŸå¾Œ
 		next;
 	    }
 
-	    # ³ÆÍ×ÁÇ¤Î¼è¤ê½Ğ¤·
+	    # å„è¦ç´ ã®å–ã‚Šå‡ºã—
 	    my($mKind, $mName, $mHp) = monsterSpec($landValue->[$x][$y]);
 	    my($special) = $HmonsterSpecial[$mKind];
 
-	    # ¹Å²½Ãæ?
+	    # ç¡¬åŒ–ä¸­?
 	    if((($special == 3) && (($HislandTurn % 2) == 1)) ||
 	       (($special == 4) && (($HislandTurn % 2) == 0))) {
-		# ¹Å²½Ãæ
+		# ç¡¬åŒ–ä¸­
 		next;
 	    }
 
-	    # Æ°¤¯Êı¸ş¤ò·èÄê
+	    # å‹•ãæ–¹å‘ã‚’æ±ºå®š
 	    my($d, $sx, $sy);
 	    my($i);
 	    for($i = 0; $i < 3; $i++) {
@@ -1536,18 +1536,18 @@ sub doEachHex {
 		$sx = $x + $ax[$d];
 		$sy = $y + $ay[$d];
 
-		# ¹Ô¤Ë¤è¤ë°ÌÃÖÄ´À°
+		# è¡Œã«ã‚ˆã‚‹ä½ç½®èª¿æ•´
 		if((($sy % 2) == 0) && (($y % 2) == 1)) {
 		    $sx--;
 		}
 
-		# ÈÏ°Ï³°È½Äê
+		# ç¯„å›²å¤–åˆ¤å®š
 		if(($sx < 0) || ($sx >= $HislandSize) ||
 		   ($sy < 0) || ($sy >= $HislandSize)) {
 		    next;
 		}
 
-		# ³¤¡¢³¤´ğ¡¢ÌıÅÄ¡¢²ø½Ã¡¢»³¡¢µ­Ç°Èê°Ê³°
+		# æµ·ã€æµ·åŸºã€æ²¹ç”°ã€æ€ªç£ã€å±±ã€è¨˜å¿µç¢‘ä»¥å¤–
 		if(($land->[$sx][$sy] != $HlandSea) &&
 		   ($land->[$sx][$sy] != $HlandSbase) &&
 		   ($land->[$sx][$sy] != $HlandOil) &&
@@ -1559,56 +1559,56 @@ sub doEachHex {
 	    }
 
 	    if($i == 3) {
-		# Æ°¤«¤Ê¤«¤Ã¤¿
+		# å‹•ã‹ãªã‹ã£ãŸ
 		next;
 	    }
 
-	    # Æ°¤¤¤¿Àè¤ÎÃÏ·Á¤Ë¤è¤ê¥á¥Ã¥»¡¼¥¸
+	    # å‹•ã„ãŸå…ˆã®åœ°å½¢ã«ã‚ˆã‚Šãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
 	    my($l) = $land->[$sx][$sy];
 	    my($lv) = $landValue->[$sx][$sy];
 	    my($lName) = landName($l, $lv);
 	    my($point) = "($sx, $sy)";
 
-	    # °ÜÆ°
+	    # ç§»å‹•
 	    $land->[$sx][$sy] = $land->[$x][$y];
 	    $landValue->[$sx][$sy] = $landValue->[$x][$y];
 
-	    # ¤â¤Èµï¤¿°ÌÃÖ¤ò¹ÓÃÏ¤Ë
+	    # ã‚‚ã¨å±…ãŸä½ç½®ã‚’è’åœ°ã«
 	    $land->[$x][$y] = $HlandWaste;
 	    $landValue->[$x][$y] = 0;
 
-	    # °ÜÆ°ºÑ¤ß¥Õ¥é¥°
+	    # ç§»å‹•æ¸ˆã¿ãƒ•ãƒ©ã‚°
 	    if($HmonsterSpecial[$mKind] == 2) {
-		# °ÜÆ°ºÑ¤ß¥Õ¥é¥°¤ÏÎ©¤Æ¤Ê¤¤
+		# ç§»å‹•æ¸ˆã¿ãƒ•ãƒ©ã‚°ã¯ç«‹ã¦ãªã„
 	    } elsif($HmonsterSpecial[$mKind] == 1) {
-		# Â®¤¤²ø½Ã
+		# é€Ÿã„æ€ªç£
 		$monsterMove[$sx][$sy] = $monsterMove[$x][$y] + 1;
 	    } else {
-		# ÉáÄÌ¤Î²ø½Ã
+		# æ™®é€šã®æ€ªç£
 		$monsterMove[$sx][$sy] = 2;
 	    }
 
 	    if(($l == $HlandDefence) && ($HdBaseAuto == 1)) {
-		# ËÉ±Ò»ÜÀß¤òÆ§¤ó¤À
+		# é˜²è¡›æ–½è¨­ã‚’è¸ã‚“ã 
 		logMonsMoveDefence($id, $name, $lName, $point, $mName);
 
-		# ¹­°èÈï³²¥ë¡¼¥Á¥ó
+		# åºƒåŸŸè¢«å®³ãƒ«ãƒ¼ãƒãƒ³
 		wideDamage($id, $name, $land, $landValue, $sx, $sy);
 	    } else {
-		# ¹Ô¤­Àè¤¬¹ÓÃÏ¤Ë¤Ê¤ë
+		# è¡Œãå…ˆãŒè’åœ°ã«ãªã‚‹
 		logMonsMove($id, $name, $lName, $point, $mName);
 	    }
 	}
 
-	# ²ĞºÒÈ½Äê
+	# ç«ç½åˆ¤å®š
 	if((($landKind == $HlandTown) && ($lv > 30)) ||
 	   ($landKind == $HlandHaribote) ||
 	   ($landKind == $HlandFactory)) {
 	    if(random(1000) < $HdisFire) {
-		# ¼ş°Ï¤Î¿¹¤Èµ­Ç°Èê¤ò¿ô¤¨¤ë
+		# å‘¨å›²ã®æ£®ã¨è¨˜å¿µç¢‘ã‚’æ•°ãˆã‚‹
 		if((countAround($land, $x, $y, $HlandForest, 7) +
 		    countAround($land, $x, $y, $HlandMonument, 7)) == 0) {
-		    # Ìµ¤«¤Ã¤¿¾ì¹ç¡¢²ĞºÒ¤Ç²õÌÇ
+		    # ç„¡ã‹ã£ãŸå ´åˆã€ç«ç½ã§å£Šæ»…
 		    my($l) = $land->[$x][$y];
 		    my($lv) = $landValue->[$x][$y];
 		    my($point) = "($x, $y)";
@@ -1622,7 +1622,7 @@ sub doEachHex {
     }
 }
 
-# ¼ş°Ï¤ÎÄ®¡¢ÇÀ¾ì¤¬¤¢¤ë¤«È½Äê
+# å‘¨å›²ã®ç”ºã€è¾²å ´ãŒã‚ã‚‹ã‹åˆ¤å®š
 sub countGrow {
     my($land, $landValue, $x, $y) = @_;
     my($i, $sx, $sy);
@@ -1630,7 +1630,7 @@ sub countGrow {
 	 $sx = $x + $ax[$i];
 	 $sy = $y + $ay[$i];
 
-	 # ¹Ô¤Ë¤è¤ë°ÌÃÖÄ´À°
+	 # è¡Œã«ã‚ˆã‚‹ä½ç½®èª¿æ•´
 	 if((($sy % 2) == 0) && (($y % 2) == 1)) {
 	     $sx--;
 	 }
@@ -1638,7 +1638,7 @@ sub countGrow {
 	 if(($sx < 0) || ($sx >= $HislandSize) ||
 	    ($sy < 0) || ($sy >= $HislandSize)) {
 	 } else {
-	     # ÈÏ°ÏÆâ¤Î¾ì¹ç
+	     # ç¯„å›²å†…ã®å ´åˆ
 	     if(($land->[$sx][$sy] == $HlandTown) ||
 		($land->[$sx][$sy] == $HlandFarm)) {
 		 if($landValue->[$sx][$sy] != 1) {
@@ -1650,19 +1650,19 @@ sub countGrow {
     return 0;
 }
 
-# ÅçÁ´ÂÎ
+# å³¶å…¨ä½“
 sub doIslandProcess {
     my($number, $island) = @_;
 
-    # Æ³½ĞÃÍ
+    # å°å‡ºå€¤
     my($name) = $island->{'name'};
     my($id) = $island->{'id'};
     my($land) = $island->{'land'};
     my($landValue) = $island->{'landValue'};
 
-    # ÃÏ¿ÌÈ½Äê
+    # åœ°éœ‡åˆ¤å®š
     if(random(1000) < (($island->{'prepare2'} + 1) * $HdisEarthquake)) {
-	# ÃÏ¿ÌÈ¯À¸
+	# åœ°éœ‡ç™ºç”Ÿ
 	logEarthquake($id, $name);
 
 	my($x, $y, $landKind, $lv, $i);
@@ -1675,7 +1675,7 @@ sub doIslandProcess {
 	    if((($landKind == $HlandTown) && ($lv >= 100)) ||
 	       ($landKind == $HlandHaribote) ||
 	       ($landKind == $HlandFactory)) {
-		# 1/4¤Ç²õÌÇ
+		# 1/4ã§å£Šæ»…
 		if(random(4) == 0) {
 		    logEQDamage($id, $name, landName($landKind, $lv),
 				"($x, $y)");
@@ -1687,9 +1687,9 @@ sub doIslandProcess {
 	}
     }
 
-    # ¿©ÎÁÉÔÂ­
+    # é£Ÿæ–™ä¸è¶³
     if($island->{'food'} <= 0) {
-	# ÉÔÂ­¥á¥Ã¥»¡¼¥¸
+	# ä¸è¶³ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
 	logStarve($id, $name);
 	$island->{'food'} = 0;
 
@@ -1704,7 +1704,7 @@ sub doIslandProcess {
 	       ($landKind == $HlandFactory) ||
 	       ($landKind == $HlandBase) ||
 	       ($landKind == $HlandDefence)) {
-		# 1/4¤Ç²õÌÇ
+		# 1/4ã§å£Šæ»…
 		if(random(4) == 0) {
 		    logSvDamage($id, $name, landName($landKind, $lv),
 				"($x, $y)");
@@ -1715,9 +1715,9 @@ sub doIslandProcess {
 	}
     }
 
-    # ÄÅÇÈÈ½Äê
+    # æ´¥æ³¢åˆ¤å®š
     if(random(1000) < $HdisTsunami) {
-	# ÄÅÇÈÈ¯À¸
+	# æ´¥æ³¢ç™ºç”Ÿ
 	logTsunami($id, $name);
 
 	my($x, $y, $landKind, $lv, $i);
@@ -1733,7 +1733,7 @@ sub doIslandProcess {
 	       ($landKind == $HlandBase) ||
 	       ($landKind == $HlandDefence) ||
 	       ($landKind == $HlandHaribote)) {
-		# 1d12 <= (¼ş°Ï¤Î³¤ - 1) ¤ÇÊø²õ
+		# 1d12 <= (å‘¨å›²ã®æµ· - 1) ã§å´©å£Š
 		if(random(12) <
 		   (countAround($land, $x, $y, $HlandOil, 7) +
 		    countAround($land, $x, $y, $HlandSbase, 7) +
@@ -1748,53 +1748,53 @@ sub doIslandProcess {
 	}
     }
 
-    # ²ø½ÃÈ½Äê
+    # æ€ªç£åˆ¤å®š
     my($r) = random(10000);
     my($pop) = $island->{'pop'};
     do{
 	if((($r < ($HdisMonster * $island->{'area'})) &&
 	    ($pop >= $HdisMonsBorder1)) ||
 	   ($island->{'monstersend'} > 0)) {
-	    # ²ø½Ã½Ğ¸½
-	    # ¼ïÎà¤ò·è¤á¤ë
+	    # æ€ªç£å‡ºç¾
+	    # ç¨®é¡ã‚’æ±ºã‚ã‚‹
 	    my($lv, $kind);
 	    if($island->{'monstersend'} > 0) {
-		# ¿ÍÂ¤
+		# äººé€ 
 		$kind = 0;
 		$island->{'monstersend'}--;
 	    } elsif($pop >= $HdisMonsBorder3) {
-		# level3¤Ş¤Ç
+		# level3ã¾ã§
 		$kind = random($HmonsterLevel3) + 1;
 	    } elsif($pop >= $HdisMonsBorder2) {
-		# level2¤Ş¤Ç
+		# level2ã¾ã§
 		$kind = random($HmonsterLevel2) + 1;
 	    } else {
-		# level1¤Î¤ß
+		# level1ã®ã¿
 		$kind = random($HmonsterLevel1) + 1;
 	    }
 
-	    # lv¤ÎÃÍ¤ò·è¤á¤ë
+	    # lvã®å€¤ã‚’æ±ºã‚ã‚‹
 	    $lv = $kind * 10
 		+ $HmonsterBHP[$kind] + random($HmonsterDHP[$kind]);
 
-	    # ¤É¤³¤Ë¸½¤ì¤ë¤«·è¤á¤ë
+	    # ã©ã“ã«ç¾ã‚Œã‚‹ã‹æ±ºã‚ã‚‹
 	    my($bx, $by, $i);
 	    for($i = 0; $i < $HpointNumber; $i++) {
 		$bx = $Hrpx[$i];
 		$by = $Hrpy[$i];
 		if($land->[$bx][$by] == $HlandTown) {
 
-		    # ÃÏ·ÁÌ¾
+		    # åœ°å½¢å
 		    my($lName) = landName($HlandTown, $landValue->[$bx][$by]);
 
-		    # ¤½¤Î¥Ø¥Ã¥¯¥¹¤ò²ø½Ã¤Ë
+		    # ãã®ãƒ˜ãƒƒã‚¯ã‚¹ã‚’æ€ªç£ã«
 		    $land->[$bx][$by] = $HlandMonster;
 		    $landValue->[$bx][$by] = $lv;
 
-		    # ²ø½Ã¾ğÊó
+		    # æ€ªç£æƒ…å ±
 		    my($mKind, $mName, $mHp) = monsterSpec($lv);
 
-		    # ¥á¥Ã¥»¡¼¥¸
+		    # ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
 		    logMonsCome($id, $name, $mName, "($bx, $by)", $lName);
 		    last;
 		}
@@ -1802,10 +1802,10 @@ sub doIslandProcess {
 	}
     } while($island->{'monstersend'} > 0);
 
-    # ÃÏÈ×ÄÀ²¼È½Äê
+    # åœ°ç›¤æ²ˆä¸‹åˆ¤å®š
     if(($island->{'area'} > $HdisFallBorder) &&
        (random(1000) < $HdisFalldown)) {
-	# ÃÏÈ×ÄÀ²¼È¯À¸
+	# åœ°ç›¤æ²ˆä¸‹ç™ºç”Ÿ
 	logFalldown($id, $name);
 
 	my($x, $y, $landKind, $lv, $i);
@@ -1820,7 +1820,7 @@ sub doIslandProcess {
 	       ($landKind != $HlandOil) &&
 	       ($landKind != $HlandMountain)) {
 
-		# ¼ş°Ï¤Ë³¤¤¬¤¢¤ì¤Ğ¡¢ÃÍ¤ò-1¤Ë
+		# å‘¨å›²ã«æµ·ãŒã‚ã‚Œã°ã€å€¤ã‚’-1ã«
 		if(countAround($land, $x, $y, $HlandSea, 7) + 
 		   countAround($land, $x, $y, $HlandSbase, 7)) {
 		    logFalldownLand($id, $name, landName($landKind, $lv),
@@ -1837,20 +1837,20 @@ sub doIslandProcess {
 	    $landKind = $land->[$x][$y];
 
 	    if($landKind == -1) {
-		# -1¤Ë¤Ê¤Ã¤Æ¤¤¤ë½ê¤òÀõÀ¥¤Ë
+		# -1ã«ãªã£ã¦ã„ã‚‹æ‰€ã‚’æµ…ç€¬ã«
 		$land->[$x][$y] = $HlandSea;
 		$landValue->[$x][$y] = 1;
 	    } elsif ($landKind == $HlandSea) {
-		# ÀõÀ¥¤Ï³¤¤Ë
+		# æµ…ç€¬ã¯æµ·ã«
 		$landValue->[$x][$y] = 0;
 	    }
 
 	}
     }
 
-    # ÂæÉ÷È½Äê
+    # å°é¢¨åˆ¤å®š
     if(random(1000) < $HdisTyphoon) {
-	# ÂæÉ÷È¯À¸
+	# å°é¢¨ç™ºç”Ÿ
 	logTyphoon($id, $name);
 
 	my($x, $y, $landKind, $lv, $i);
@@ -1863,7 +1863,7 @@ sub doIslandProcess {
 	    if(($landKind == $HlandFarm) ||
 	       ($landKind == $HlandHaribote)) {
 
-		# 1d12 <= (6 - ¼ş°Ï¤Î¿¹) ¤ÇÊø²õ
+		# 1d12 <= (6 - å‘¨å›²ã®æ£®) ã§å´©å£Š
 		if(random(12) < 
 		   (6
 		    - countAround($land, $x, $y, $HlandForest, 7)
@@ -1878,52 +1878,52 @@ sub doIslandProcess {
 	}
     }
 
-    # µğÂçğ¨ÀĞÈ½Äê
+    # å·¨å¤§éš•çŸ³åˆ¤å®š
     if(random(1000) < $HdisHugeMeteo) {
 	my($x, $y, $landKind, $lv, $point);
 
-	# Íî²¼
+	# è½ä¸‹
 	$x = random($HislandSize);
 	$y = random($HislandSize);
 	$landKind = $land->[$x][$y];
 	$lv = $landValue->[$x][$y];
 	$point = "($x, $y)";
 
-	# ¥á¥Ã¥»¡¼¥¸
+	# ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
 	logHugeMeteo($id, $name, $point);
 
-	# ¹­°èÈï³²¥ë¡¼¥Á¥ó
+	# åºƒåŸŸè¢«å®³ãƒ«ãƒ¼ãƒãƒ³
 	wideDamage($id, $name, $land, $landValue, $x, $y);
     }
 
-    # µğÂç¥ß¥µ¥¤¥ëÈ½Äê
+    # å·¨å¤§ãƒŸã‚µã‚¤ãƒ«åˆ¤å®š
     while($island->{'bigmissile'} > 0) {
 	$island->{'bigmissile'} --;
 
 	my($x, $y, $landKind, $lv, $point);
 
-	# Íî²¼
+	# è½ä¸‹
 	$x = random($HislandSize);
 	$y = random($HislandSize);
 	$landKind = $land->[$x][$y];
 	$lv = $landValue->[$x][$y];
 	$point = "($x, $y)";
 
-	# ¥á¥Ã¥»¡¼¥¸
+	# ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
 	logMonDamage($id, $name, $point);
 
-	# ¹­°èÈï³²¥ë¡¼¥Á¥ó
+	# åºƒåŸŸè¢«å®³ãƒ«ãƒ¼ãƒãƒ³
 	wideDamage($id, $name, $land, $landValue, $x, $y);
     }
 
-    # ğ¨ÀĞÈ½Äê
+    # éš•çŸ³åˆ¤å®š
     if(random(1000) < $HdisMeteo) {
 	my($x, $y, $landKind, $lv, $point, $first);
 	$first = 1;
 	while((random(2) == 0) || ($first == 1)) {
 	    $first = 0;
 	    
-	    # Íî²¼
+	    # è½ä¸‹
 	    $x = random($HislandSize);
 	    $y = random($HislandSize);
 	    $landKind = $land->[$x][$y];
@@ -1931,11 +1931,11 @@ sub doIslandProcess {
 	    $point = "($x, $y)";
 
 	    if(($landKind == $HlandSea) && ($lv == 0)){
-		# ³¤¥İ¥Á¥ã
+		# æµ·ãƒãƒãƒ£
 		logMeteoSea($id, $name, landName($landKind, $lv),
 			    $point);
 	    } elsif($landKind == $HlandMountain) {
-		# »³ÇË²õ
+		# å±±ç ´å£Š
 		logMeteoMountain($id, $name, landName($landKind, $lv),
 				 $point);
 		$land->[$x][$y] = $HlandWaste;
@@ -1948,7 +1948,7 @@ sub doIslandProcess {
 		logMeteoMonster($id, $name, landName($landKind, $lv),
 				$point);
 	    } elsif($landKind == $HlandSea) {
-		# ÀõÀ¥
+		# æµ…ç€¬
 		logMeteoSea1($id, $name, landName($landKind, $lv),
 			     $point);
 	    } else {
@@ -1960,7 +1960,7 @@ sub doIslandProcess {
 	}
     }
 
-    # Ê®²ĞÈ½Äê
+    # å™´ç«åˆ¤å®š
     if(random(1000) < $HdisEruption) {
 	my($x, $y, $sx, $sy, $i, $landKind, $lv, $point);
 	$x = random($HislandSize);
@@ -1977,7 +1977,7 @@ sub doIslandProcess {
 	    $sx = $x + $ax[$i];
 	    $sy = $y + $ay[$i];
 
-	    # ¹Ô¤Ë¤è¤ë°ÌÃÖÄ´À°
+	    # è¡Œã«ã‚ˆã‚‹ä½ç½®èª¿æ•´
 	    if((($sy % 2) == 0) && (($y % 2) == 1)) {
 		$sx--;
 	    }
@@ -1989,16 +1989,16 @@ sub doIslandProcess {
 	    if(($sx < 0) || ($sx >= $HislandSize) ||
 	       ($sy < 0) || ($sy >= $HislandSize)) {
 	    } else {
-		# ÈÏ°ÏÆâ¤Î¾ì¹ç
+		# ç¯„å›²å†…ã®å ´åˆ
 		$landKind = $land->[$sx][$sy];
 		$lv = $landValue->[$sx][$sy];
 		$point = "($sx, $sy)";
 		if(($landKind == $HlandSea) ||
 		   ($landKind == $HlandOil) ||
 		   ($landKind == $HlandSbase)) {
-		    # ³¤¤Î¾ì¹ç
+		    # æµ·ã®å ´åˆ
 		    if($lv == 1) {
-			# ÀõÀ¥
+			# æµ…ç€¬
 			logEruptionSea1($id, $name, landName($landKind, $lv),
 					$point);
 		    } else {
@@ -2013,7 +2013,7 @@ sub doIslandProcess {
 			($landKind == $HlandWaste)) {
 		    next;
 		} else {
-		    # ¤½¤ì°Ê³°¤Î¾ì¹ç
+		    # ãã‚Œä»¥å¤–ã®å ´åˆ
 		    logEruptionNormal($id, $name, landName($landKind, $lv),
 				      $point);
 		}
@@ -2023,21 +2023,21 @@ sub doIslandProcess {
 	}
     }
 
-    # ¿©ÎÁ¤¬¤¢¤Õ¤ì¤Æ¤¿¤é´¹¶â
+    # é£Ÿæ–™ãŒã‚ãµã‚Œã¦ãŸã‚‰æ›é‡‘
     if($island->{'food'} > 9999) {
 	$island->{'money'} += int(($island->{'food'} - 9999) / 10);
 	$island->{'food'} = 9999;
     } 
 
-    # ¶â¤¬¤¢¤Õ¤ì¤Æ¤¿¤éÀÚ¤ê¼Î¤Æ
+    # é‡‘ãŒã‚ãµã‚Œã¦ãŸã‚‰åˆ‡ã‚Šæ¨ã¦
     if($island->{'money'} > 9999) {
 	$island->{'money'} = 9999;
     } 
 
-    # ³Æ¼ï¤ÎÃÍ¤ò·×»»
+    # å„ç¨®ã®å€¤ã‚’è¨ˆç®—
     estimate($number);
 
-    # ÈË±É¡¢ºÒÆñ¾Ş
+    # ç¹æ „ã€ç½é›£è³
     $pop = $island->{'pop'};
     my($damage) = $island->{'oldPop'} - $pop;
     my($prize) = $island->{'prize'};
@@ -2046,7 +2046,7 @@ sub doIslandProcess {
     my($monsters) = $2;
     my($turns) = $3;
 
-    # ÈË±É¾Ş
+    # ç¹æ „è³
     if((!($flags & 1)) &&  $pop >= 3000){
 	$flags |= 1;
 	logPrize($id, $name, $Hprize[1]);
@@ -2058,7 +2058,7 @@ sub doIslandProcess {
 	logPrize($id, $name, $Hprize[3]);
     }
 
-    # ºÒÆñ¾Ş
+    # ç½é›£è³
     if((!($flags & 64)) &&  $damage >= 500){
 	$flags |= 64;
 	logPrize($id, $name, $Hprize[7]);
@@ -2073,17 +2073,17 @@ sub doIslandProcess {
     $island->{'prize'} = "$flags,$monsters,$turns";
 }
 
-# ¿Í¸ı½ç¤Ë¥½¡¼¥È
+# äººå£é †ã«ã‚½ãƒ¼ãƒˆ
 sub islandSort {
     my($flag, $i, $tmp);
 
-    # ¿Í¸ı¤¬Æ±¤¸¤È¤­¤ÏÄ¾Á°¤Î¥¿¡¼¥ó¤Î½çÈÖ¤Î¤Ş¤Ş
+    # äººå£ãŒåŒã˜ã¨ãã¯ç›´å‰ã®ã‚¿ãƒ¼ãƒ³ã®é †ç•ªã®ã¾ã¾
     my @idx = (0..$#Hislands);
     @idx = sort { $Hislands[$b]->{'pop'} <=> $Hislands[$a]->{'pop'} || $a <=> $b } @idx;
     @Hislands = @Hislands[@idx];
 }
 
-# ¹­°èÈï³²¥ë¡¼¥Á¥ó
+# åºƒåŸŸè¢«å®³ãƒ«ãƒ¼ãƒãƒ³
 sub wideDamage {
     my($id, $name, $land, $landValue, $x, $y) = @_;
     my($sx, $sy, $i, $landKind, $landName, $lv, $point);
@@ -2092,7 +2092,7 @@ sub wideDamage {
 	$sx = $x + $ax[$i];
 	$sy = $y + $ay[$i];
 
-	# ¹Ô¤Ë¤è¤ë°ÌÃÖÄ´À°
+	# è¡Œã«ã‚ˆã‚‹ä½ç½®èª¿æ•´
 	if((($sy % 2) == 0) && (($y % 2) == 1)) {
 	    $sx--;
 	}
@@ -2102,15 +2102,15 @@ sub wideDamage {
 	$landName = landName($landKind, $lv);
 	$point = "($sx, $sy)";
 
-	# ÈÏ°Ï³°È½Äê
+	# ç¯„å›²å¤–åˆ¤å®š
 	if(($sx < 0) || ($sx >= $HislandSize) ||
 	   ($sy < 0) || ($sy >= $HislandSize)) {
 	    next;
 	}
 
-	# ÈÏ°Ï¤Ë¤è¤ëÊ¬´ô
+	# ç¯„å›²ã«ã‚ˆã‚‹åˆ†å²
 	if($i < 7) {
-	    # Ãæ¿´¡¢¤ª¤è¤Ó1¥Ø¥Ã¥¯¥¹
+	    # ä¸­å¿ƒã€ãŠã‚ˆã³1ãƒ˜ãƒƒã‚¯ã‚¹
 	    if($landKind == $HlandSea) {
 		$landValue->[$sx][$sy] = 0;
 		next;
@@ -2127,15 +2127,15 @@ sub wideDamage {
 		}
 		$land->[$sx][$sy] = $HlandSea;
 		if($i == 0) {
-		    # ³¤
+		    # æµ·
 		    $landValue->[$sx][$sy] = 0;
 		} else {
-		    # ÀõÀ¥
+		    # æµ…ç€¬
 		    $landValue->[$sx][$sy] = 1;
 		}
 	    }
 	} else {
-	    # 2¥Ø¥Ã¥¯¥¹
+	    # 2ãƒ˜ãƒƒã‚¯ã‚¹
 	    if(($landKind == $HlandSea) ||
 	       ($landKind == $HlandOil) ||
 	       ($landKind == $HlandWaste) ||
@@ -2155,33 +2155,33 @@ sub wideDamage {
     }
 }
 
-# ¥í¥°¤Ø¤Î½ĞÎÏ
-# Âè1°ú¿ô:¥á¥Ã¥»¡¼¥¸
-# Âè2°ú¿ô:Åö»ö¼Ô
-# Âè3°ú¿ô:Áê¼ê
-# ÄÌ¾ï¥í¥°
+# ãƒ­ã‚°ã¸ã®å‡ºåŠ›
+# ç¬¬1å¼•æ•°:ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
+# ç¬¬2å¼•æ•°:å½“äº‹è€…
+# ç¬¬3å¼•æ•°:ç›¸æ‰‹
+# é€šå¸¸ãƒ­ã‚°
 sub logOut {
     push(@HlogPool,"0,$HislandTurn,$_[1],$_[2],$_[0]");
 }
 
-# ÃÙ±ä¥í¥°
+# é…å»¶ãƒ­ã‚°
 sub logLate {
     push(@HlateLogPool,"0,$HislandTurn,$_[1],$_[2],$_[0]");
 }
 
-# µ¡Ì©¥í¥°
+# æ©Ÿå¯†ãƒ­ã‚°
 sub logSecret {
     push(@HsecretLogPool,"1,$HislandTurn,$_[1],$_[2],$_[0]");
 }
 
-# µ­Ï¿¥í¥°
+# è¨˜éŒ²ãƒ­ã‚°
 sub logHistory {
     open(HOUT, ">>${HdirName}/hakojima.his");
     print HOUT "$HislandTurn,$_[0]\n";
     close(HOUT);
 }
 
-# µ­Ï¿¥í¥°Ä´À°
+# è¨˜éŒ²ãƒ­ã‚°èª¿æ•´
 sub logHistoryTrim {
     open(HIN, "${HdirName}/hakojima.his");
     my(@line, $l, $count);
@@ -2203,11 +2203,11 @@ sub logHistoryTrim {
     }
 }
 
-# ¥í¥°½ñ¤­½Ğ¤·
+# ãƒ­ã‚°æ›¸ãå‡ºã—
 sub logFlush {
     open(LOUT, ">${HdirName}/hakojima.log0");
 
-    # Á´ÉôµÕ½ç¤Ë¤·¤Æ½ñ¤­½Ğ¤¹
+    # å…¨éƒ¨é€†é †ã«ã—ã¦æ›¸ãå‡ºã™
     my($i);
     for($i = $#HsecretLogPool; $i >= 0; $i--) {
 	print LOUT $HsecretLogPool[$i];
@@ -2225,627 +2225,627 @@ sub logFlush {
 }
 
 #----------------------------------------------------------------------
-# ¥í¥°¥Æ¥ó¥×¥ì¡¼¥È
+# ãƒ­ã‚°ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆ
 #----------------------------------------------------------------------
-# »ñ¶âÂ­¤ê¤Ê¤¤
+# è³‡é‡‘è¶³ã‚Šãªã„
 sub logNoMoney {
     my($id, $name, $comName) = @_;
-    logOut("${HtagName_}${name}Åç${H_tagName}¤ÇÍ½Äê¤µ¤ì¤Æ¤¤¤¿${HtagComName_}$comName${H_tagComName}¤Ï¡¢»ñ¶âÉÔÂ­¤Î¤¿¤áÃæ»ß¤µ¤ì¤Ş¤·¤¿¡£",$id);
+    logOut("${HtagName_}${name}å³¶${H_tagName}ã§äºˆå®šã•ã‚Œã¦ã„ãŸ${HtagComName_}$comName${H_tagComName}ã¯ã€è³‡é‡‘ä¸è¶³ã®ãŸã‚ä¸­æ­¢ã•ã‚Œã¾ã—ãŸã€‚",$id);
 }
 
-# ¿©ÎÁÂ­¤ê¤Ê¤¤
+# é£Ÿæ–™è¶³ã‚Šãªã„
 sub logNoFood {
     my($id, $name, $comName) = @_;
-    logOut("${HtagName_}${name}Åç${H_tagName}¤ÇÍ½Äê¤µ¤ì¤Æ¤¤¤¿${HtagComName_}$comName${H_tagComName}¤Ï¡¢È÷Ãß¿©ÎÁÉÔÂ­¤Î¤¿¤áÃæ»ß¤µ¤ì¤Ş¤·¤¿¡£",$id);
+    logOut("${HtagName_}${name}å³¶${H_tagName}ã§äºˆå®šã•ã‚Œã¦ã„ãŸ${HtagComName_}$comName${H_tagComName}ã¯ã€å‚™è“„é£Ÿæ–™ä¸è¶³ã®ãŸã‚ä¸­æ­¢ã•ã‚Œã¾ã—ãŸã€‚",$id);
 }
 
-# ÂĞ¾İÃÏ·Á¤Î¼ïÎà¤Ë¤è¤ë¼ºÇÔ
+# å¯¾è±¡åœ°å½¢ã®ç¨®é¡ã«ã‚ˆã‚‹å¤±æ•—
 sub logLandFail {
     my($id, $name, $comName, $kind, $point) = @_;
-    logOut("${HtagName_}${name}Åç${H_tagName}¤ÇÍ½Äê¤µ¤ì¤Æ¤¤¤¿${HtagComName_}$comName${H_tagComName}¤Ï¡¢Í½ÄêÃÏ¤Î${HtagName_}$point${H_tagName}¤¬<B>$kind</B>¤À¤Ã¤¿¤¿¤áÃæ»ß¤µ¤ì¤Ş¤·¤¿¡£",$id);
+    logOut("${HtagName_}${name}å³¶${H_tagName}ã§äºˆå®šã•ã‚Œã¦ã„ãŸ${HtagComName_}$comName${H_tagComName}ã¯ã€äºˆå®šåœ°ã®${HtagName_}$point${H_tagName}ãŒ<B>$kind</B>ã ã£ãŸãŸã‚ä¸­æ­¢ã•ã‚Œã¾ã—ãŸã€‚",$id);
 END
 }
 
-# ¼ş¤ê¤ËÎ¦¤¬¤Ê¤¯¤ÆËä¤áÎ©¤Æ¼ºÇÔ
+# å‘¨ã‚Šã«é™¸ãŒãªãã¦åŸ‹ã‚ç«‹ã¦å¤±æ•—
 sub logNoLandAround {
     my($id, $name, $comName, $point) = @_;
-    logOut("${HtagName_}${name}Åç${H_tagName}¤ÇÍ½Äê¤µ¤ì¤Æ¤¤¤¿${HtagComName_}$comName${H_tagComName}¤Ï¡¢Í½ÄêÃÏ¤Î${HtagName_}$point${H_tagName}¤Î¼şÊÕ¤ËÎ¦ÃÏ¤¬¤Ê¤«¤Ã¤¿¤¿¤áÃæ»ß¤µ¤ì¤Ş¤·¤¿¡£",$id);
+    logOut("${HtagName_}${name}å³¶${H_tagName}ã§äºˆå®šã•ã‚Œã¦ã„ãŸ${HtagComName_}$comName${H_tagComName}ã¯ã€äºˆå®šåœ°ã®${HtagName_}$point${H_tagName}ã®å‘¨è¾ºã«é™¸åœ°ãŒãªã‹ã£ãŸãŸã‚ä¸­æ­¢ã•ã‚Œã¾ã—ãŸã€‚",$id);
 END
 }
 
-# À°ÃÏ·ÏÀ®¸ù
+# æ•´åœ°ç³»æˆåŠŸ
 sub logLandSuc {
     my($id, $name, $comName, $point) = @_;
-    logOut("${HtagName_}${name}Åç$point${H_tagName}¤Ç${HtagComName_}${comName}${H_tagComName}¤¬¹Ô¤ï¤ì¤Ş¤·¤¿¡£",$id);
+    logOut("${HtagName_}${name}å³¶$point${H_tagName}ã§${HtagComName_}${comName}${H_tagComName}ãŒè¡Œã‚ã‚Œã¾ã—ãŸã€‚",$id);
 END
 }
 
-# ÌıÅÄÈ¯¸«
+# æ²¹ç”°ç™ºè¦‹
 sub logOilFound {
     my($id, $name, $point, $comName, $str) = @_;
-    logOut("${HtagName_}${name}Åç$point${H_tagName}¤Ç<B>$str</B>¤ÎÍ½»»¤ò¤Ä¤®¹ş¤ó¤À${HtagComName_}${comName}${H_tagComName}¤¬¹Ô¤ï¤ì¡¢<B>ÌıÅÄ¤¬·¡¤êÅö¤Æ¤é¤ì¤Ş¤·¤¿</B>¡£",$id);
+    logOut("${HtagName_}${name}å³¶$point${H_tagName}ã§<B>$str</B>ã®äºˆç®—ã‚’ã¤ãè¾¼ã‚“ã ${HtagComName_}${comName}${H_tagComName}ãŒè¡Œã‚ã‚Œã€<B>æ²¹ç”°ãŒæ˜ã‚Šå½“ã¦ã‚‰ã‚Œã¾ã—ãŸ</B>ã€‚",$id);
 END
 }
 
-# ÌıÅÄÈ¯¸«¤Ê¤é¤º
+# æ²¹ç”°ç™ºè¦‹ãªã‚‰ãš
 sub logOilFail {
     my($id, $name, $point, $comName, $str) = @_;
-    logOut("${HtagName_}${name}Åç$point${H_tagName}¤Ç<B>$str</B>¤ÎÍ½»»¤ò¤Ä¤®¹ş¤ó¤À${HtagComName_}${comName}${H_tagComName}¤¬¹Ô¤ï¤ì¤Ş¤·¤¿¤¬¡¢ÌıÅÄ¤Ï¸«¤Ä¤«¤ê¤Ş¤»¤ó¤Ç¤·¤¿¡£",$id);
+    logOut("${HtagName_}${name}å³¶$point${H_tagName}ã§<B>$str</B>ã®äºˆç®—ã‚’ã¤ãè¾¼ã‚“ã ${HtagComName_}${comName}${H_tagComName}ãŒè¡Œã‚ã‚Œã¾ã—ãŸãŒã€æ²¹ç”°ã¯è¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã§ã—ãŸã€‚",$id);
 END
 }
 
-# ÌıÅÄ¤«¤é¤Î¼ıÆş
+# æ²¹ç”°ã‹ã‚‰ã®åå…¥
 sub logOilMoney {
     my($id, $name, $lName, $point, $str) = @_;
-    logOut("${HtagName_}${name}Åç$point${H_tagName}¤Î<B>$lName</B>¤«¤é¡¢<B>$str</B>¤Î¼ı±×¤¬¾å¤¬¤ê¤Ş¤·¤¿¡£",$id);
+    logOut("${HtagName_}${name}å³¶$point${H_tagName}ã®<B>$lName</B>ã‹ã‚‰ã€<B>$str</B>ã®åç›ŠãŒä¸ŠãŒã‚Šã¾ã—ãŸã€‚",$id);
 END
 }
 
-# ÌıÅÄ¸Ï³é
+# æ²¹ç”°æ¯æ¸‡
 sub logOilEnd {
     my($id, $name, $lName, $point) = @_;
-    logOut("${HtagName_}${name}Åç$point${H_tagName}¤Î<B>$lName</B>¤Ï¸Ï³é¤·¤¿¤è¤¦¤Ç¤¹¡£",$id);
+    logOut("${HtagName_}${name}å³¶$point${H_tagName}ã®<B>$lName</B>ã¯æ¯æ¸‡ã—ãŸã‚ˆã†ã§ã™ã€‚",$id);
 END
 }
 
-# ËÉ±Ò»ÜÀß¡¢¼«Çú¥»¥Ã¥È
+# é˜²è¡›æ–½è¨­ã€è‡ªçˆ†ã‚»ãƒƒãƒˆ
 sub logBombSet {
     my($id, $name, $lName, $point) = @_;
-    logOut("${HtagName_}${name}Åç$point${H_tagName}¤Î<B>$lName</B>¤Î<B>¼«ÇúÁõÃÖ¤¬¥»¥Ã¥È</B>¤µ¤ì¤Ş¤·¤¿¡£",$id);
+    logOut("${HtagName_}${name}å³¶$point${H_tagName}ã®<B>$lName</B>ã®<B>è‡ªçˆ†è£…ç½®ãŒã‚»ãƒƒãƒˆ</B>ã•ã‚Œã¾ã—ãŸã€‚",$id);
 END
 }
 
-# ËÉ±Ò»ÜÀß¡¢¼«ÇúºîÆ°
+# é˜²è¡›æ–½è¨­ã€è‡ªçˆ†ä½œå‹•
 sub logBombFire {
     my($id, $name, $lName, $point) = @_;
-    logOut("${HtagName_}${name}Åç$point${H_tagName}¤Î<B>$lName</B>¡¢${HtagDisaster_}¼«ÇúÁõÃÖºîÆ°¡ª¡ª${H_tagDisaster}",$id);
+    logOut("${HtagName_}${name}å³¶$point${H_tagName}ã®<B>$lName</B>ã€${HtagDisaster_}è‡ªçˆ†è£…ç½®ä½œå‹•ï¼ï¼${H_tagDisaster}",$id);
 END
 }
 
-# µ­Ç°Èê¡¢È¯¼Í
+# è¨˜å¿µç¢‘ã€ç™ºå°„
 sub logMonFly {
     my($id, $name, $lName, $point) = @_;
-    logOut("${HtagName_}${name}Åç$point${H_tagName}¤Î<B>$lName</B>¤¬<B>¹ì²»¤È¤È¤â¤ËÈô¤ÓÎ©¤Á¤Ş¤·¤¿</B>¡£",$id);
+    logOut("${HtagName_}${name}å³¶$point${H_tagName}ã®<B>$lName</B>ãŒ<B>è½ŸéŸ³ã¨ã¨ã‚‚ã«é£›ã³ç«‹ã¡ã¾ã—ãŸ</B>ã€‚",$id);
 END
 }
 
-# µ­Ç°Èê¡¢Íî²¼
+# è¨˜å¿µç¢‘ã€è½ä¸‹
 sub logMonDamage {
     my($id, $name, $point) = @_;
-    logOut("<B>²¿¤«¤È¤Æ¤Ä¤â¤Ê¤¤¤â¤Î</B>¤¬${HtagName_}${name}Åç$point${H_tagName}ÃÏÅÀ¤ËÍî²¼¤·¤Ş¤·¤¿¡ª¡ª",$id);
+    logOut("<B>ä½•ã‹ã¨ã¦ã¤ã‚‚ãªã„ã‚‚ã®</B>ãŒ${HtagName_}${name}å³¶$point${H_tagName}åœ°ç‚¹ã«è½ä¸‹ã—ã¾ã—ãŸï¼ï¼",$id);
 }
 
-# ¿¢ÎÓor¥ß¥µ¥¤¥ë´ğÃÏ
+# æ¤æ—orãƒŸã‚µã‚¤ãƒ«åŸºåœ°
 sub logPBSuc {
     my($id, $name, $comName, $point) = @_;
-    logSecret("${HtagName_}${name}Åç$point${H_tagName}¤Ç${HtagComName_}${comName}${H_tagComName}¤¬¹Ô¤ï¤ì¤Ş¤·¤¿¡£",$id);
-    logOut("¤³¤³¤í¤Ê¤·¤«¡¢${HtagName_}${name}Åç${H_tagName}¤Î<B>¿¹</B>¤¬Áı¤¨¤¿¤è¤¦¤Ç¤¹¡£",$id);
+    logSecret("${HtagName_}${name}å³¶$point${H_tagName}ã§${HtagComName_}${comName}${H_tagComName}ãŒè¡Œã‚ã‚Œã¾ã—ãŸã€‚",$id);
+    logOut("ã“ã“ã‚ãªã—ã‹ã€${HtagName_}${name}å³¶${H_tagName}ã®<B>æ£®</B>ãŒå¢—ãˆãŸã‚ˆã†ã§ã™ã€‚",$id);
 END
 }
 
-# ¥Ï¥ê¥Ü¥Æ
+# ãƒãƒªãƒœãƒ†
 sub logHariSuc {
     my($id, $name, $comName, $comName2, $point) = @_;
-    logSecret("${HtagName_}${name}Åç$point${H_tagName}¤Ç${HtagComName_}${comName}${H_tagComName}¤¬¹Ô¤ï¤ì¤Ş¤·¤¿¡£",$id);
+    logSecret("${HtagName_}${name}å³¶$point${H_tagName}ã§${HtagComName_}${comName}${H_tagComName}ãŒè¡Œã‚ã‚Œã¾ã—ãŸã€‚",$id);
     logLandSuc($id, $name, $comName2, $point);
 END
 }
 
-# ¥ß¥µ¥¤¥ë·â¤È¤¦¤È¤·¤¿(or ²ø½ÃÇÉ¸¯¤·¤è¤¦¤È¤·¤¿)¤¬¥¿¡¼¥²¥Ã¥È¤¬¤¤¤Ê¤¤
+# ãƒŸã‚µã‚¤ãƒ«æ’ƒã¨ã†ã¨ã—ãŸ(or æ€ªç£æ´¾é£ã—ã‚ˆã†ã¨ã—ãŸ)ãŒã‚¿ãƒ¼ã‚²ãƒƒãƒˆãŒã„ãªã„
 sub logMsNoTarget {
     my($id, $name, $comName) = @_;
-    logOut("${HtagName_}${name}Åç${H_tagName}¤ÇÍ½Äê¤µ¤ì¤Æ¤¤¤¿${HtagComName_}${comName}${H_tagComName}¤Ï¡¢ÌÜÉ¸¤ÎÅç¤Ë¿Í¤¬¸«Åö¤¿¤é¤Ê¤¤¤¿¤áÃæ»ß¤µ¤ì¤Ş¤·¤¿¡£",$id);
+    logOut("${HtagName_}${name}å³¶${H_tagName}ã§äºˆå®šã•ã‚Œã¦ã„ãŸ${HtagComName_}${comName}${H_tagComName}ã¯ã€ç›®æ¨™ã®å³¶ã«äººãŒè¦‹å½“ãŸã‚‰ãªã„ãŸã‚ä¸­æ­¢ã•ã‚Œã¾ã—ãŸã€‚",$id);
 END
 }
 
-# ¥ß¥µ¥¤¥ë·â¤È¤¦¤È¤·¤¿¤¬´ğÃÏ¤¬¤Ê¤¤
+# ãƒŸã‚µã‚¤ãƒ«æ’ƒã¨ã†ã¨ã—ãŸãŒåŸºåœ°ãŒãªã„
 sub logMsNoBase {
     my($id, $name, $comName) = @_;
-    logOut("${HtagName_}${name}Åç${H_tagName}¤ÇÍ½Äê¤µ¤ì¤Æ¤¤¤¿${HtagComName_}${comName}${H_tagComName}¤Ï¡¢<B>¥ß¥µ¥¤¥ëÀßÈ÷¤òÊİÍ­¤·¤Æ¤¤¤Ê¤¤</B>¤¿¤á¤Ë¼Â¹Ô¤Ç¤­¤Ş¤»¤ó¤Ç¤·¤¿¡£",$id);
+    logOut("${HtagName_}${name}å³¶${H_tagName}ã§äºˆå®šã•ã‚Œã¦ã„ãŸ${HtagComName_}${comName}${H_tagComName}ã¯ã€<B>ãƒŸã‚µã‚¤ãƒ«è¨­å‚™ã‚’ä¿æœ‰ã—ã¦ã„ãªã„</B>ãŸã‚ã«å®Ÿè¡Œã§ãã¾ã›ã‚“ã§ã—ãŸã€‚",$id);
 END
 }
 
-# ¥ß¥µ¥¤¥ë·â¤Ã¤¿¤¬ÈÏ°Ï³°
+# ãƒŸã‚µã‚¤ãƒ«æ’ƒã£ãŸãŒç¯„å›²å¤–
 sub logMsOut {
     my($id, $tId, $name, $tName, $comName, $point) = @_;
-    logOut("${HtagName_}${name}Åç${H_tagName}¤¬${HtagName_}${tName}Åç$point${H_tagName}ÃÏÅÀ¤Ë¸ş¤±¤Æ${HtagComName_}${comName}${H_tagComName}¤ò¹Ô¤¤¤Ş¤·¤¿¤¬¡¢<B>ÎÎ°è³°¤Î³¤</B>¤ËÍî¤Á¤¿ÌÏÍÍ¤Ç¤¹¡£",$id, $tId);
+    logOut("${HtagName_}${name}å³¶${H_tagName}ãŒ${HtagName_}${tName}å³¶$point${H_tagName}åœ°ç‚¹ã«å‘ã‘ã¦${HtagComName_}${comName}${H_tagComName}ã‚’è¡Œã„ã¾ã—ãŸãŒã€<B>é ˜åŸŸå¤–ã®æµ·</B>ã«è½ã¡ãŸæ¨¡æ§˜ã§ã™ã€‚",$id, $tId);
 }
 
-# ¥¹¥Æ¥ë¥¹¥ß¥µ¥¤¥ë·â¤Ã¤¿¤¬ÈÏ°Ï³°
+# ã‚¹ãƒ†ãƒ«ã‚¹ãƒŸã‚µã‚¤ãƒ«æ’ƒã£ãŸãŒç¯„å›²å¤–
 sub logMsOutS {
     my($id, $tId, $name, $tName, $comName, $point) = @_;
-    logSecret("${HtagName_}${name}Åç${H_tagName}¤¬${HtagName_}${tName}Åç$point${H_tagName}ÃÏÅÀ¤Ë¸ş¤±¤Æ${HtagComName_}${comName}${H_tagComName}¤ò¹Ô¤¤¤Ş¤·¤¿¤¬¡¢<B>ÎÎ°è³°¤Î³¤</B>¤ËÍî¤Á¤¿ÌÏÍÍ¤Ç¤¹¡£",$id, $tId);
-    logLate("<B>²¿¼Ô¤«</B>¤¬${HtagName_}${tName}Åç$point${H_tagName}¤Ø¸ş¤±¤Æ${HtagComName_}${comName}${H_tagComName}¤ò¹Ô¤¤¤Ş¤·¤¿¤¬¡¢<B>ÎÎ°è³°¤Î³¤</B>¤ËÍî¤Á¤¿ÌÏÍÍ¤Ç¤¹¡£",$tId);
+    logSecret("${HtagName_}${name}å³¶${H_tagName}ãŒ${HtagName_}${tName}å³¶$point${H_tagName}åœ°ç‚¹ã«å‘ã‘ã¦${HtagComName_}${comName}${H_tagComName}ã‚’è¡Œã„ã¾ã—ãŸãŒã€<B>é ˜åŸŸå¤–ã®æµ·</B>ã«è½ã¡ãŸæ¨¡æ§˜ã§ã™ã€‚",$id, $tId);
+    logLate("<B>ä½•è€…ã‹</B>ãŒ${HtagName_}${tName}å³¶$point${H_tagName}ã¸å‘ã‘ã¦${HtagComName_}${comName}${H_tagComName}ã‚’è¡Œã„ã¾ã—ãŸãŒã€<B>é ˜åŸŸå¤–ã®æµ·</B>ã«è½ã¡ãŸæ¨¡æ§˜ã§ã™ã€‚",$tId);
 }
 
-# ¥ß¥µ¥¤¥ë·â¤Ã¤¿¤¬ËÉ±Ò»ÜÀß¤Ç¥­¥ã¥Ã¥Á
+# ãƒŸã‚µã‚¤ãƒ«æ’ƒã£ãŸãŒé˜²è¡›æ–½è¨­ã§ã‚­ãƒ£ãƒƒãƒ
 sub logMsCaught {
     my($id, $tId, $name, $tName, $comName, $point, $tPoint) = @_;
-    logOut("${HtagName_}${name}Åç${H_tagName}¤¬${HtagName_}${tName}Åç$point${H_tagName}ÃÏÅÀ¤Ë¸ş¤±¤Æ${HtagComName_}${comName}${H_tagComName}¤ò¹Ô¤¤¤Ş¤·¤¿¤¬¡¢${HtagName_}$tPoint${H_tagName}ÃÏÅÀ¾å¶õ¤Ë¤ÆÎÏ¾ì¤ËÂª¤¨¤é¤ì¡¢<B>¶õÃæÇúÈ¯</B>¤·¤Ş¤·¤¿¡£",$id, $tId);
+    logOut("${HtagName_}${name}å³¶${H_tagName}ãŒ${HtagName_}${tName}å³¶$point${H_tagName}åœ°ç‚¹ã«å‘ã‘ã¦${HtagComName_}${comName}${H_tagComName}ã‚’è¡Œã„ã¾ã—ãŸãŒã€${HtagName_}$tPoint${H_tagName}åœ°ç‚¹ä¸Šç©ºã«ã¦åŠ›å ´ã«æ‰ãˆã‚‰ã‚Œã€<B>ç©ºä¸­çˆ†ç™º</B>ã—ã¾ã—ãŸã€‚",$id, $tId);
 }
 
-# ¥¹¥Æ¥ë¥¹¥ß¥µ¥¤¥ë·â¤Ã¤¿¤¬ËÉ±Ò»ÜÀß¤Ç¥­¥ã¥Ã¥Á
+# ã‚¹ãƒ†ãƒ«ã‚¹ãƒŸã‚µã‚¤ãƒ«æ’ƒã£ãŸãŒé˜²è¡›æ–½è¨­ã§ã‚­ãƒ£ãƒƒãƒ
 sub logMsCaughtS {
     my($id, $tId, $name, $tName, $comName, $point, $tPoint) = @_;
-    logSecret("${HtagName_}${name}Åç${H_tagName}¤¬${HtagName_}${tName}Åç$point${H_tagName}ÃÏÅÀ¤Ë¸ş¤±¤Æ${HtagComName_}${comName}${H_tagComName}¤ò¹Ô¤¤¤Ş¤·¤¿¤¬¡¢${HtagName_}$tPoint${H_tagName}ÃÏÅÀ¾å¶õ¤Ë¤ÆÎÏ¾ì¤ËÂª¤¨¤é¤ì¡¢<B>¶õÃæÇúÈ¯</B>¤·¤Ş¤·¤¿¡£",$id, $tId);
-    logLate("<B>²¿¼Ô¤«</B>¤¬${HtagName_}${tName}Åç$point${H_tagName}¤Ø¸ş¤±¤Æ${HtagComName_}${comName}${H_tagComName}¤ò¹Ô¤¤¤Ş¤·¤¿¤¬¡¢${HtagName_}$tPoint${H_tagName}ÃÏÅÀ¾å¶õ¤Ë¤ÆÎÏ¾ì¤ËÂª¤¨¤é¤ì¡¢<B>¶õÃæÇúÈ¯</B>¤·¤Ş¤·¤¿¡£",$tId);
+    logSecret("${HtagName_}${name}å³¶${H_tagName}ãŒ${HtagName_}${tName}å³¶$point${H_tagName}åœ°ç‚¹ã«å‘ã‘ã¦${HtagComName_}${comName}${H_tagComName}ã‚’è¡Œã„ã¾ã—ãŸãŒã€${HtagName_}$tPoint${H_tagName}åœ°ç‚¹ä¸Šç©ºã«ã¦åŠ›å ´ã«æ‰ãˆã‚‰ã‚Œã€<B>ç©ºä¸­çˆ†ç™º</B>ã—ã¾ã—ãŸã€‚",$id, $tId);
+    logLate("<B>ä½•è€…ã‹</B>ãŒ${HtagName_}${tName}å³¶$point${H_tagName}ã¸å‘ã‘ã¦${HtagComName_}${comName}${H_tagComName}ã‚’è¡Œã„ã¾ã—ãŸãŒã€${HtagName_}$tPoint${H_tagName}åœ°ç‚¹ä¸Šç©ºã«ã¦åŠ›å ´ã«æ‰ãˆã‚‰ã‚Œã€<B>ç©ºä¸­çˆ†ç™º</B>ã—ã¾ã—ãŸã€‚",$tId);
 }
 
-# ¥ß¥µ¥¤¥ë·â¤Ã¤¿¤¬¸ú²Ì¤Ê¤·
+# ãƒŸã‚µã‚¤ãƒ«æ’ƒã£ãŸãŒåŠ¹æœãªã—
 sub logMsNoDamage {
     my($id, $tId, $name, $tName, $comName, $tLname, $point, $tPoint) = @_;
-    logOut("${HtagName_}${name}Åç${H_tagName}¤¬${HtagName_}${tName}Åç$point${H_tagName}ÃÏÅÀ¤Ë¸ş¤±¤Æ${HtagComName_}${comName}${H_tagComName}¤ò¹Ô¤¤¤Ş¤·¤¿¤¬¡¢${HtagName_}$tPoint${H_tagName}¤Î<B>$tLname</B>¤ËÍî¤Á¤¿¤Î¤ÇÈï³²¤¬¤¢¤ê¤Ş¤»¤ó¤Ç¤·¤¿¡£",$id, $tId);
+    logOut("${HtagName_}${name}å³¶${H_tagName}ãŒ${HtagName_}${tName}å³¶$point${H_tagName}åœ°ç‚¹ã«å‘ã‘ã¦${HtagComName_}${comName}${H_tagComName}ã‚’è¡Œã„ã¾ã—ãŸãŒã€${HtagName_}$tPoint${H_tagName}ã®<B>$tLname</B>ã«è½ã¡ãŸã®ã§è¢«å®³ãŒã‚ã‚Šã¾ã›ã‚“ã§ã—ãŸã€‚",$id, $tId);
 }
 
-# ¥¹¥Æ¥ë¥¹¥ß¥µ¥¤¥ë·â¤Ã¤¿¤¬¸ú²Ì¤Ê¤·
+# ã‚¹ãƒ†ãƒ«ã‚¹ãƒŸã‚µã‚¤ãƒ«æ’ƒã£ãŸãŒåŠ¹æœãªã—
 sub logMsNoDamageS {
     my($id, $tId, $name, $tName, $comName, $tLname, $point, $tPoint) = @_;
-    logSecret("${HtagName_}${name}Åç${H_tagName}¤¬${HtagName_}${tName}Åç$point${H_tagName}ÃÏÅÀ¤Ë¸ş¤±¤Æ${HtagComName_}${comName}${H_tagComName}¤ò¹Ô¤¤¤Ş¤·¤¿¤¬¡¢${HtagName_}$tPoint${H_tagName}¤Î<B>$tLname</B>¤ËÍî¤Á¤¿¤Î¤ÇÈï³²¤¬¤¢¤ê¤Ş¤»¤ó¤Ç¤·¤¿¡£",$id, $tId);
+    logSecret("${HtagName_}${name}å³¶${H_tagName}ãŒ${HtagName_}${tName}å³¶$point${H_tagName}åœ°ç‚¹ã«å‘ã‘ã¦${HtagComName_}${comName}${H_tagComName}ã‚’è¡Œã„ã¾ã—ãŸãŒã€${HtagName_}$tPoint${H_tagName}ã®<B>$tLname</B>ã«è½ã¡ãŸã®ã§è¢«å®³ãŒã‚ã‚Šã¾ã›ã‚“ã§ã—ãŸã€‚",$id, $tId);
 
-    logLate("<B>²¿¼Ô¤«</B>¤¬${HtagName_}${tName}Åç$point${H_tagName}ÃÏÅÀ¤Ë¸ş¤±¤Æ${HtagComName_}${comName}${H_tagComName}¤ò¹Ô¤¤¤Ş¤·¤¿¤¬¡¢${HtagName_}$tPoint${H_tagName}¤Î<B>$tLname</B>¤ËÍî¤Á¤¿¤Î¤ÇÈï³²¤¬¤¢¤ê¤Ş¤»¤ó¤Ç¤·¤¿¡£",$tId);
+    logLate("<B>ä½•è€…ã‹</B>ãŒ${HtagName_}${tName}å³¶$point${H_tagName}åœ°ç‚¹ã«å‘ã‘ã¦${HtagComName_}${comName}${H_tagComName}ã‚’è¡Œã„ã¾ã—ãŸãŒã€${HtagName_}$tPoint${H_tagName}ã®<B>$tLname</B>ã«è½ã¡ãŸã®ã§è¢«å®³ãŒã‚ã‚Šã¾ã›ã‚“ã§ã—ãŸã€‚",$tId);
 }
 
-# Î¦ÃÏÇË²õÃÆ¡¢»³¤ËÌ¿Ãæ
+# é™¸åœ°ç ´å£Šå¼¾ã€å±±ã«å‘½ä¸­
 sub logMsLDMountain {
     my($id, $tId, $name, $tName, $comName, $tLname, $point, $tPoint) = @_;
-    logOut("${HtagName_}${name}Åç${H_tagName}¤¬${HtagName_}${tName}Åç$point${H_tagName}ÃÏÅÀ¤Ë¸ş¤±¤Æ${HtagComName_}${comName}${H_tagComName}¤ò¹Ô¤¤¡¢${HtagName_}$tPoint${H_tagName}¤Î<B>$tLname</B>¤ËÌ¿Ãæ¡£<B>$tLname</B>¤Ï¾Ã¤·Èô¤Ó¡¢¹ÓÃÏ¤È²½¤·¤Ş¤·¤¿¡£",$id, $tId);
+    logOut("${HtagName_}${name}å³¶${H_tagName}ãŒ${HtagName_}${tName}å³¶$point${H_tagName}åœ°ç‚¹ã«å‘ã‘ã¦${HtagComName_}${comName}${H_tagComName}ã‚’è¡Œã„ã€${HtagName_}$tPoint${H_tagName}ã®<B>$tLname</B>ã«å‘½ä¸­ã€‚<B>$tLname</B>ã¯æ¶ˆã—é£›ã³ã€è’åœ°ã¨åŒ–ã—ã¾ã—ãŸã€‚",$id, $tId);
 }
 
-# Î¦ÃÏÇË²õÃÆ¡¢³¤Äì´ğÃÏ¤ËÌ¿Ãæ
+# é™¸åœ°ç ´å£Šå¼¾ã€æµ·åº•åŸºåœ°ã«å‘½ä¸­
 sub logMsLDSbase {
     my($id, $tId, $name, $tName, $comName, $tLname, $point, $tPoint) = @_;
-    logOut("${HtagName_}${name}Åç${H_tagName}¤¬${HtagName_}${tName}Åç$point${H_tagName}ÃÏÅÀ¤Ë¸ş¤±¤Æ${HtagComName_}${comName}${H_tagComName}¤ò¹Ô¤¤¡¢${HtagName_}$tPoint${H_tagName}¤ËÃå¿å¸åÇúÈ¯¡¢Æ±ÃÏÅÀ¤Ë¤¢¤Ã¤¿<B>$tLname</B>¤ÏÀ×·Á¤â¤Ê¤¯¿á¤­Èô¤Ó¤Ş¤·¤¿¡£",$id, $tId);
+    logOut("${HtagName_}${name}å³¶${H_tagName}ãŒ${HtagName_}${tName}å³¶$point${H_tagName}åœ°ç‚¹ã«å‘ã‘ã¦${HtagComName_}${comName}${H_tagComName}ã‚’è¡Œã„ã€${HtagName_}$tPoint${H_tagName}ã«ç€æ°´å¾Œçˆ†ç™ºã€åŒåœ°ç‚¹ã«ã‚ã£ãŸ<B>$tLname</B>ã¯è·¡å½¢ã‚‚ãªãå¹ãé£›ã³ã¾ã—ãŸã€‚",$id, $tId);
 }
 
-# Î¦ÃÏÇË²õÃÆ¡¢²ø½Ã¤ËÌ¿Ãæ
+# é™¸åœ°ç ´å£Šå¼¾ã€æ€ªç£ã«å‘½ä¸­
 sub logMsLDMonster {
     my($id, $tId, $name, $tName, $comName, $tLname, $point, $tPoint) = @_;
-    logOut("${HtagName_}${name}Åç${H_tagName}¤¬${HtagName_}${tName}Åç$point${H_tagName}ÃÏÅÀ¤Ë¸ş¤±¤Æ${HtagComName_}${comName}${H_tagComName}¤ò¹Ô¤¤¡¢${HtagName_}$tPoint${H_tagName}¤ËÃåÃÆ¤·ÇúÈ¯¡£Î¦ÃÏ¤Ï<B>²ø½Ã$tLname</B>¤â¤í¤È¤â¿åË×¤·¤Ş¤·¤¿¡£",$id, $tId);
+    logOut("${HtagName_}${name}å³¶${H_tagName}ãŒ${HtagName_}${tName}å³¶$point${H_tagName}åœ°ç‚¹ã«å‘ã‘ã¦${HtagComName_}${comName}${H_tagComName}ã‚’è¡Œã„ã€${HtagName_}$tPoint${H_tagName}ã«ç€å¼¾ã—çˆ†ç™ºã€‚é™¸åœ°ã¯<B>æ€ªç£$tLname</B>ã‚‚ã‚ã¨ã‚‚æ°´æ²¡ã—ã¾ã—ãŸã€‚",$id, $tId);
 }
 
-# Î¦ÃÏÇË²õÃÆ¡¢ÀõÀ¥¤ËÌ¿Ãæ
+# é™¸åœ°ç ´å£Šå¼¾ã€æµ…ç€¬ã«å‘½ä¸­
 sub logMsLDSea1 {
     my($id, $tId, $name, $tName, $comName, $tLname, $point, $tPoint) = @_;
-    logOut("${HtagName_}${name}Åç${H_tagName}¤¬${HtagName_}${tName}Åç$point${H_tagName}ÃÏÅÀ¤Ë¸ş¤±¤Æ${HtagComName_}${comName}${H_tagComName}¤ò¹Ô¤¤¡¢${HtagName_}$tPoint${H_tagName}¤Î<B>$tLname</B>¤ËÃåÃÆ¡£³¤Äì¤¬¤¨¤°¤é¤ì¤Ş¤·¤¿¡£",$id, $tId);
+    logOut("${HtagName_}${name}å³¶${H_tagName}ãŒ${HtagName_}${tName}å³¶$point${H_tagName}åœ°ç‚¹ã«å‘ã‘ã¦${HtagComName_}${comName}${H_tagComName}ã‚’è¡Œã„ã€${HtagName_}$tPoint${H_tagName}ã®<B>$tLname</B>ã«ç€å¼¾ã€‚æµ·åº•ãŒãˆãã‚‰ã‚Œã¾ã—ãŸã€‚",$id, $tId);
 }
 
-# Î¦ÃÏÇË²õÃÆ¡¢¤½¤ÎÂ¾¤ÎÃÏ·Á¤ËÌ¿Ãæ
+# é™¸åœ°ç ´å£Šå¼¾ã€ãã®ä»–ã®åœ°å½¢ã«å‘½ä¸­
 sub logMsLDLand {
     my($id, $tId, $name, $tName, $comName, $tLname, $point, $tPoint) = @_;
-    logOut("${HtagName_}${name}Åç${H_tagName}¤¬${HtagName_}${tName}Åç$point${H_tagName}ÃÏÅÀ¤Ë¸ş¤±¤Æ${HtagComName_}${comName}${H_tagComName}¤ò¹Ô¤¤¡¢${HtagName_}$tPoint${H_tagName}¤Î<B>$tLname</B>¤ËÃåÃÆ¡£Î¦ÃÏ¤Ï¿åË×¤·¤Ş¤·¤¿¡£",$id, $tId);
+    logOut("${HtagName_}${name}å³¶${H_tagName}ãŒ${HtagName_}${tName}å³¶$point${H_tagName}åœ°ç‚¹ã«å‘ã‘ã¦${HtagComName_}${comName}${H_tagComName}ã‚’è¡Œã„ã€${HtagName_}$tPoint${H_tagName}ã®<B>$tLname</B>ã«ç€å¼¾ã€‚é™¸åœ°ã¯æ°´æ²¡ã—ã¾ã—ãŸã€‚",$id, $tId);
 }
 
-# ÄÌ¾ï¥ß¥µ¥¤¥ë¡¢¹ÓÃÏ¤ËÃåÃÆ
+# é€šå¸¸ãƒŸã‚µã‚¤ãƒ«ã€è’åœ°ã«ç€å¼¾
 sub logMsWaste {
     my($id, $tId, $name, $tName, $comName, $tLname, $point, $tPoint) = @_;
-    logOut("${HtagName_}${name}Åç${H_tagName}¤¬${HtagName_}${tName}Åç$point${H_tagName}ÃÏÅÀ¤Ë¸ş¤±¤Æ${HtagComName_}${comName}${H_tagComName}¤ò¹Ô¤¤¤Ş¤·¤¿¤¬¡¢${HtagName_}$tPoint${H_tagName}¤Î<B>$tLname</B>¤ËÍî¤Á¤Ş¤·¤¿¡£",$id, $tId);
+    logOut("${HtagName_}${name}å³¶${H_tagName}ãŒ${HtagName_}${tName}å³¶$point${H_tagName}åœ°ç‚¹ã«å‘ã‘ã¦${HtagComName_}${comName}${H_tagComName}ã‚’è¡Œã„ã¾ã—ãŸãŒã€${HtagName_}$tPoint${H_tagName}ã®<B>$tLname</B>ã«è½ã¡ã¾ã—ãŸã€‚",$id, $tId);
 }
 
-# ¥¹¥Æ¥ë¥¹¥ß¥µ¥¤¥ë¡¢¹ÓÃÏ¤ËÃåÃÆ
+# ã‚¹ãƒ†ãƒ«ã‚¹ãƒŸã‚µã‚¤ãƒ«ã€è’åœ°ã«ç€å¼¾
 sub logMsWasteS {
     my($id, $tId, $name, $tName, $comName, $tLname, $point, $tPoint) = @_;
-    logSecret("${HtagName_}${name}Åç${H_tagName}¤¬${HtagName_}${tName}Åç$point${H_tagName}ÃÏÅÀ¤Ë¸ş¤±¤Æ${HtagComName_}${comName}${H_tagComName}¤ò¹Ô¤¤¤Ş¤·¤¿¤¬¡¢${HtagName_}$tPoint${H_tagName}¤Î<B>$tLname</B>¤ËÍî¤Á¤Ş¤·¤¿¡£",$id, $tId);
-    logLate("<B>²¿¼Ô¤«</B>¤¬${HtagName_}${tName}Åç$point${H_tagName}ÃÏÅÀ¤Ë¸ş¤±¤Æ${HtagComName_}${comName}${H_tagComName}¤ò¹Ô¤¤¤Ş¤·¤¿¤¬¡¢${HtagName_}$tPoint${H_tagName}¤Î<B>$tLname</B>¤ËÍî¤Á¤Ş¤·¤¿¡£",$tId);
+    logSecret("${HtagName_}${name}å³¶${H_tagName}ãŒ${HtagName_}${tName}å³¶$point${H_tagName}åœ°ç‚¹ã«å‘ã‘ã¦${HtagComName_}${comName}${H_tagComName}ã‚’è¡Œã„ã¾ã—ãŸãŒã€${HtagName_}$tPoint${H_tagName}ã®<B>$tLname</B>ã«è½ã¡ã¾ã—ãŸã€‚",$id, $tId);
+    logLate("<B>ä½•è€…ã‹</B>ãŒ${HtagName_}${tName}å³¶$point${H_tagName}åœ°ç‚¹ã«å‘ã‘ã¦${HtagComName_}${comName}${H_tagComName}ã‚’è¡Œã„ã¾ã—ãŸãŒã€${HtagName_}$tPoint${H_tagName}ã®<B>$tLname</B>ã«è½ã¡ã¾ã—ãŸã€‚",$tId);
 }
 
-# ÄÌ¾ï¥ß¥µ¥¤¥ë¡¢²ø½Ã¤ËÌ¿Ãæ¡¢¹Å²½Ãæ¤Ë¤ÆÌµ½ı
+# é€šå¸¸ãƒŸã‚µã‚¤ãƒ«ã€æ€ªç£ã«å‘½ä¸­ã€ç¡¬åŒ–ä¸­ã«ã¦ç„¡å‚·
 sub logMsMonNoDamage {
     my($id, $tId, $name, $tName, $comName, $tLname, $point, $tPoint) = @_;
-    logOut("${HtagName_}${name}Åç${H_tagName}¤¬${HtagName_}${tName}Åç$point${H_tagName}ÃÏÅÀ¤Ë¸ş¤±¤Æ${HtagComName_}${comName}${H_tagComName}¤ò¹Ô¤¤¡¢${HtagName_}$tPoint${H_tagName}¤Î<B>²ø½Ã$tLname</B>¤ËÌ¿Ãæ¡¢¤·¤«¤·¹Å²½¾õÂÖ¤À¤Ã¤¿¤¿¤á¸ú²Ì¤¬¤¢¤ê¤Ş¤»¤ó¤Ç¤·¤¿¡£",$id, $tId);
+    logOut("${HtagName_}${name}å³¶${H_tagName}ãŒ${HtagName_}${tName}å³¶$point${H_tagName}åœ°ç‚¹ã«å‘ã‘ã¦${HtagComName_}${comName}${H_tagComName}ã‚’è¡Œã„ã€${HtagName_}$tPoint${H_tagName}ã®<B>æ€ªç£$tLname</B>ã«å‘½ä¸­ã€ã—ã‹ã—ç¡¬åŒ–çŠ¶æ…‹ã ã£ãŸãŸã‚åŠ¹æœãŒã‚ã‚Šã¾ã›ã‚“ã§ã—ãŸã€‚",$id, $tId);
 }
 
-# ¥¹¥Æ¥ë¥¹¥ß¥µ¥¤¥ë¡¢²ø½Ã¤ËÌ¿Ãæ¡¢¹Å²½Ãæ¤Ë¤ÆÌµ½ı
+# ã‚¹ãƒ†ãƒ«ã‚¹ãƒŸã‚µã‚¤ãƒ«ã€æ€ªç£ã«å‘½ä¸­ã€ç¡¬åŒ–ä¸­ã«ã¦ç„¡å‚·
 sub logMsMonNoDamageS {
     my($id, $tId, $name, $tName, $comName, $tLname, $point, $tPoint) = @_;
-    logSecret("${HtagName_}${name}Åç${H_tagName}¤¬${HtagName_}${tName}Åç$point${H_tagName}ÃÏÅÀ¤Ë¸ş¤±¤Æ${HtagComName_}${comName}${H_tagComName}¤ò¹Ô¤¤¡¢${HtagName_}$tPoint${H_tagName}¤Î<B>²ø½Ã$tLname</B>¤ËÌ¿Ãæ¡¢¤·¤«¤·¹Å²½¾õÂÖ¤À¤Ã¤¿¤¿¤á¸ú²Ì¤¬¤¢¤ê¤Ş¤»¤ó¤Ç¤·¤¿¡£",$id, $tId);
-    logOut("<B>²¿¼Ô¤«</B>¤¬${HtagName_}${tName}Åç$point${H_tagName}ÃÏÅÀ¤Ë¸ş¤±¤Æ${HtagComName_}${comName}${H_tagComName}¤ò¹Ô¤¤¡¢${HtagName_}$tPoint${H_tagName}¤Î<B>²ø½Ã$tLname</B>¤ËÌ¿Ãæ¡¢¤·¤«¤·¹Å²½¾õÂÖ¤À¤Ã¤¿¤¿¤á¸ú²Ì¤¬¤¢¤ê¤Ş¤»¤ó¤Ç¤·¤¿¡£",$tId);
+    logSecret("${HtagName_}${name}å³¶${H_tagName}ãŒ${HtagName_}${tName}å³¶$point${H_tagName}åœ°ç‚¹ã«å‘ã‘ã¦${HtagComName_}${comName}${H_tagComName}ã‚’è¡Œã„ã€${HtagName_}$tPoint${H_tagName}ã®<B>æ€ªç£$tLname</B>ã«å‘½ä¸­ã€ã—ã‹ã—ç¡¬åŒ–çŠ¶æ…‹ã ã£ãŸãŸã‚åŠ¹æœãŒã‚ã‚Šã¾ã›ã‚“ã§ã—ãŸã€‚",$id, $tId);
+    logOut("<B>ä½•è€…ã‹</B>ãŒ${HtagName_}${tName}å³¶$point${H_tagName}åœ°ç‚¹ã«å‘ã‘ã¦${HtagComName_}${comName}${H_tagComName}ã‚’è¡Œã„ã€${HtagName_}$tPoint${H_tagName}ã®<B>æ€ªç£$tLname</B>ã«å‘½ä¸­ã€ã—ã‹ã—ç¡¬åŒ–çŠ¶æ…‹ã ã£ãŸãŸã‚åŠ¹æœãŒã‚ã‚Šã¾ã›ã‚“ã§ã—ãŸã€‚",$tId);
 }
 
-# ÄÌ¾ï¥ß¥µ¥¤¥ë¡¢²ø½Ã¤ËÌ¿Ãæ¡¢»¦½ı
+# é€šå¸¸ãƒŸã‚µã‚¤ãƒ«ã€æ€ªç£ã«å‘½ä¸­ã€æ®ºå‚·
 sub logMsMonKill {
     my($id, $tId, $name, $tName, $comName, $tLname, $point, $tPoint) = @_;
-    logOut("${HtagName_}${name}Åç${H_tagName}¤¬${HtagName_}${tName}Åç$point${H_tagName}ÃÏÅÀ¤Ë¸ş¤±¤Æ${HtagComName_}${comName}${H_tagComName}¤ò¹Ô¤¤¡¢${HtagName_}$tPoint${H_tagName}¤Î<B>²ø½Ã$tLname</B>¤ËÌ¿Ãæ¡£<B>²ø½Ã$tLname</B>¤ÏÎÏ¿Ô¤­¡¢Åİ¤ì¤Ş¤·¤¿¡£",$id, $tId);
+    logOut("${HtagName_}${name}å³¶${H_tagName}ãŒ${HtagName_}${tName}å³¶$point${H_tagName}åœ°ç‚¹ã«å‘ã‘ã¦${HtagComName_}${comName}${H_tagComName}ã‚’è¡Œã„ã€${HtagName_}$tPoint${H_tagName}ã®<B>æ€ªç£$tLname</B>ã«å‘½ä¸­ã€‚<B>æ€ªç£$tLname</B>ã¯åŠ›å°½ãã€å€’ã‚Œã¾ã—ãŸã€‚",$id, $tId);
 }
 
-# ¥¹¥Æ¥ë¥¹¥ß¥µ¥¤¥ë¡¢²ø½Ã¤ËÌ¿Ãæ¡¢»¦½ı
+# ã‚¹ãƒ†ãƒ«ã‚¹ãƒŸã‚µã‚¤ãƒ«ã€æ€ªç£ã«å‘½ä¸­ã€æ®ºå‚·
 sub logMsMonKillS {
     my($id, $tId, $name, $tName, $comName, $tLname, $point, $tPoint) = @_;
-    logSecret("${HtagName_}${name}Åç${H_tagName}¤¬${HtagName_}${tName}Åç$point${H_tagName}ÃÏÅÀ¤Ë¸ş¤±¤Æ${HtagComName_}${comName}${H_tagComName}¤ò¹Ô¤¤¡¢${HtagName_}$tPoint${H_tagName}¤Î<B>²ø½Ã$tLname</B>¤ËÌ¿Ãæ¡£<B>²ø½Ã$tLname</B>¤ÏÎÏ¿Ô¤­¡¢Åİ¤ì¤Ş¤·¤¿¡£",$id, $tId);
-    logLate("<B>²¿¼Ô¤«</B>¤¬${HtagName_}${tName}Åç$point${H_tagName}ÃÏÅÀ¤Ë¸ş¤±¤Æ${HtagComName_}${comName}${H_tagComName}¤ò¹Ô¤¤¡¢${HtagName_}$tPoint${H_tagName}¤Î<B>²ø½Ã$tLname</B>¤ËÌ¿Ãæ¡£<B>²ø½Ã$tLname</B>¤ÏÎÏ¿Ô¤­¡¢Åİ¤ì¤Ş¤·¤¿¡£", $tId);
+    logSecret("${HtagName_}${name}å³¶${H_tagName}ãŒ${HtagName_}${tName}å³¶$point${H_tagName}åœ°ç‚¹ã«å‘ã‘ã¦${HtagComName_}${comName}${H_tagComName}ã‚’è¡Œã„ã€${HtagName_}$tPoint${H_tagName}ã®<B>æ€ªç£$tLname</B>ã«å‘½ä¸­ã€‚<B>æ€ªç£$tLname</B>ã¯åŠ›å°½ãã€å€’ã‚Œã¾ã—ãŸã€‚",$id, $tId);
+    logLate("<B>ä½•è€…ã‹</B>ãŒ${HtagName_}${tName}å³¶$point${H_tagName}åœ°ç‚¹ã«å‘ã‘ã¦${HtagComName_}${comName}${H_tagComName}ã‚’è¡Œã„ã€${HtagName_}$tPoint${H_tagName}ã®<B>æ€ªç£$tLname</B>ã«å‘½ä¸­ã€‚<B>æ€ªç£$tLname</B>ã¯åŠ›å°½ãã€å€’ã‚Œã¾ã—ãŸã€‚", $tId);
 }
 
-# ÄÌ¾ï¥ß¥µ¥¤¥ë¡¢²ø½Ã¤ËÌ¿Ãæ¡¢¥À¥á¡¼¥¸
+# é€šå¸¸ãƒŸã‚µã‚¤ãƒ«ã€æ€ªç£ã«å‘½ä¸­ã€ãƒ€ãƒ¡ãƒ¼ã‚¸
 sub logMsMonster {
     my($id, $tId, $name, $tName, $comName, $tLname, $point, $tPoint) = @_;
-    logOut("${HtagName_}${name}Åç${H_tagName}¤¬${HtagName_}${tName}Åç$point${H_tagName}ÃÏÅÀ¤Ë¸ş¤±¤Æ${HtagComName_}${comName}${H_tagComName}¤ò¹Ô¤¤¡¢${HtagName_}$tPoint${H_tagName}¤Î<B>²ø½Ã$tLname</B>¤ËÌ¿Ãæ¡£<B>²ø½Ã$tLname</B>¤Ï¶ì¤·¤½¤¦¤ËÒöÓ¬¤·¤Ş¤·¤¿¡£",$id, $tId);
+    logOut("${HtagName_}${name}å³¶${H_tagName}ãŒ${HtagName_}${tName}å³¶$point${H_tagName}åœ°ç‚¹ã«å‘ã‘ã¦${HtagComName_}${comName}${H_tagComName}ã‚’è¡Œã„ã€${HtagName_}$tPoint${H_tagName}ã®<B>æ€ªç£$tLname</B>ã«å‘½ä¸­ã€‚<B>æ€ªç£$tLname</B>ã¯è‹¦ã—ãã†ã«å’†å“®ã—ã¾ã—ãŸã€‚",$id, $tId);
 }
 
-# ¥¹¥Æ¥ë¥¹¥ß¥µ¥¤¥ë¡¢²ø½Ã¤ËÌ¿Ãæ¡¢¥À¥á¡¼¥¸
+# ã‚¹ãƒ†ãƒ«ã‚¹ãƒŸã‚µã‚¤ãƒ«ã€æ€ªç£ã«å‘½ä¸­ã€ãƒ€ãƒ¡ãƒ¼ã‚¸
 sub logMsMonsterS {
     my($id, $tId, $name, $tName, $comName, $tLname, $point, $tPoint) = @_;
-    logSecret("${HtagName_}${name}Åç${H_tagName}¤¬${HtagName_}${tName}Åç$point${H_tagName}ÃÏÅÀ¤Ë¸ş¤±¤Æ${HtagComName_}${comName}${H_tagComName}¤ò¹Ô¤¤¡¢${HtagName_}$tPoint${H_tagName}¤Î<B>²ø½Ã$tLname</B>¤ËÌ¿Ãæ¡£<B>²ø½Ã$tLname</B>¤Ï¶ì¤·¤½¤¦¤ËÒöÓ¬¤·¤Ş¤·¤¿¡£",$id, $tId);
-    logLate("<B>²¿¼Ô¤«</B>¤¬${HtagName_}${tName}Åç$point${H_tagName}ÃÏÅÀ¤Ë¸ş¤±¤Æ${HtagComName_}${comName}${H_tagComName}¤ò¹Ô¤¤¡¢${HtagName_}$tPoint${H_tagName}¤Î<B>²ø½Ã$tLname</B>¤ËÌ¿Ãæ¡£<B>²ø½Ã$tLname</B>¤Ï¶ì¤·¤½¤¦¤ËÒöÓ¬¤·¤Ş¤·¤¿¡£",$tId);
+    logSecret("${HtagName_}${name}å³¶${H_tagName}ãŒ${HtagName_}${tName}å³¶$point${H_tagName}åœ°ç‚¹ã«å‘ã‘ã¦${HtagComName_}${comName}${H_tagComName}ã‚’è¡Œã„ã€${HtagName_}$tPoint${H_tagName}ã®<B>æ€ªç£$tLname</B>ã«å‘½ä¸­ã€‚<B>æ€ªç£$tLname</B>ã¯è‹¦ã—ãã†ã«å’†å“®ã—ã¾ã—ãŸã€‚",$id, $tId);
+    logLate("<B>ä½•è€…ã‹</B>ãŒ${HtagName_}${tName}å³¶$point${H_tagName}åœ°ç‚¹ã«å‘ã‘ã¦${HtagComName_}${comName}${H_tagComName}ã‚’è¡Œã„ã€${HtagName_}$tPoint${H_tagName}ã®<B>æ€ªç£$tLname</B>ã«å‘½ä¸­ã€‚<B>æ€ªç£$tLname</B>ã¯è‹¦ã—ãã†ã«å’†å“®ã—ã¾ã—ãŸã€‚",$tId);
 }
 
-# ²ø½Ã¤Î»àÂÎ
+# æ€ªç£ã®æ­»ä½“
 sub logMsMonMoney {
     my($tId, $mName, $value) = @_;
-    logOut("<B>²ø½Ã$mName</B>¤Î»Ä³¼¤Ë¤Ï¡¢<B>$value$HunitMoney</B>¤ÎÃÍ¤¬ÉÕ¤­¤Ş¤·¤¿¡£",$tId);
+    logOut("<B>æ€ªç£$mName</B>ã®æ®‹éª¸ã«ã¯ã€<B>$value$HunitMoney</B>ã®å€¤ãŒä»˜ãã¾ã—ãŸã€‚",$tId);
 }
 
-# ÄÌ¾ï¥ß¥µ¥¤¥ëÄÌ¾ïÃÏ·Á¤ËÌ¿Ãæ
+# é€šå¸¸ãƒŸã‚µã‚¤ãƒ«é€šå¸¸åœ°å½¢ã«å‘½ä¸­
 sub logMsNormal {
     my($id, $tId, $name, $tName, $comName, $tLname, $point, $tPoint) = @_;
-    logOut("${HtagName_}${name}Åç${H_tagName}¤¬${HtagName_}${tName}Åç$point${H_tagName}ÃÏÅÀ¤Ë¸ş¤±¤Æ${HtagComName_}${comName}${H_tagComName}¤ò¹Ô¤¤¡¢${HtagName_}$tPoint${H_tagName}¤Î<B>$tLname</B>¤ËÌ¿Ãæ¡¢°ìÂÓ¤¬²õÌÇ¤·¤Ş¤·¤¿¡£",$id, $tId);
+    logOut("${HtagName_}${name}å³¶${H_tagName}ãŒ${HtagName_}${tName}å³¶$point${H_tagName}åœ°ç‚¹ã«å‘ã‘ã¦${HtagComName_}${comName}${H_tagComName}ã‚’è¡Œã„ã€${HtagName_}$tPoint${H_tagName}ã®<B>$tLname</B>ã«å‘½ä¸­ã€ä¸€å¸¯ãŒå£Šæ»…ã—ã¾ã—ãŸã€‚",$id, $tId);
 }
 
-# ¥¹¥Æ¥ë¥¹¥ß¥µ¥¤¥ëÄÌ¾ïÃÏ·Á¤ËÌ¿Ãæ
+# ã‚¹ãƒ†ãƒ«ã‚¹ãƒŸã‚µã‚¤ãƒ«é€šå¸¸åœ°å½¢ã«å‘½ä¸­
 sub logMsNormalS {
     my($id, $tId, $name, $tName, $comName, $tLname, $point, $tPoint) = @_;
-    logSecret("${HtagName_}${name}Åç${H_tagName}¤¬${HtagName_}${tName}Åç$point${H_tagName}ÃÏÅÀ¤Ë¸ş¤±¤Æ${HtagComName_}${comName}${H_tagComName}¤ò¹Ô¤¤¡¢${HtagName_}$tPoint${H_tagName}¤Î<B>$tLname</B>¤ËÌ¿Ãæ¡¢°ìÂÓ¤¬²õÌÇ¤·¤Ş¤·¤¿¡£",$id, $tId);
-    logLate("<B>²¿¼Ô¤«</B>¤¬${HtagName_}${tName}Åç$point${H_tagName}ÃÏÅÀ¤Ë¸ş¤±¤Æ${HtagComName_}${comName}${H_tagComName}¤ò¹Ô¤¤¡¢${HtagName_}$tPoint${H_tagName}¤Î<B>$tLname</B>¤ËÌ¿Ãæ¡¢°ìÂÓ¤¬²õÌÇ¤·¤Ş¤·¤¿¡£",$tId);
+    logSecret("${HtagName_}${name}å³¶${H_tagName}ãŒ${HtagName_}${tName}å³¶$point${H_tagName}åœ°ç‚¹ã«å‘ã‘ã¦${HtagComName_}${comName}${H_tagComName}ã‚’è¡Œã„ã€${HtagName_}$tPoint${H_tagName}ã®<B>$tLname</B>ã«å‘½ä¸­ã€ä¸€å¸¯ãŒå£Šæ»…ã—ã¾ã—ãŸã€‚",$id, $tId);
+    logLate("<B>ä½•è€…ã‹</B>ãŒ${HtagName_}${tName}å³¶$point${H_tagName}åœ°ç‚¹ã«å‘ã‘ã¦${HtagComName_}${comName}${H_tagComName}ã‚’è¡Œã„ã€${HtagName_}$tPoint${H_tagName}ã®<B>$tLname</B>ã«å‘½ä¸­ã€ä¸€å¸¯ãŒå£Šæ»…ã—ã¾ã—ãŸã€‚",$tId);
 }
 
-# ¥ß¥µ¥¤¥ëÆñÌ±ÅşÃå
+# ãƒŸã‚µã‚¤ãƒ«é›£æ°‘åˆ°ç€
 sub logMsBoatPeople {
     my($id, $name, $achive) = @_;
-    logOut("${HtagName_}${name}Åç${H_tagName}¤Ë¤É¤³¤«¤é¤È¤â¤Ê¤¯<B>$achive${HunitPop}¤â¤ÎÆñÌ±</B>¤¬ÉºÃå¤·¤Ş¤·¤¿¡£${HtagName_}${name}Åç${H_tagName}¤Ï²÷¤¯¼õ¤±Æş¤ì¤¿¤è¤¦¤Ç¤¹¡£",$id);
+    logOut("${HtagName_}${name}å³¶${H_tagName}ã«ã©ã“ã‹ã‚‰ã¨ã‚‚ãªã<B>$achive${HunitPop}ã‚‚ã®é›£æ°‘</B>ãŒæ¼‚ç€ã—ã¾ã—ãŸã€‚${HtagName_}${name}å³¶${H_tagName}ã¯å¿«ãå—ã‘å…¥ã‚ŒãŸã‚ˆã†ã§ã™ã€‚",$id);
 }
 
-# ²ø½ÃÇÉ¸¯
+# æ€ªç£æ´¾é£
 sub logMonsSend {
     my($id, $tId, $name, $tName) = @_;
-    logOut("${HtagName_}${name}Åç${H_tagName}¤¬<B>¿ÍÂ¤²ø½Ã</B>¤ò·úÂ¤¡£${HtagName_}${tName}Åç${H_tagName}¤ØÁ÷¤ê¤³¤ß¤Ş¤·¤¿¡£",$id, $tId);
+    logOut("${HtagName_}${name}å³¶${H_tagName}ãŒ<B>äººé€ æ€ªç£</B>ã‚’å»ºé€ ã€‚${HtagName_}${tName}å³¶${H_tagName}ã¸é€ã‚Šã“ã¿ã¾ã—ãŸã€‚",$id, $tId);
 }
 
-# »ñ¶â·«¤ê
+# è³‡é‡‘ç¹°ã‚Š
 sub logDoNothing {
     my($id, $name, $comName) = @_;
-#    logOut("${HtagName_}${name}Åç${H_tagName}¤Ç${HtagComName_}${comName}${H_tagComName}¤¬¹Ô¤ï¤ì¤Ş¤·¤¿¡£",$id);
+#    logOut("${HtagName_}${name}å³¶${H_tagName}ã§${HtagComName_}${comName}${H_tagComName}ãŒè¡Œã‚ã‚Œã¾ã—ãŸã€‚",$id);
 }
 
-# Í¢½Ğ
+# è¼¸å‡º
 sub logSell {
     my($id, $name, $comName, $value) = @_;
-    logOut("${HtagName_}${name}Åç${H_tagName}¤¬<B>$value$HunitFood</B>¤Î${HtagComName_}${comName}${H_tagComName}¤ò¹Ô¤¤¤Ş¤·¤¿¡£",$id);
+    logOut("${HtagName_}${name}å³¶${H_tagName}ãŒ<B>$value$HunitFood</B>ã®${HtagComName_}${comName}${H_tagComName}ã‚’è¡Œã„ã¾ã—ãŸã€‚",$id);
 }
 
-# ±ç½õ
+# æ´åŠ©
 sub logAid {
     my($id, $tId, $name, $tName, $comName, $str) = @_;
-    logOut("${HtagName_}${name}Åç${H_tagName}¤¬${HtagName_}${tName}Åç${H_tagName}¤Ø<B>$str</B>¤Î${HtagComName_}${comName}${H_tagComName}¤ò¹Ô¤¤¤Ş¤·¤¿¡£",$id, $tId);
+    logOut("${HtagName_}${name}å³¶${H_tagName}ãŒ${HtagName_}${tName}å³¶${H_tagName}ã¸<B>$str</B>ã®${HtagComName_}${comName}${H_tagComName}ã‚’è¡Œã„ã¾ã—ãŸã€‚",$id, $tId);
 }
 
-# Í¶Ã×³èÆ°
+# èª˜è‡´æ´»å‹•
 sub logPropaganda {
     my($id, $name, $comName) = @_;
-    logOut("${HtagName_}${name}Åç${H_tagName}¤Ç${HtagComName_}${comName}${H_tagComName}¤¬¹Ô¤ï¤ì¤Ş¤·¤¿¡£",$id);
+    logOut("${HtagName_}${name}å³¶${H_tagName}ã§${HtagComName_}${comName}${H_tagComName}ãŒè¡Œã‚ã‚Œã¾ã—ãŸã€‚",$id);
 }
 
-# Êü´ş
+# æ”¾æ£„
 sub logGiveup {
     my($id, $name) = @_;
-    logOut("${HtagName_}${name}Åç${H_tagName}¤ÏÊü´ş¤µ¤ì¡¢<B>Ìµ¿ÍÅç</B>¤Ë¤Ê¤ê¤Ş¤·¤¿¡£",$id);
-    logHistory("${HtagName_}${name}Åç${H_tagName}¡¢Êü´ş¤µ¤ì<B>Ìµ¿ÍÅç</B>¤È¤Ê¤ë¡£");
+    logOut("${HtagName_}${name}å³¶${H_tagName}ã¯æ”¾æ£„ã•ã‚Œã€<B>ç„¡äººå³¶</B>ã«ãªã‚Šã¾ã—ãŸã€‚",$id);
+    logHistory("${HtagName_}${name}å³¶${H_tagName}ã€æ”¾æ£„ã•ã‚Œ<B>ç„¡äººå³¶</B>ã¨ãªã‚‹ã€‚");
 }
 
-# »àÌÇ
+# æ­»æ»…
 sub logDead {
     my($id, $name) = @_;
-    logOut("${HtagName_}${name}Åç${H_tagName}¤«¤é¿Í¤¬¤¤¤Ê¤¯¤Ê¤ê¡¢<B>Ìµ¿ÍÅç</B>¤Ë¤Ê¤ê¤Ş¤·¤¿¡£",$id);
-    logHistory("${HtagName_}${name}Åç${H_tagName}¡¢¿Í¤¬¤¤¤Ê¤¯¤Ê¤ê<B>Ìµ¿ÍÅç</B>¤È¤Ê¤ë¡£");
+    logOut("${HtagName_}${name}å³¶${H_tagName}ã‹ã‚‰äººãŒã„ãªããªã‚Šã€<B>ç„¡äººå³¶</B>ã«ãªã‚Šã¾ã—ãŸã€‚",$id);
+    logHistory("${HtagName_}${name}å³¶${H_tagName}ã€äººãŒã„ãªããªã‚Š<B>ç„¡äººå³¶</B>ã¨ãªã‚‹ã€‚");
 }
 
-# È¯¸«
+# ç™ºè¦‹
 sub logDiscover {
     my($name) = @_;
-    logHistory("${HtagName_}${name}Åç${H_tagName}¤¬È¯¸«¤µ¤ì¤ë¡£");
+    logHistory("${HtagName_}${name}å³¶${H_tagName}ãŒç™ºè¦‹ã•ã‚Œã‚‹ã€‚");
 }
 
-# Ì¾Á°¤ÎÊÑ¹¹
+# åå‰ã®å¤‰æ›´
 sub logChangeName {
     my($name1, $name2) = @_;
-    logHistory("${HtagName_}${name1}Åç${H_tagName}¡¢Ì¾¾Î¤ò${HtagName_}${name2}Åç${H_tagName}¤ËÊÑ¹¹¤¹¤ë¡£");
+    logHistory("${HtagName_}${name1}å³¶${H_tagName}ã€åç§°ã‚’${HtagName_}${name2}å³¶${H_tagName}ã«å¤‰æ›´ã™ã‚‹ã€‚");
 }
 
-# µ²²î
+# é£¢é¤“
 sub logStarve {
     my($id, $name) = @_;
-    logOut("${HtagName_}${name}Åç${H_tagName}¤Î${HtagDisaster_}¿©ÎÁ¤¬ÉÔÂ­${H_tagDisaster}¤·¤Æ¤¤¤Ş¤¹¡ª¡ª",$id);
+    logOut("${HtagName_}${name}å³¶${H_tagName}ã®${HtagDisaster_}é£Ÿæ–™ãŒä¸è¶³${H_tagDisaster}ã—ã¦ã„ã¾ã™ï¼ï¼",$id);
 }
 
-# ²ø½Ã¸½¤ë
+# æ€ªç£ç¾ã‚‹
 sub logMonsCome {
     my($id, $name, $mName, $point, $lName) = @_;
-    logOut("${HtagName_}${name}Åç${H_tagName}¤Ë<B>²ø½Ã$mName</B>½Ğ¸½¡ª¡ª${HtagName_}$point${H_tagName}¤Î<B>$lName</B>¤¬Æ§¤ß¹Ó¤é¤µ¤ì¤Ş¤·¤¿¡£",$id);
+    logOut("${HtagName_}${name}å³¶${H_tagName}ã«<B>æ€ªç£$mName</B>å‡ºç¾ï¼ï¼${HtagName_}$point${H_tagName}ã®<B>$lName</B>ãŒè¸ã¿è’ã‚‰ã•ã‚Œã¾ã—ãŸã€‚",$id);
 }
 
-# ²ø½ÃÆ°¤¯
+# æ€ªç£å‹•ã
 sub logMonsMove {
     my($id, $name, $lName, $point, $mName) = @_;
-    logOut("${HtagName_}${name}Åç$point${H_tagName}¤Î<B>$lName</B>¤¬<B>²ø½Ã$mName</B>¤ËÆ§¤ß¹Ó¤é¤µ¤ì¤Ş¤·¤¿¡£",$id);
+    logOut("${HtagName_}${name}å³¶$point${H_tagName}ã®<B>$lName</B>ãŒ<B>æ€ªç£$mName</B>ã«è¸ã¿è’ã‚‰ã•ã‚Œã¾ã—ãŸã€‚",$id);
 }
 
-# ²ø½Ã¡¢ËÉ±Ò»ÜÀß¤òÆ§¤à
+# æ€ªç£ã€é˜²è¡›æ–½è¨­ã‚’è¸ã‚€
 sub logMonsMoveDefence {
     my($id, $name, $lName, $point, $mName) = @_;
-    logOut("<B>²ø½Ã$mName</B>¤¬${HtagName_}${name}Åç$point${H_tagName}¤Î<B>$lName</B>¤ØÅşÃ£¡¢<B>${lName}¤Î¼«ÇúÁõÃÖ¤¬ºîÆ°¡ª¡ª</B>",$id);
+    logOut("<B>æ€ªç£$mName</B>ãŒ${HtagName_}${name}å³¶$point${H_tagName}ã®<B>$lName</B>ã¸åˆ°é”ã€<B>${lName}ã®è‡ªçˆ†è£…ç½®ãŒä½œå‹•ï¼ï¼</B>",$id);
 }
 
-# ²ĞºÒ
+# ç«ç½
 sub logFire {
     my($id, $name, $lName, $point) = @_;
-    logOut("${HtagName_}${name}Åç$point${H_tagName}¤Î<B>$lName</B>¤¬${HtagDisaster_}²ĞºÒ${H_tagDisaster}¤Ë¤è¤ê²õÌÇ¤·¤Ş¤·¤¿¡£",$id);
+    logOut("${HtagName_}${name}å³¶$point${H_tagName}ã®<B>$lName</B>ãŒ${HtagDisaster_}ç«ç½${H_tagDisaster}ã«ã‚ˆã‚Šå£Šæ»…ã—ã¾ã—ãŸã€‚",$id);
 }
 
-# ËäÂ¢¶â
+# åŸ‹è”µé‡‘
 sub logMaizo {
     my($id, $name, $comName, $value) = @_;
-    logOut("${HtagName_}${name}Åç${H_tagName}¤Ç¤Î${HtagComName_}$comName${H_tagComName}Ãæ¤Ë¡¢<B>$value$HunitMoney¤â¤ÎËäÂ¢¶â</B>¤¬È¯¸«¤µ¤ì¤Ş¤·¤¿¡£",$id);
+    logOut("${HtagName_}${name}å³¶${H_tagName}ã§ã®${HtagComName_}$comName${H_tagComName}ä¸­ã«ã€<B>$value$HunitMoneyã‚‚ã®åŸ‹è”µé‡‘</B>ãŒç™ºè¦‹ã•ã‚Œã¾ã—ãŸã€‚",$id);
 }
 
-# ÃÏ¿ÌÈ¯À¸
+# åœ°éœ‡ç™ºç”Ÿ
 sub logEarthquake {
     my($id, $name) = @_;
-    logOut("${HtagName_}${name}Åç${H_tagName}¤ÇÂçµ¬ÌÏ¤Ê${HtagDisaster_}ÃÏ¿Ì${H_tagDisaster}¤¬È¯À¸¡ª¡ª",$id);
+    logOut("${HtagName_}${name}å³¶${H_tagName}ã§å¤§è¦æ¨¡ãª${HtagDisaster_}åœ°éœ‡${H_tagDisaster}ãŒç™ºç”Ÿï¼ï¼",$id);
 }
 
-# ÃÏ¿ÌÈï³²
+# åœ°éœ‡è¢«å®³
 sub logEQDamage {
     my($id, $name, $lName, $point) = @_;
-    logOut("${HtagName_}${name}Åç$point${H_tagName}¤Î<B>$lName</B>¤Ï${HtagDisaster_}ÃÏ¿Ì${H_tagDisaster}¤Ë¤è¤ê²õÌÇ¤·¤Ş¤·¤¿¡£",$id);
+    logOut("${HtagName_}${name}å³¶$point${H_tagName}ã®<B>$lName</B>ã¯${HtagDisaster_}åœ°éœ‡${H_tagDisaster}ã«ã‚ˆã‚Šå£Šæ»…ã—ã¾ã—ãŸã€‚",$id);
 }
 
-# ¿©ÎÁÉÔÂ­Èï³²
+# é£Ÿæ–™ä¸è¶³è¢«å®³
 sub logSvDamage {
     my($id, $name, $lName, $point) = @_;
-    logOut("${HtagName_}${name}Åç$point${H_tagName}¤Î<B>$lName</B>¤Ë<B>¿©ÎÁ¤òµá¤á¤Æ½»Ì±¤¬»¦Åş</B>¡£<B>$lName</B>¤Ï²õÌÇ¤·¤Ş¤·¤¿¡£",$id);
+    logOut("${HtagName_}${name}å³¶$point${H_tagName}ã®<B>$lName</B>ã«<B>é£Ÿæ–™ã‚’æ±‚ã‚ã¦ä½æ°‘ãŒæ®ºåˆ°</B>ã€‚<B>$lName</B>ã¯å£Šæ»…ã—ã¾ã—ãŸã€‚",$id);
 }
 
-# ÄÅÇÈÈ¯À¸
+# æ´¥æ³¢ç™ºç”Ÿ
 sub logTsunami {
     my($id, $name) = @_;
-    logOut("${HtagName_}${name}Åç${H_tagName}ÉÕ¶á¤Ç${HtagDisaster_}ÄÅÇÈ${H_tagDisaster}È¯À¸¡ª¡ª",$id);
+    logOut("${HtagName_}${name}å³¶${H_tagName}ä»˜è¿‘ã§${HtagDisaster_}æ´¥æ³¢${H_tagDisaster}ç™ºç”Ÿï¼ï¼",$id);
 }
 
-# ÄÅÇÈÈï³²
+# æ´¥æ³¢è¢«å®³
 sub logTsunamiDamage {
     my($id, $name, $lName, $point) = @_;
-    logOut("${HtagName_}${name}Åç$point${H_tagName}¤Î<B>$lName</B>¤Ï${HtagDisaster_}ÄÅÇÈ${H_tagDisaster}¤Ë¤è¤êÊø²õ¤·¤Ş¤·¤¿¡£",$id);
+    logOut("${HtagName_}${name}å³¶$point${H_tagName}ã®<B>$lName</B>ã¯${HtagDisaster_}æ´¥æ³¢${H_tagDisaster}ã«ã‚ˆã‚Šå´©å£Šã—ã¾ã—ãŸã€‚",$id);
 }
 
-# ÂæÉ÷È¯À¸
+# å°é¢¨ç™ºç”Ÿ
 sub logTyphoon {
     my($id, $name) = @_;
-    logOut("${HtagName_}${name}Åç${H_tagName}¤Ë${HtagDisaster_}ÂæÉ÷${H_tagDisaster}¾åÎ¦¡ª¡ª",$id);
+    logOut("${HtagName_}${name}å³¶${H_tagName}ã«${HtagDisaster_}å°é¢¨${H_tagDisaster}ä¸Šé™¸ï¼ï¼",$id);
 }
 
-# ÂæÉ÷Èï³²
+# å°é¢¨è¢«å®³
 sub logTyphoonDamage {
     my($id, $name, $lName, $point) = @_;
-    logOut("${HtagName_}${name}Åç$point${H_tagName}¤Î<B>$lName</B>¤Ï${HtagDisaster_}ÂæÉ÷${H_tagDisaster}¤ÇÈô¤Ğ¤µ¤ì¤Ş¤·¤¿¡£",$id);
+    logOut("${HtagName_}${name}å³¶$point${H_tagName}ã®<B>$lName</B>ã¯${HtagDisaster_}å°é¢¨${H_tagDisaster}ã§é£›ã°ã•ã‚Œã¾ã—ãŸã€‚",$id);
 }
 
-# ğ¨ÀĞ¡¢³¤
+# éš•çŸ³ã€æµ·
 sub logMeteoSea {
     my($id, $name, $lName, $point) = @_;
-    logOut("${HtagName_}${name}Åç$point${H_tagName}¤Î<B>$lName</B>¤Ë${HtagDisaster_}ğ¨ÀĞ${H_tagDisaster}¤¬Íî²¼¤·¤Ş¤·¤¿¡£",$id);
+    logOut("${HtagName_}${name}å³¶$point${H_tagName}ã®<B>$lName</B>ã«${HtagDisaster_}éš•çŸ³${H_tagDisaster}ãŒè½ä¸‹ã—ã¾ã—ãŸã€‚",$id);
 }
 
-# ğ¨ÀĞ¡¢»³
+# éš•çŸ³ã€å±±
 sub logMeteoMountain {
     my($id, $name, $lName, $point) = @_;
-    logOut("${HtagName_}${name}Åç$point${H_tagName}¤Î<B>$lName</B>¤Ë${HtagDisaster_}ğ¨ÀĞ${H_tagDisaster}¤¬Íî²¼¡¢<B>$lName</B>¤Ï¾Ã¤·Èô¤Ó¤Ş¤·¤¿¡£",$id);
+    logOut("${HtagName_}${name}å³¶$point${H_tagName}ã®<B>$lName</B>ã«${HtagDisaster_}éš•çŸ³${H_tagDisaster}ãŒè½ä¸‹ã€<B>$lName</B>ã¯æ¶ˆã—é£›ã³ã¾ã—ãŸã€‚",$id);
 }
 
-# ğ¨ÀĞ¡¢³¤Äì´ğÃÏ
+# éš•çŸ³ã€æµ·åº•åŸºåœ°
 sub logMeteoSbase {
     my($id, $name, $lName, $point) = @_;
-    logOut("${HtagName_}${name}Åç$point${H_tagName}¤Î<B>$lName</B>¤Ë${HtagDisaster_}ğ¨ÀĞ${H_tagDisaster}¤¬Íî²¼¡¢<B>$lName</B>¤ÏÊø²õ¤·¤Ş¤·¤¿¡£",$id);
+    logOut("${HtagName_}${name}å³¶$point${H_tagName}ã®<B>$lName</B>ã«${HtagDisaster_}éš•çŸ³${H_tagDisaster}ãŒè½ä¸‹ã€<B>$lName</B>ã¯å´©å£Šã—ã¾ã—ãŸã€‚",$id);
 }
 
-# ğ¨ÀĞ¡¢²ø½Ã
+# éš•çŸ³ã€æ€ªç£
 sub logMeteoMonster {
     my($id, $name, $lName, $point) = @_;
-    logOut("<B>²ø½Ã$lName</B>¤¬¤¤¤¿${HtagName_}${name}Åç$point${H_tagName}ÃÏÅÀ¤Ë${HtagDisaster_}ğ¨ÀĞ${H_tagDisaster}¤¬Íî²¼¡¢Î¦ÃÏ¤Ï<B>²ø½Ã$lName</B>¤â¤í¤È¤â¿åË×¤·¤Ş¤·¤¿¡£",$id);
+    logOut("<B>æ€ªç£$lName</B>ãŒã„ãŸ${HtagName_}${name}å³¶$point${H_tagName}åœ°ç‚¹ã«${HtagDisaster_}éš•çŸ³${H_tagDisaster}ãŒè½ä¸‹ã€é™¸åœ°ã¯<B>æ€ªç£$lName</B>ã‚‚ã‚ã¨ã‚‚æ°´æ²¡ã—ã¾ã—ãŸã€‚",$id);
 }
 
-# ğ¨ÀĞ¡¢ÀõÀ¥
+# éš•çŸ³ã€æµ…ç€¬
 sub logMeteoSea1 {
     my($id, $name, $lName, $point) = @_;
-    logOut("${HtagName_}${name}Åç$point${H_tagName}ÃÏÅÀ¤Ë${HtagDisaster_}ğ¨ÀĞ${H_tagDisaster}¤¬Íî²¼¡¢³¤Äì¤¬¤¨¤°¤é¤ì¤Ş¤·¤¿¡£",$id);
+    logOut("${HtagName_}${name}å³¶$point${H_tagName}åœ°ç‚¹ã«${HtagDisaster_}éš•çŸ³${H_tagDisaster}ãŒè½ä¸‹ã€æµ·åº•ãŒãˆãã‚‰ã‚Œã¾ã—ãŸã€‚",$id);
 }
 
-# ğ¨ÀĞ¡¢¤½¤ÎÂ¾
+# éš•çŸ³ã€ãã®ä»–
 sub logMeteoNormal {
     my($id, $name, $lName, $point) = @_;
-    logOut("${HtagName_}${name}Åç$point${H_tagName}ÃÏÅÀ¤Î<B>$lName</B>¤Ë${HtagDisaster_}ğ¨ÀĞ${H_tagDisaster}¤¬Íî²¼¡¢°ìÂÓ¤¬¿åË×¤·¤Ş¤·¤¿¡£",$id);
+    logOut("${HtagName_}${name}å³¶$point${H_tagName}åœ°ç‚¹ã®<B>$lName</B>ã«${HtagDisaster_}éš•çŸ³${H_tagDisaster}ãŒè½ä¸‹ã€ä¸€å¸¯ãŒæ°´æ²¡ã—ã¾ã—ãŸã€‚",$id);
 }
 
-# ğ¨ÀĞ¡¢¤½¤ÎÂ¾
+# éš•çŸ³ã€ãã®ä»–
 sub logHugeMeteo {
     my($id, $name, $point) = @_;
-    logOut("${HtagName_}${name}Åç$point${H_tagName}ÃÏÅÀ¤Ë${HtagDisaster_}µğÂçğ¨ÀĞ${H_tagDisaster}¤¬Íî²¼¡ª¡ª",$id);
+    logOut("${HtagName_}${name}å³¶$point${H_tagName}åœ°ç‚¹ã«${HtagDisaster_}å·¨å¤§éš•çŸ³${H_tagDisaster}ãŒè½ä¸‹ï¼ï¼",$id);
 }
 
-# Ê®²Ğ
+# å™´ç«
 sub logEruption {
     my($id, $name, $lName, $point) = @_;
-    logOut("${HtagName_}${name}Åç$point${H_tagName}ÃÏÅÀ¤Ç${HtagDisaster_}²Ğ»³¤¬Ê®²Ğ${H_tagDisaster}¡¢<B>»³</B>¤¬½ĞÍè¤Ş¤·¤¿¡£",$id);
+    logOut("${HtagName_}${name}å³¶$point${H_tagName}åœ°ç‚¹ã§${HtagDisaster_}ç«å±±ãŒå™´ç«${H_tagDisaster}ã€<B>å±±</B>ãŒå‡ºæ¥ã¾ã—ãŸã€‚",$id);
 }
 
-# Ê®²Ğ¡¢ÀõÀ¥
+# å™´ç«ã€æµ…ç€¬
 sub logEruptionSea1 {
     my($id, $name, $lName, $point) = @_;
-    logOut("${HtagName_}${name}Åç$point${H_tagName}ÃÏÅÀ¤Î<B>$lName</B>¤Ï¡¢${HtagDisaster_}Ê®²Ğ${H_tagDisaster}¤Î±Æ¶Á¤ÇÎ¦ÃÏ¤Ë¤Ê¤ê¤Ş¤·¤¿¡£",$id);
+    logOut("${HtagName_}${name}å³¶$point${H_tagName}åœ°ç‚¹ã®<B>$lName</B>ã¯ã€${HtagDisaster_}å™´ç«${H_tagDisaster}ã®å½±éŸ¿ã§é™¸åœ°ã«ãªã‚Šã¾ã—ãŸã€‚",$id);
 }
 
-# Ê®²Ğ¡¢³¤or³¤´ğ
+# å™´ç«ã€æµ·oræµ·åŸº
 sub logEruptionSea {
     my($id, $name, $lName, $point) = @_;
-    logOut("${HtagName_}${name}Åç$point${H_tagName}ÃÏÅÀ¤Î<B>$lName</B>¤Ï¡¢${HtagDisaster_}Ê®²Ğ${H_tagDisaster}¤Î±Æ¶Á¤Ç³¤Äì¤¬Î´µ¯¡¢ÀõÀ¥¤Ë¤Ê¤ê¤Ş¤·¤¿¡£",$id);
+    logOut("${HtagName_}${name}å³¶$point${H_tagName}åœ°ç‚¹ã®<B>$lName</B>ã¯ã€${HtagDisaster_}å™´ç«${H_tagDisaster}ã®å½±éŸ¿ã§æµ·åº•ãŒéš†èµ·ã€æµ…ç€¬ã«ãªã‚Šã¾ã—ãŸã€‚",$id);
 }
 
-# Ê®²Ğ¡¢¤½¤ÎÂ¾
+# å™´ç«ã€ãã®ä»–
 sub logEruptionNormal {
     my($id, $name, $lName, $point) = @_;
-    logOut("${HtagName_}${name}Åç$point${H_tagName}ÃÏÅÀ¤Î<B>$lName</B>¤Ï¡¢${HtagDisaster_}Ê®²Ğ${H_tagDisaster}¤Î±Æ¶Á¤Ç²õÌÇ¤·¤Ş¤·¤¿¡£",$id);
+    logOut("${HtagName_}${name}å³¶$point${H_tagName}åœ°ç‚¹ã®<B>$lName</B>ã¯ã€${HtagDisaster_}å™´ç«${H_tagDisaster}ã®å½±éŸ¿ã§å£Šæ»…ã—ã¾ã—ãŸã€‚",$id);
 }
 
-# ÃÏÈ×ÄÀ²¼È¯À¸
+# åœ°ç›¤æ²ˆä¸‹ç™ºç”Ÿ
 sub logFalldown {
     my($id, $name) = @_;
-    logOut("${HtagName_}${name}Åç${H_tagName}¤Ç${HtagDisaster_}ÃÏÈ×ÄÀ²¼${H_tagDisaster}¤¬È¯À¸¤·¤Ş¤·¤¿¡ª¡ª",$id);
+    logOut("${HtagName_}${name}å³¶${H_tagName}ã§${HtagDisaster_}åœ°ç›¤æ²ˆä¸‹${H_tagDisaster}ãŒç™ºç”Ÿã—ã¾ã—ãŸï¼ï¼",$id);
 }
 
-# ÃÏÈ×ÄÀ²¼Èï³²
+# åœ°ç›¤æ²ˆä¸‹è¢«å®³
 sub logFalldownLand {
     my($id, $name, $lName, $point) = @_;
-    logOut("${HtagName_}${name}Åç$point${H_tagName}¤Î<B>$lName</B>¤Ï³¤¤ÎÃæ¤ØÄÀ¤ß¤Ş¤·¤¿¡£",$id);
+    logOut("${HtagName_}${name}å³¶$point${H_tagName}ã®<B>$lName</B>ã¯æµ·ã®ä¸­ã¸æ²ˆã¿ã¾ã—ãŸã€‚",$id);
 }
 
-# ¹­°èÈï³²¡¢¿åË×
+# åºƒåŸŸè¢«å®³ã€æ°´æ²¡
 sub logWideDamageSea {
     my($id, $name, $lName, $point) = @_;
-    logOut("${HtagName_}${name}Åç$point${H_tagName}¤Î<B>$lName</B>¤Ï<B>¿åË×</B>¤·¤Ş¤·¤¿¡£",$id);
+    logOut("${HtagName_}${name}å³¶$point${H_tagName}ã®<B>$lName</B>ã¯<B>æ°´æ²¡</B>ã—ã¾ã—ãŸã€‚",$id);
 }
 
-# ¹­°èÈï³²¡¢³¤¤Î·úÀß
+# åºƒåŸŸè¢«å®³ã€æµ·ã®å»ºè¨­
 sub logWideDamageSea2 {
     my($id, $name, $lName, $point) = @_;
-    logOut("${HtagName_}${name}Åç$point${H_tagName}¤Î<B>$lName</B>¤ÏÀ×·Á¤â¤Ê¤¯¤Ê¤ê¤Ş¤·¤¿¡£",$id);
+    logOut("${HtagName_}${name}å³¶$point${H_tagName}ã®<B>$lName</B>ã¯è·¡å½¢ã‚‚ãªããªã‚Šã¾ã—ãŸã€‚",$id);
 }
 
-# ¹­°èÈï³²¡¢²ø½Ã¿åË×
+# åºƒåŸŸè¢«å®³ã€æ€ªç£æ°´æ²¡
 sub logWideDamageMonsterSea {
     my($id, $name, $lName, $point) = @_;
-    logOut("${HtagName_}${name}Åç$point${H_tagName}¤ÎÎ¦ÃÏ¤Ï<B>²ø½Ã$lName</B>¤â¤í¤È¤â¿åË×¤·¤Ş¤·¤¿¡£",$id);
+    logOut("${HtagName_}${name}å³¶$point${H_tagName}ã®é™¸åœ°ã¯<B>æ€ªç£$lName</B>ã‚‚ã‚ã¨ã‚‚æ°´æ²¡ã—ã¾ã—ãŸã€‚",$id);
 }
 
-# ¹­°èÈï³²¡¢²ø½Ã
+# åºƒåŸŸè¢«å®³ã€æ€ªç£
 sub logWideDamageMonster {
     my($id, $name, $lName, $point) = @_;
-    logOut("${HtagName_}${name}Åç$point${H_tagName}¤Î<B>²ø½Ã$lName</B>¤Ï¾Ã¤·Èô¤Ó¤Ş¤·¤¿¡£",$id);
+    logOut("${HtagName_}${name}å³¶$point${H_tagName}ã®<B>æ€ªç£$lName</B>ã¯æ¶ˆã—é£›ã³ã¾ã—ãŸã€‚",$id);
 }
 
-# ¹­°èÈï³²¡¢¹ÓÃÏ
+# åºƒåŸŸè¢«å®³ã€è’åœ°
 sub logWideDamageWaste {
     my($id, $name, $lName, $point) = @_;
-    logOut("${HtagName_}${name}Åç$point${H_tagName}¤Î<B>$lName</B>¤Ï°ì½Ö¤Ë¤·¤Æ<B>¹ÓÃÏ</B>¤È²½¤·¤Ş¤·¤¿¡£",$id);
+    logOut("${HtagName_}${name}å³¶$point${H_tagName}ã®<B>$lName</B>ã¯ä¸€ç¬ã«ã—ã¦<B>è’åœ°</B>ã¨åŒ–ã—ã¾ã—ãŸã€‚",$id);
 }
 
-# ¼õ¾Ş
+# å—è³
 sub logPrize {
     my($id, $name, $pName) = @_;
-    logOut("${HtagName_}${name}Åç${H_tagName}¤¬<B>$pName</B>¤ò¼õ¾Ş¤·¤Ş¤·¤¿¡£",$id);
-    logHistory("${HtagName_}${name}Åç${H_tagName}¡¢<B>$pName</B>¤ò¼õ¾Ş");
+    logOut("${HtagName_}${name}å³¶${H_tagName}ãŒ<B>$pName</B>ã‚’å—è³ã—ã¾ã—ãŸã€‚",$id);
+    logHistory("${HtagName_}${name}å³¶${H_tagName}ã€<B>$pName</B>ã‚’å—è³");
 }
 
-# Åç¤¬¤¤¤Ã¤Ñ¤¤¤Ê¾ì¹ç
+# å³¶ãŒã„ã£ã±ã„ãªå ´åˆ
 sub tempNewIslandFull {
     out(<<END);
-${HtagBig_}¿½¤·Ìõ¤¢¤ê¤Ş¤»¤ó¡¢Åç¤¬°ìÇÕ¤ÇÅĞÏ¿¤Ç¤­¤Ş¤»¤ó¡ª¡ª${H_tagBig}$HtempBack
+${HtagBig_}ç”³ã—è¨³ã‚ã‚Šã¾ã›ã‚“ã€å³¶ãŒä¸€æ¯ã§ç™»éŒ²ã§ãã¾ã›ã‚“ï¼ï¼${H_tagBig}$HtempBack
 END
 }
 
-# ¿·µ¬¤ÇÌ¾Á°¤¬¤Ê¤¤¾ì¹ç
+# æ–°è¦ã§åå‰ãŒãªã„å ´åˆ
 sub tempNewIslandNoName {
     out(<<END);
-${HtagBig_}Åç¤Ë¤Ä¤±¤ëÌ¾Á°¤¬É¬Í×¤Ç¤¹¡£${H_tagBig}$HtempBack
+${HtagBig_}å³¶ã«ã¤ã‘ã‚‹åå‰ãŒå¿…è¦ã§ã™ã€‚${H_tagBig}$HtempBack
 END
 }
 
-# ¿·µ¬¤ÇÌ¾Á°¤¬ÉÔÀµ¤Ê¾ì¹ç
+# æ–°è¦ã§åå‰ãŒä¸æ­£ãªå ´åˆ
 sub tempNewIslandBadName {
     out(<<END);
-${HtagBig_}',?()<>\$'¤È¤«Æş¤Ã¤Æ¤¿¤ê¡¢¡ÖÌµ¿ÍÅç¡×¤È¤«¤¤¤Ã¤¿ÊÑ¤ÊÌ¾Á°¤Ï¤ä¤á¤Ş¤·¤ç¤¦¤è¡Á${H_tagBig}$HtempBack
+${HtagBig_}',?()<>\$'ã¨ã‹å…¥ã£ã¦ãŸã‚Šã€ã€Œç„¡äººå³¶ã€ã¨ã‹ã„ã£ãŸå¤‰ãªåå‰ã¯ã‚„ã‚ã¾ã—ã‚‡ã†ã‚ˆã€œ${H_tagBig}$HtempBack
 END
 }
 
-# ¤¹¤Ç¤Ë¤½¤ÎÌ¾Á°¤ÎÅç¤¬¤¢¤ë¾ì¹ç
+# ã™ã§ã«ãã®åå‰ã®å³¶ãŒã‚ã‚‹å ´åˆ
 sub tempNewIslandAlready {
     out(<<END);
-${HtagBig_}¤½¤ÎÅç¤Ê¤é¤¹¤Ç¤ËÈ¯¸«¤µ¤ì¤Æ¤¤¤Ş¤¹¡£${H_tagBig}$HtempBack
+${HtagBig_}ãã®å³¶ãªã‚‰ã™ã§ã«ç™ºè¦‹ã•ã‚Œã¦ã„ã¾ã™ã€‚${H_tagBig}$HtempBack
 END
 }
 
-# ¥Ñ¥¹¥ï¡¼¥É¤¬¤Ê¤¤¾ì¹ç
+# ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãŒãªã„å ´åˆ
 sub tempNewIslandNoPassword {
     out(<<END);
-${HtagBig_}¥Ñ¥¹¥ï¡¼¥É¤¬É¬Í×¤Ç¤¹¡£${H_tagBig}$HtempBack
+${HtagBig_}ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãŒå¿…è¦ã§ã™ã€‚${H_tagBig}$HtempBack
 END
 }
 
-# Åç¤òÈ¯¸«¤·¤Ş¤·¤¿!!
+# å³¶ã‚’ç™ºè¦‹ã—ã¾ã—ãŸ!!
 sub tempNewIslandHead {
     out(<<END);
 <CENTER>
-${HtagBig_}Åç¤òÈ¯¸«¤·¤Ş¤·¤¿¡ª¡ª${H_tagBig}<BR>
-${HtagBig_}${HtagName_}¡Ö${HcurrentName}Åç¡×${H_tagName}¤ÈÌ¿Ì¾¤·¤Ş¤¹¡£${H_tagBig}<BR>
+${HtagBig_}å³¶ã‚’ç™ºè¦‹ã—ã¾ã—ãŸï¼ï¼${H_tagBig}<BR>
+${HtagBig_}${HtagName_}ã€Œ${HcurrentName}å³¶ã€${H_tagName}ã¨å‘½åã—ã¾ã™ã€‚${H_tagBig}<BR>
 $HtempBack<BR>
 </CENTER>
 END
 }
 
-# ÃÏ·Á¤Î¸Æ¤ÓÊı
+# åœ°å½¢ã®å‘¼ã³æ–¹
 sub landName {
     my($land, $lv) = @_;
     if($land == $HlandSea) {
 	if($lv == 1) {
-            return 'ÀõÀ¥';
+            return 'æµ…ç€¬';
         } else {
-            return '³¤';
+            return 'æµ·';
 	}
     } elsif($land == $HlandWaste) {
-	return '¹ÓÃÏ';
+	return 'è’åœ°';
     } elsif($land == $HlandPlains) {
-	return 'Ê¿ÃÏ';
+	return 'å¹³åœ°';
     } elsif($land == $HlandTown) {
 	if($lv < 30) {
-	    return 'Â¼';
+	    return 'æ‘';
 	} elsif($lv < 100) {
-	    return 'Ä®';
+	    return 'ç”º';
 	} else {
-	    return 'ÅÔ»Ô';
+	    return 'éƒ½å¸‚';
 	}
     } elsif($land == $HlandForest) {
-	return '¿¹';
+	return 'æ£®';
     } elsif($land == $HlandFarm) {
-	return 'ÇÀ¾ì';
+	return 'è¾²å ´';
     } elsif($land == $HlandFactory) {
-	return '¹©¾ì';
+	return 'å·¥å ´';
     } elsif($land == $HlandBase) {
-	return '¥ß¥µ¥¤¥ë´ğÃÏ';
+	return 'ãƒŸã‚µã‚¤ãƒ«åŸºåœ°';
     } elsif($land == $HlandDefence) {
-	return 'ËÉ±Ò»ÜÀß';
+	return 'é˜²è¡›æ–½è¨­';
     } elsif($land == $HlandMountain) {
-	return '»³';
+	return 'å±±';
     } elsif($land == $HlandMonster) {
 	my($kind, $name, $hp) = monsterSpec($lv);
 	return $name;
     } elsif($land == $HlandSbase) {
-	return '³¤Äì´ğÃÏ';
+	return 'æµ·åº•åŸºåœ°';
     } elsif($land == $HlandOil) {
-	return '³¤ÄìÌıÅÄ';
+	return 'æµ·åº•æ²¹ç”°';
     } elsif($land == $HlandMonument) {
 	return $HmonumentName[$lv];
     } elsif($land == $HlandHaribote) {
-	return '¥Ï¥ê¥Ü¥Æ';
+	return 'ãƒãƒªãƒœãƒ†';
     }
 }
 
-# ¿Í¸ı¤½¤ÎÂ¾¤ÎÃÍ¤ò»»½Ğ
+# äººå£ãã®ä»–ã®å€¤ã‚’ç®—å‡º
 sub estimate {
     my($number) = $_[0];
     my($island);
     my($pop, $area, $farm, $factory, $mountain) = (0, 0, 0, 0, 0, 0);
 
-    # ÃÏ·Á¤ò¼èÆÀ
+    # åœ°å½¢ã‚’å–å¾—
     $island = $Hislands[$number];
     my($land) = $island->{'land'};
     my($landValue) = $island->{'landValue'};
 
-    # ¿ô¤¨¤ë
+    # æ•°ãˆã‚‹
     my($x, $y, $kind, $value);
     for($y = 0; $y < $HislandSize; $y++) {
 	for($x = 0; $x < $HislandSize; $x++) {
@@ -2856,23 +2856,23 @@ sub estimate {
 	       ($kind != $HlandOil)){
 		$area++;
 		if($kind == $HlandTown) {
-		    # Ä®
+		    # ç”º
 		    $pop += $value;
 		} elsif($kind == $HlandFarm) {
-		    # ÇÀ¾ì
+		    # è¾²å ´
 		    $farm += $value;
 		} elsif($kind == $HlandFactory) {
-		    # ¹©¾ì
+		    # å·¥å ´
 		    $factory += $value;
 		} elsif($kind == $HlandMountain) {
-		    # »³
+		    # å±±
 		    $mountain += $value;
 		}
 	    }
 	}
     }
 
-    # ÂåÆş
+    # ä»£å…¥
     $island->{'pop'}      = $pop;
     $island->{'area'}     = $area;
     $island->{'farm'}     = $farm;
@@ -2881,7 +2881,7 @@ sub estimate {
 }
 
 
-# ÈÏ°ÏÆâ¤ÎÃÏ·Á¤ò¿ô¤¨¤ë
+# ç¯„å›²å†…ã®åœ°å½¢ã‚’æ•°ãˆã‚‹
 sub countAround {
     my($land, $x, $y, $kind, $range) = @_;
     my($i, $count, $sx, $sy);
@@ -2890,20 +2890,20 @@ sub countAround {
 	 $sx = $x + $ax[$i];
 	 $sy = $y + $ay[$i];
 
-	 # ¹Ô¤Ë¤è¤ë°ÌÃÖÄ´À°
+	 # è¡Œã«ã‚ˆã‚‹ä½ç½®èª¿æ•´
 	 if((($sy % 2) == 0) && (($y % 2) == 1)) {
 	     $sx--;
 	 }
 
 	 if(($sx < 0) || ($sx >= $HislandSize) ||
 	    ($sy < 0) || ($sy >= $HislandSize)) {
-	     # ÈÏ°Ï³°¤Î¾ì¹ç
+	     # ç¯„å›²å¤–ã®å ´åˆ
 	     if($kind == $HlandSea) {
-		 # ³¤¤Ê¤é²Ã»»
+		 # æµ·ãªã‚‰åŠ ç®—
 		 $count++;
 	     }
 	 } else {
-	     # ÈÏ°ÏÆâ¤Î¾ì¹ç
+	     # ç¯„å›²å†…ã®å ´åˆ
 	     if($land->[$sx][$sy] == $kind) {
 		 $count++;
 	     }
@@ -2912,18 +2912,18 @@ sub countAround {
     return $count;
 }
 
-# 0¤«¤é(n - 1)¤Ş¤Ç¤Î¿ô»ú¤¬°ì²ó¤Å¤Ä½Ğ¤Æ¤¯¤ë¿ôÎó¤òºî¤ë
+# 0ã‹ã‚‰(n - 1)ã¾ã§ã®æ•°å­—ãŒä¸€å›ã¥ã¤å‡ºã¦ãã‚‹æ•°åˆ—ã‚’ä½œã‚‹
 sub randomArray {
     my($n) = @_;
     my(@list, $i);
 
-    # ½é´üÃÍ
+    # åˆæœŸå€¤
     if($n == 0) {
 	$n = 1;
     }
     @list = (0..$n-1);
 
-    # ¥·¥ã¥Ã¥Õ¥ë
+    # ã‚·ãƒ£ãƒƒãƒ•ãƒ«
     for ($i = $n; --$i; ) {
 	my($j) = int(rand($i+1));
 	if($i == $j) { next; };
@@ -2933,24 +2933,24 @@ sub randomArray {
     return @list;
 }
 
-# Ì¾Á°ÊÑ¹¹¼ºÇÔ
+# åå‰å¤‰æ›´å¤±æ•—
 sub tempChangeNothing {
     out(<<END);
-${HtagBig_}Ì¾Á°¡¢¥Ñ¥¹¥ï¡¼¥É¤È¤â¤Ë¶õÍó¤Ç¤¹${H_tagBig}$HtempBack
+${HtagBig_}åå‰ã€ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã¨ã‚‚ã«ç©ºæ¬„ã§ã™${H_tagBig}$HtempBack
 END
 }
 
-# Ì¾Á°ÊÑ¹¹»ñ¶âÂ­¤ê¤º
+# åå‰å¤‰æ›´è³‡é‡‘è¶³ã‚Šãš
 sub tempChangeNoMoney {
     out(<<END);
-${HtagBig_}»ñ¶âÉÔÂ­¤Î¤¿¤áÊÑ¹¹¤Ç¤­¤Ş¤»¤ó${H_tagBig}$HtempBack
+${HtagBig_}è³‡é‡‘ä¸è¶³ã®ãŸã‚å¤‰æ›´ã§ãã¾ã›ã‚“${H_tagBig}$HtempBack
 END
 }
 
-# Ì¾Á°ÊÑ¹¹À®¸ù
+# åå‰å¤‰æ›´æˆåŠŸ
 sub tempChange {
     out(<<END);
-${HtagBig_}ÊÑ¹¹´°Î»¤·¤Ş¤·¤¿${H_tagBig}$HtempBack
+${HtagBig_}å¤‰æ›´å®Œäº†ã—ã¾ã—ãŸ${H_tagBig}$HtempBack
 END
 }
 

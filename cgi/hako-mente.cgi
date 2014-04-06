@@ -1,46 +1,46 @@
 #!/usr/bin/perl
-# ¢¬¤Ï¥µ¡¼¥Ğ¡¼¤Ë¹ç¤ï¤»¤ÆÊÑ¹¹¤·¤Æ²¼¤µ¤¤¡£
+# â†‘ã¯ã‚µãƒ¼ãƒãƒ¼ã«åˆã‚ã›ã¦å¤‰æ›´ã—ã¦ä¸‹ã•ã„ã€‚
 
 #----------------------------------------------------------------------
-# È¢Äí½ôÅç ver2.30
-# ¥á¥ó¥Æ¥Ê¥ó¥¹¥Ä¡¼¥ë(ver1.01)
-# »ÈÍÑ¾ò·ï¡¢»ÈÍÑÊıË¡Åù¤Ï¡¢hako-readme.txt¥Õ¥¡¥¤¥ë¤ò»²¾È
+# ç®±åº­è«¸å³¶ ver2.30
+# ãƒ¡ãƒ³ãƒ†ãƒŠãƒ³ã‚¹ãƒ„ãƒ¼ãƒ«(ver1.01)
+# ä½¿ç”¨æ¡ä»¶ã€ä½¿ç”¨æ–¹æ³•ç­‰ã¯ã€hako-readme.txtãƒ•ã‚¡ã‚¤ãƒ«ã‚’å‚ç…§
 #
-# È¢Äí½ôÅç¤Î¥Ú¡¼¥¸: http://www.bekkoame.ne.jp/~tokuoka/hakoniwa.html
+# ç®±åº­è«¸å³¶ã®ãƒšãƒ¼ã‚¸: http://www.bekkoame.ne.jp/~tokuoka/hakoniwa.html
 #----------------------------------------------------------------------
 
 
-# ¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½
-# ³Æ¼ïÀßÄêÃÍ
-# ¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½
+# â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•
+# å„ç¨®è¨­å®šå€¤
+# â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•
 
-# ¥Ş¥¹¥¿¡¼¥Ñ¥¹¥ï¡¼¥É
+# ãƒã‚¹ã‚¿ãƒ¼ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰
 my($masterpassword) = 'yourpassword';
 
-# 1¥¿¡¼¥ó¤¬²¿ÉÃ¤«
-my($unitTime) = 21600; # 6»ş´Ö
+# 1ã‚¿ãƒ¼ãƒ³ãŒä½•ç§’ã‹
+my($unitTime) = 21600; # 6æ™‚é–“
 
-# ¥Ç¥£¥ì¥¯¥È¥ê¤Î¥Ñ¡¼¥ß¥Ã¥·¥ç¥ó
+# ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã®ãƒ‘ãƒ¼ãƒŸãƒƒã‚·ãƒ§ãƒ³
 my($dirMode) = 0755;
 
-# ¤³¤Î¥Õ¥¡¥¤¥ë
-# my($thisFile) = 'http://¾ì½ê/cgi-bin/hako-mente.cgi';
+# ã“ã®ãƒ•ã‚¡ã‚¤ãƒ«
+# my($thisFile) = 'http://å ´æ‰€/cgi-bin/hako-mente.cgi';
 my($thisFile) = 'http://localhost/cgi-bin/hako-mente.cgi';
 
-# ¥Ç¡¼¥¿¥Ç¥£¥ì¥¯¥È¥ê¤ÎÌ¾Á°
-# hakojima.cgiÃæ¤Î¤â¤Î¤È¹ç¤ï¤»¤Æ¤¯¤À¤µ¤¤¡£
+# ãƒ‡ãƒ¼ã‚¿ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã®åå‰
+# hakojima.cgiä¸­ã®ã‚‚ã®ã¨åˆã‚ã›ã¦ãã ã•ã„ã€‚
 my($dirName) = 'data';
 
 
-# use Time::Local¤¬»È¤¨¤Ê¤¤´Ä¶­¤Ç¤Ï¡¢'use Time::Local'¤Î¹Ô¤ò¾Ã¤·¤Æ²¼¤µ¤¤¡£
-# ¤¿¤À¤·¡¢¹¹¿·»ş´Ö¤ÎÊÑ¹¹¤¬'ÉÃ»ØÄê¤ÇÊÑ¹¹'¤·¤«¤Ç¤­¤Ê¤¯¤Ê¤ê¤Ş¤¹¡£
+# use Time::LocalãŒä½¿ãˆãªã„ç’°å¢ƒã§ã¯ã€'use Time::Local'ã®è¡Œã‚’æ¶ˆã—ã¦ä¸‹ã•ã„ã€‚
+# ãŸã ã—ã€æ›´æ–°æ™‚é–“ã®å¤‰æ›´ãŒ'ç§’æŒ‡å®šã§å¤‰æ›´'ã—ã‹ã§ããªããªã‚Šã¾ã™ã€‚
 use Time::Local;
 
-# ¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½
-# ÀßÄê¹àÌÜ¤Ï°Ê¾å
-# ¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½¡½
+# â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•
+# è¨­å®šé …ç›®ã¯ä»¥ä¸Š
+# â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•â€•
 
-# ³Æ¼ïÊÑ¿ô
+# å„ç¨®å¤‰æ•°
 my($mainMode);
 my($inputPass);
 my($deleteID);
@@ -57,7 +57,7 @@ Content-type: text/html
 
 <HTML>
 <HEAD>
-<TITLE>È¢Åç£² ¥á¥ó¥Æ¥Ê¥ó¥¹¥Ä¡¼¥ë</TITLE>
+<TITLE>ç®±å³¶ï¼’ ãƒ¡ãƒ³ãƒ†ãƒŠãƒ³ã‚¹ãƒ„ãƒ¼ãƒ«</TITLE>
 </HEAD>
 <BODY>
 END
@@ -127,17 +127,17 @@ sub deleteMode {
 sub newMode {
     mkdir($dirName, $dirMode);
 
-    # ¸½ºß¤Î»ş´Ö¤ò¼èÆÀ
+    # ç¾åœ¨ã®æ™‚é–“ã‚’å–å¾—
     my($now) = time;
     $now = $now - ($now % ($unitTime));
 
-    open(OUT, ">$dirName/hakojima.dat"); # ¥Õ¥¡¥¤¥ë¤ò³«¤¯
-    print OUT "1\n";         # ¥¿¡¼¥ó¿ô1
-    print OUT "$now\n";      # ³«»Ï»ş´Ö
-    print OUT "0\n";         # Åç¤Î¿ô
-    print OUT "1\n";         # ¼¡¤Ë³ä¤êÅö¤Æ¤ëID
+    open(OUT, ">$dirName/hakojima.dat"); # ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‹ã
+    print OUT "1\n";         # ã‚¿ãƒ¼ãƒ³æ•°1
+    print OUT "$now\n";      # é–‹å§‹æ™‚é–“
+    print OUT "0\n";         # å³¶ã®æ•°
+    print OUT "1\n";         # æ¬¡ã«å‰²ã‚Šå½“ã¦ã‚‹ID
 
-    # ¥Õ¥¡¥¤¥ë¤òÊÄ¤¸¤ë
+    # ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‰ã˜ã‚‹
     close(OUT);
 }
 
@@ -167,21 +167,21 @@ sub mainMode {
 
     print <<END;
 <FORM action="$thisFile" method="POST">
-<H1>È¢Åç£² ¥á¥ó¥Æ¥Ê¥ó¥¹¥Ä¡¼¥ë</H1>
-<B>¥Ñ¥¹¥ï¡¼¥É:</B><INPUT TYPE=password SIZE=32 MAXLENGTH=32 NAME=PASSWORD></TD>
+<H1>ç®±å³¶ï¼’ ãƒ¡ãƒ³ãƒ†ãƒŠãƒ³ã‚¹ãƒ„ãƒ¼ãƒ«</H1>
+<B>ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰:</B><INPUT TYPE=password SIZE=32 MAXLENGTH=32 NAME=PASSWORD></TD>
 END
 
-    # ¸½Ìò¥Ç¡¼¥¿
+    # ç¾å½¹ãƒ‡ãƒ¼ã‚¿
     if(-d "${dirName}") {
 	dataPrint("");
     } else {
 	print <<END;
     <HR>
-    <INPUT TYPE="submit" VALUE="¿·¤·¤¤¥Ç¡¼¥¿¤òºî¤ë" NAME="NEW">
+    <INPUT TYPE="submit" VALUE="æ–°ã—ã„ãƒ‡ãƒ¼ã‚¿ã‚’ä½œã‚‹" NAME="NEW">
 END
     }
 
-    # ¥Ğ¥Ã¥¯¥¢¥Ã¥×¥Ç¡¼¥¿
+    # ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—ãƒ‡ãƒ¼ã‚¿
     my($dn);
     while($dn = readdir(DIN)) {
 	if($dn =~ /^${dirName}.bak(.*)/) {
@@ -191,17 +191,17 @@ END
     closedir(DIN);
 }
 
-# É½¼¨¥â¡¼¥É
+# è¡¨ç¤ºãƒ¢ãƒ¼ãƒ‰
 sub dataPrint {
     my($suf) = @_;
 
     print "<HR>";
     if($suf eq "") {
 	open(IN, "${dirName}/hakojima.dat");
-	print "<H1>¸½Ìò¥Ç¡¼¥¿</H1>";
+	print "<H1>ç¾å½¹ãƒ‡ãƒ¼ã‚¿</H1>";
     } else {
 	open(IN, "${dirName}.bak$suf/hakojima.dat");
-	print "<H1>¥Ğ¥Ã¥¯¥¢¥Ã¥×$suf</H1>";
+	print "<H1>ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—$suf</H1>";
     }
 
     my($lastTurn);
@@ -212,10 +212,10 @@ sub dataPrint {
     my($timeString) = timeToString($lastTime);
 
     print <<END;
-    <B>¥¿¡¼¥ó$lastTurn</B><BR>
-    <B>ºÇ½ª¹¹¿·»ş´Ö</B>:$timeString<BR>
-    <B>ºÇ½ª¹¹¿·»ş´Ö(ÉÃ¿ôÉ½¼¨)</B>:1970Ç¯1·î1Æü¤«¤é$lastTime ÉÃ<BR>
-    <INPUT TYPE="submit" VALUE="¤³¤Î¥Ç¡¼¥¿¤òºï½ü" NAME="DELETE$suf">
+    <B>ã‚¿ãƒ¼ãƒ³$lastTurn</B><BR>
+    <B>æœ€çµ‚æ›´æ–°æ™‚é–“</B>:$timeString<BR>
+    <B>æœ€çµ‚æ›´æ–°æ™‚é–“(ç§’æ•°è¡¨ç¤º)</B>:1970å¹´1æœˆ1æ—¥ã‹ã‚‰$lastTime ç§’<BR>
+    <INPUT TYPE="submit" VALUE="ã“ã®ãƒ‡ãƒ¼ã‚¿ã‚’å‰Šé™¤" NAME="DELETE$suf">
 END
 
     if($suf eq "") {
@@ -225,21 +225,21 @@ END
 	$year += 1900;
 
 	print <<END;
-    <H2>ºÇ½ª¹¹¿·»ş´Ö¤ÎÊÑ¹¹</H2>
-    <INPUT TYPE="text" SIZE=4 NAME="YEAR" VALUE="$year">Ç¯
-    <INPUT TYPE="text" SIZE=2 NAME="MON" VALUE="$mon">·î
-    <INPUT TYPE="text" SIZE=2 NAME="DATE" VALUE="$date">Æü
-    <INPUT TYPE="text" SIZE=2 NAME="HOUR" VALUE="$hour">»ş
-    <INPUT TYPE="text" SIZE=2 NAME="MIN" VALUE="$min">Ê¬
-    <INPUT TYPE="text" SIZE=2 NAME="NSEC" VALUE="$sec">ÉÃ
-    <INPUT TYPE="submit" VALUE="ÊÑ¹¹" NAME="NTIME"><BR>
-    1970Ç¯1·î1Æü¤«¤é<INPUT TYPE="text" SIZE=32 NAME="SSEC" VALUE="$lastTime">ÉÃ
-    <INPUT TYPE="submit" VALUE="ÉÃ»ØÄê¤ÇÊÑ¹¹" NAME="STIME">
+    <H2>æœ€çµ‚æ›´æ–°æ™‚é–“ã®å¤‰æ›´</H2>
+    <INPUT TYPE="text" SIZE=4 NAME="YEAR" VALUE="$year">å¹´
+    <INPUT TYPE="text" SIZE=2 NAME="MON" VALUE="$mon">æœˆ
+    <INPUT TYPE="text" SIZE=2 NAME="DATE" VALUE="$date">æ—¥
+    <INPUT TYPE="text" SIZE=2 NAME="HOUR" VALUE="$hour">æ™‚
+    <INPUT TYPE="text" SIZE=2 NAME="MIN" VALUE="$min">åˆ†
+    <INPUT TYPE="text" SIZE=2 NAME="NSEC" VALUE="$sec">ç§’
+    <INPUT TYPE="submit" VALUE="å¤‰æ›´" NAME="NTIME"><BR>
+    1970å¹´1æœˆ1æ—¥ã‹ã‚‰<INPUT TYPE="text" SIZE=32 NAME="SSEC" VALUE="$lastTime">ç§’
+    <INPUT TYPE="submit" VALUE="ç§’æŒ‡å®šã§å¤‰æ›´" NAME="STIME">
 
 END
     } else {
 	print <<END;
-	<INPUT TYPE="submit" VALUE="¤³¤Î¥Ç¡¼¥¿¤ò¸½Ìò¤Ë" NAME="CURRENT$suf">
+	<INPUT TYPE="submit" VALUE="ã“ã®ãƒ‡ãƒ¼ã‚¿ã‚’ç¾å½¹ã«" NAME="CURRENT$suf">
 END
     }
 }
@@ -250,14 +250,14 @@ sub timeToString {
     $mon++;
     $year += 1900;
 
-    return "${year}Ç¯ ${mon}·î ${date}Æü ${hour}»ş ${min}Ê¬ ${sec}ÉÃ";
+    return "${year}å¹´ ${mon}æœˆ ${date}æ—¥ ${hour}æ™‚ ${min}åˆ† ${sec}ç§’";
 }
 
-# CGI¤ÎÆÉ¤ß¤³¤ß
+# CGIã®èª­ã¿ã“ã¿
 sub cgiInput {
     my($line);
 
-    # ÆşÎÏ¤ò¼õ¤±¼è¤ë
+    # å…¥åŠ›ã‚’å—ã‘å–ã‚‹
     $line = <>;
     $line =~ tr/+/ /;
     $line =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
@@ -302,7 +302,7 @@ sub cgiInput {
     }
 }
 
-# ¥Õ¥¡¥¤¥ë¤Î¥³¥Ô¡¼
+# ãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚³ãƒ”ãƒ¼
 sub fileCopy {
     my($src, $dist) = @_;
     open(IN, $src);
@@ -314,13 +314,13 @@ sub fileCopy {
     close(OUT);
 }
 
-# ¥Ñ¥¹¥Á¥§¥Ã¥¯
+# ãƒ‘ã‚¹ãƒã‚§ãƒƒã‚¯
 sub passCheck {
     if($inputPass eq $masterpassword) {
 	return 1;
     } else {
 	print <<END;
-   <FONT SIZE=7>¥Ñ¥¹¥ï¡¼¥É¤¬°ã¤¤¤Ş¤¹¡£</FONT>
+   <FONT SIZE=7>ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãŒé•ã„ã¾ã™ã€‚</FONT>
 END
         return 0;
     }

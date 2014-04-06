@@ -1,79 +1,79 @@
 #----------------------------------------------------------------------
-# È¢Äí½ôÅç ver2.30
-# ¥È¥Ã¥×¥â¥¸¥å¡¼¥ë(ver1.00)
-# »ÈÍÑ¾ò·ï¡¢»ÈÍÑÊıË¡Åù¤Ï¡¢hako-readme.txt¥Õ¥¡¥¤¥ë¤ò»²¾È
+# ç®±åº­è«¸å³¶ ver2.30
+# ãƒˆãƒƒãƒ—ãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«(ver1.00)
+# ä½¿ç”¨æ¡ä»¶ã€ä½¿ç”¨æ–¹æ³•ç­‰ã¯ã€hako-readme.txtãƒ•ã‚¡ã‚¤ãƒ«ã‚’å‚ç…§
 #
-# È¢Äí½ôÅç¤Î¥Ú¡¼¥¸: http://www.bekkoame.ne.jp/~tokuoka/hakoniwa.html
+# ç®±åº­è«¸å³¶ã®ãƒšãƒ¼ã‚¸: http://www.bekkoame.ne.jp/~tokuoka/hakoniwa.html
 #----------------------------------------------------------------------
 
 
 #----------------------------------------------------------------------
-# ¥È¥Ã¥×¥Ú¡¼¥¸¥â¡¼¥É
+# ãƒˆãƒƒãƒ—ãƒšãƒ¼ã‚¸ãƒ¢ãƒ¼ãƒ‰
 #----------------------------------------------------------------------
-# ¥á¥¤¥ó
+# ãƒ¡ã‚¤ãƒ³
 sub topPageMain {
-    # ³«Êü
+    # é–‹æ”¾
     unlock();
 
-    # ¥Æ¥ó¥×¥ì¡¼¥È½ĞÎÏ
+    # ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆå‡ºåŠ›
     tempTopPage();
 }
 
-# ¥È¥Ã¥×¥Ú¡¼¥¸
+# ãƒˆãƒƒãƒ—ãƒšãƒ¼ã‚¸
 sub tempTopPage {
-    # ¥¿¥¤¥È¥ë
+    # ã‚¿ã‚¤ãƒˆãƒ«
     out(<<END);
 ${HtagTitle_}$Htitle${H_tagTitle}
 END
 
-    # ¥Ç¥Ğ¥Ã¥°¥â¡¼¥É¤Ê¤é¡Ö¥¿¡¼¥ó¤ò¿Ê¤á¤ë¡×¥Ü¥¿¥ó
+    # ãƒ‡ãƒãƒƒã‚°ãƒ¢ãƒ¼ãƒ‰ãªã‚‰ã€Œã‚¿ãƒ¼ãƒ³ã‚’é€²ã‚ã‚‹ã€ãƒœã‚¿ãƒ³
     if($Hdebug == 1) {
         out(<<END);
 <FORM action="$HthisFile" method="POST">
-<INPUT TYPE="submit" VALUE="¥¿¡¼¥ó¤ò¿Ê¤á¤ë" NAME="TurnButton">
+<INPUT TYPE="submit" VALUE="ã‚¿ãƒ¼ãƒ³ã‚’é€²ã‚ã‚‹" NAME="TurnButton">
 </FORM>
 END
     }
 
     my($mStr1) = '';
     if($HhideMoneyMode != 0) {
-	$mStr1 = "<TH $HbgTitleCell align=center nowrap=nowrap><NOBR>${HtagTH_}»ñ¶â${H_tagTH}</NOBR></TH>";
+	$mStr1 = "<TH $HbgTitleCell align=center nowrap=nowrap><NOBR>${HtagTH_}è³‡é‡‘${H_tagTH}</NOBR></TH>";
     }
 
-    # ¥Õ¥©¡¼¥à
+    # ãƒ•ã‚©ãƒ¼ãƒ 
     out(<<END);
-<H1>${HtagHeader_}¥¿¡¼¥ó$HislandTurn${H_tagHeader}</H1>
+<H1>${HtagHeader_}ã‚¿ãƒ¼ãƒ³$HislandTurn${H_tagHeader}</H1>
 
 <HR>
-<H1>${HtagHeader_}¼«Ê¬¤ÎÅç¤Ø${H_tagHeader}</H1>
+<H1>${HtagHeader_}è‡ªåˆ†ã®å³¶ã¸${H_tagHeader}</H1>
 <FORM action="$HthisFile" method="POST">
-¤¢¤Ê¤¿¤ÎÅç¤ÎÌ¾Á°¤Ï¡©<BR>
+ã‚ãªãŸã®å³¶ã®åå‰ã¯ï¼Ÿ<BR>
 <SELECT NAME="ISLANDID">
 $HislandList
 </SELECT><BR>
 
-¥Ñ¥¹¥ï¡¼¥É¤ò¤É¤¦¤¾¡ª¡ª<BR>
+ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’ã©ã†ãï¼ï¼<BR>
 <INPUT TYPE="password" NAME="PASSWORD" VALUE="$HdefaultPassword" SIZE=32 MAXLENGTH=32><BR>
-<INPUT TYPE="submit" VALUE="³«È¯¤·¤Ë¹Ô¤¯" NAME="OwnerButton"><BR>
+<INPUT TYPE="submit" VALUE="é–‹ç™ºã—ã«è¡Œã" NAME="OwnerButton"><BR>
 </FORM>
 
 <HR>
 
-<H1>${HtagHeader_}½ôÅç¤Î¾õ¶·${H_tagHeader}</H1>
+<H1>${HtagHeader_}è«¸å³¶ã®çŠ¶æ³${H_tagHeader}</H1>
 <P>
-Åç¤ÎÌ¾Á°¤ò¥¯¥ê¥Ã¥¯¤¹¤ë¤È¡¢<B>´Ñ¸÷</B>¤¹¤ë¤³¤È¤¬¤Ç¤­¤Ş¤¹¡£
+å³¶ã®åå‰ã‚’ã‚¯ãƒªãƒƒã‚¯ã™ã‚‹ã¨ã€<B>è¦³å…‰</B>ã™ã‚‹ã“ã¨ãŒã§ãã¾ã™ã€‚
 </P>
 <TABLE BORDER>
 <TR>
-<TH $HbgTitleCell align=center nowrap=nowrap><NOBR>${HtagTH_}½ç°Ì${H_tagTH}</NOBR></TH>
-<TH $HbgTitleCell align=center nowrap=nowrap><NOBR>${HtagTH_}Åç${H_tagTH}</NOBR></TH>
-<TH $HbgTitleCell align=center nowrap=nowrap><NOBR>${HtagTH_}¿Í¸ı${H_tagTH}</NOBR></TH>
-<TH $HbgTitleCell align=center nowrap=nowrap><NOBR>${HtagTH_}ÌÌÀÑ${H_tagTH}</NOBR></TH>
+<TH $HbgTitleCell align=center nowrap=nowrap><NOBR>${HtagTH_}é †ä½${H_tagTH}</NOBR></TH>
+<TH $HbgTitleCell align=center nowrap=nowrap><NOBR>${HtagTH_}å³¶${H_tagTH}</NOBR></TH>
+<TH $HbgTitleCell align=center nowrap=nowrap><NOBR>${HtagTH_}äººå£${H_tagTH}</NOBR></TH>
+<TH $HbgTitleCell align=center nowrap=nowrap><NOBR>${HtagTH_}é¢ç©${H_tagTH}</NOBR></TH>
 $mStr1
-<TH $HbgTitleCell align=center nowrap=nowrap><NOBR>${HtagTH_}¿©ÎÁ${H_tagTH}</NOBR></TH>
-<TH $HbgTitleCell align=center nowrap=nowrap><NOBR>${HtagTH_}ÇÀ¾ìµ¬ÌÏ${H_tagTH}</NOBR></TH>
-<TH $HbgTitleCell align=center nowrap=nowrap><NOBR>${HtagTH_}¹©¾ìµ¬ÌÏ${H_tagTH}</NOBR></TH>
-<TH $HbgTitleCell align=center nowrap=nowrap><NOBR>${HtagTH_}ºÎ·¡¾ìµ¬ÌÏ${H_tagTH}</NOBR></TH>
+<TH $HbgTitleCell align=center nowrap=nowrap><NOBR>${HtagTH_}é£Ÿæ–™${H_tagTH}</NOBR></TH>
+<TH $HbgTitleCell align=center nowrap=nowrap><NOBR>${HtagTH_}è¾²å ´è¦æ¨¡${H_tagTH}</NOBR></TH>
+<TH $HbgTitleCell align=center nowrap=nowrap><NOBR>${HtagTH_}å·¥å ´è¦æ¨¡${H_tagTH}</NOBR></TH>
+<TH $HbgTitleCell align=center nowrap=nowrap><NOBR>${HtagTH_}æ¡æ˜å ´è¦æ¨¡${H_tagTH}</NOBR></TH>
 </TR>
 END
 
@@ -86,13 +86,13 @@ END
 	$farm = $island->{'farm'};
 	$factory = $island->{'factory'};
 	$mountain = $island->{'mountain'};
-	$farm = ($farm == 0) ? "ÊİÍ­¤»¤º" : "${farm}0$HunitPop";
-	$factory = ($factory == 0) ? "ÊİÍ­¤»¤º" : "${factory}0$HunitPop";
-	$mountain = ($mountain == 0) ? "ÊİÍ­¤»¤º" : "${mountain}0$HunitPop";
+	$farm = ($farm == 0) ? "ä¿æœ‰ã›ãš" : "${farm}0$HunitPop";
+	$factory = ($factory == 0) ? "ä¿æœ‰ã›ãš" : "${factory}0$HunitPop";
+	$mountain = ($mountain == 0) ? "ä¿æœ‰ã›ãš" : "${mountain}0$HunitPop";
 	if($island->{'absent'}  == 0) {
-		$name = "${HtagName_}$island->{'name'}Åç${H_tagName}";
+		$name = "${HtagName_}$island->{'name'}å³¶${H_tagName}";
 	} else {
-	    $name = "${HtagName2_}$island->{'name'}Åç($island->{'absent'})${H_tagName2}";
+	    $name = "${HtagName2_}$island->{'name'}å³¶($island->{'absent'})${H_tagName2}";
 	}
 
 	$prize = $island->{'prize'};
@@ -103,12 +103,12 @@ END
 	$turns = $3;
 	$prize = '';
 
-	# ¥¿¡¼¥óÇÕ¤ÎÉ½¼¨
+	# ã‚¿ãƒ¼ãƒ³æ¯ã®è¡¨ç¤º
 	while($turns =~ s/([0-9]*),//) {
 	    $prize .= "<IMG SRC=\"prize0.gif\" ALT=\"$1${Hprize[0]}\" WIDTH=16 HEIGHT=16> ";
 	}
 
-	# Ì¾Á°¤Ë¾Ş¤ÎÊ¸»ú¤òÄÉ²Ã
+	# åå‰ã«è³ã®æ–‡å­—ã‚’è¿½åŠ 
 	my($f) = 1;
 	my($i);
 	for($i = 1; $i < 10; $i++) {
@@ -118,7 +118,7 @@ END
 	    $f *= 2;
 	}
 
-	# Åİ¤·¤¿²ø½Ã¥ê¥¹¥È
+	# å€’ã—ãŸæ€ªç£ãƒªã‚¹ãƒˆ
 	$f = 1;
 	my($max) = -1;
 	my($mNameList) = '';
@@ -163,7 +163,7 @@ $mStr1
 <TD $HbgInfoCell align=right nowrap=nowrap><NOBR>$mountain</NOBR></TD>
 </TR>
 <TR>
-<TD $HbgCommentCell COLSPAN=7 align=left nowrap=nowrap><NOBR>${HtagTH_}¥³¥á¥ó¥È¡§${H_tagTH}$island->{'comment'}</NOBR></TD>
+<TD $HbgCommentCell COLSPAN=7 align=left nowrap=nowrap><NOBR>${HtagTH_}ã‚³ãƒ¡ãƒ³ãƒˆï¼š${H_tagTH}$island->{'comment'}</NOBR></TD>
 </TR>
 END
     }
@@ -172,64 +172,64 @@ END
 </TABLE>
 
 <HR>
-<H1>${HtagHeader_}¿·¤·¤¤Åç¤òÃµ¤¹${H_tagHeader}</H1>
+<H1>${HtagHeader_}æ–°ã—ã„å³¶ã‚’æ¢ã™${H_tagHeader}</H1>
 END
 
     if($HislandNumber < $HmaxIsland) {
 	out(<<END);
 <FORM action="$HthisFile" method="POST">
-¤É¤ó¤ÊÌ¾Á°¤ò¤Ä¤±¤ëÍ½Äê¡©<BR>
-<INPUT TYPE="text" NAME="ISLANDNAME" SIZE=32 MAXLENGTH=32>Åç<BR>
-¥Ñ¥¹¥ï¡¼¥É¤Ï¡©<BR>
+ã©ã‚“ãªåå‰ã‚’ã¤ã‘ã‚‹äºˆå®šï¼Ÿ<BR>
+<INPUT TYPE="text" NAME="ISLANDNAME" SIZE=32 MAXLENGTH=32>å³¶<BR>
+ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã¯ï¼Ÿ<BR>
 <INPUT TYPE="password" NAME="PASSWORD" SIZE=32 MAXLENGTH=32><BR>
-Ç°¤Î¤¿¤á¥Ñ¥¹¥ï¡¼¥É¤ò¤â¤¦°ì²ó<BR>
+å¿µã®ãŸã‚ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’ã‚‚ã†ä¸€å›<BR>
 <INPUT TYPE="password" NAME="PASSWORD2" SIZE=32 MAXLENGTH=32><BR>
 
-<INPUT TYPE="submit" VALUE="Ãµ¤·¤Ë¹Ô¤¯" NAME="NewIslandButton">
+<INPUT TYPE="submit" VALUE="æ¢ã—ã«è¡Œã" NAME="NewIslandButton">
 </FORM>
 END
     } else {
 	out(<<END);
-        Åç¤Î¿ô¤¬ºÇÂç¿ô¤Ç¤¹¡¦¡¦¡¦¸½ºßÅĞÏ¿¤Ç¤­¤Ş¤»¤ó¡£
+        å³¶ã®æ•°ãŒæœ€å¤§æ•°ã§ã™ãƒ»ãƒ»ãƒ»ç¾åœ¨ç™»éŒ²ã§ãã¾ã›ã‚“ã€‚
 END
     }
 
     out(<<END);
 <HR>
-<H1>${HtagHeader_}Åç¤ÎÌ¾Á°¤È¥Ñ¥¹¥ï¡¼¥É¤ÎÊÑ¹¹${H_tagHeader}</H1>
+<H1>${HtagHeader_}å³¶ã®åå‰ã¨ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã®å¤‰æ›´${H_tagHeader}</H1>
 <P>
-(Ãí°Õ)Ì¾Á°¤ÎÊÑ¹¹¤Ë¤Ï$HcostChangeName${HunitMoney}¤«¤«¤ê¤Ş¤¹¡£
+(æ³¨æ„)åå‰ã®å¤‰æ›´ã«ã¯$HcostChangeName${HunitMoney}ã‹ã‹ã‚Šã¾ã™ã€‚
 </P>
 <FORM action="$HthisFile" method="POST">
-¤É¤ÎÅç¤Ç¤¹¤«¡©<BR>
+ã©ã®å³¶ã§ã™ã‹ï¼Ÿ<BR>
 <SELECT NAME="ISLANDID">
 $HislandList
 </SELECT>
 <BR>
-¤É¤ó¤ÊÌ¾Á°¤ËÊÑ¤¨¤Ş¤¹¤«¡©(ÊÑ¹¹¤¹¤ë¾ì¹ç¤Î¤ß)<BR>
-<INPUT TYPE="text" NAME="ISLANDNAME" SIZE=32 MAXLENGTH=32>Åç<BR>
-¥Ñ¥¹¥ï¡¼¥É¤Ï¡©(É¬¿Ü)<BR>
+ã©ã‚“ãªåå‰ã«å¤‰ãˆã¾ã™ã‹ï¼Ÿ(å¤‰æ›´ã™ã‚‹å ´åˆã®ã¿)<BR>
+<INPUT TYPE="text" NAME="ISLANDNAME" SIZE=32 MAXLENGTH=32>å³¶<BR>
+ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã¯ï¼Ÿ(å¿…é ˆ)<BR>
 <INPUT TYPE="password" NAME="OLDPASS" SIZE=32 MAXLENGTH=32><BR>
-¿·¤·¤¤¥Ñ¥¹¥ï¡¼¥É¤Ï¡©(ÊÑ¹¹¤¹¤ë»ş¤Î¤ß)<BR>
+æ–°ã—ã„ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã¯ï¼Ÿ(å¤‰æ›´ã™ã‚‹æ™‚ã®ã¿)<BR>
 <INPUT TYPE="password" NAME="PASSWORD" SIZE=32 MAXLENGTH=32><BR>
-Ç°¤Î¤¿¤á¥Ñ¥¹¥ï¡¼¥É¤ò¤â¤¦°ì²ó(ÊÑ¹¹¤¹¤ë»ş¤Î¤ß)<BR>
+å¿µã®ãŸã‚ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’ã‚‚ã†ä¸€å›(å¤‰æ›´ã™ã‚‹æ™‚ã®ã¿)<BR>
 <INPUT TYPE="password" NAME="PASSWORD2" SIZE=32 MAXLENGTH=32><BR>
 
-<INPUT TYPE="submit" VALUE="ÊÑ¹¹¤¹¤ë" NAME="ChangeInfoButton">
+<INPUT TYPE="submit" VALUE="å¤‰æ›´ã™ã‚‹" NAME="ChangeInfoButton">
 </FORM>
 
 <HR>
 
-<H1>${HtagHeader_}ºÇ¶á¤Î½ĞÍè»ö${H_tagHeader}</H1>
+<H1>${HtagHeader_}æœ€è¿‘ã®å‡ºæ¥äº‹${H_tagHeader}</H1>
 END
     logPrintTop();
     out(<<END);
-<H1>${HtagHeader_}È¯¸«¤Îµ­Ï¿${H_tagHeader}</H1>
+<H1>${HtagHeader_}ç™ºè¦‹ã®è¨˜éŒ²${H_tagHeader}</H1>
 END
     historyPrint();
 }
 
-# ¥È¥Ã¥×¥Ú¡¼¥¸ÍÑ¥í¥°É½¼¨
+# ãƒˆãƒƒãƒ—ãƒšãƒ¼ã‚¸ç”¨ãƒ­ã‚°è¡¨ç¤º
 sub logPrintTop {
     my($i);
     for($i = 0; $i < $HtopLogTurn; $i++) {
@@ -237,7 +237,7 @@ sub logPrintTop {
     }
 }
 
-# µ­Ï¿¥Õ¥¡¥¤¥ëÉ½¼¨
+# è¨˜éŒ²ãƒ•ã‚¡ã‚¤ãƒ«è¡¨ç¤º
 sub historyPrint {
     open(HIN, "${HdirName}/hakojima.his");
     my(@line, $l);
@@ -249,7 +249,7 @@ sub historyPrint {
 
     foreach $l (@line) {
 	$l =~ /^([0-9]*),(.*)$/;
-	out("<NOBR>${HtagNumber_}¥¿¡¼¥ó${1}${H_tagNumber}¡§${2}</NOBR><BR>\n");
+	out("<NOBR>${HtagNumber_}ã‚¿ãƒ¼ãƒ³${1}${H_tagNumber}ï¼š${2}</NOBR><BR>\n");
     }
     close(HIN);
 }

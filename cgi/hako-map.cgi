@@ -1,104 +1,104 @@
 #----------------------------------------------------------------------
-# È¢Äí½ôÅç ver2.30
-# ÃÏ¿Ş¥â¡¼¥É¥â¥¸¥å¡¼¥ë(ver1.00)
-# »ÈÍÑ¾ò·ï¡¢»ÈÍÑÊıË¡Åù¤Ï¡¢hako-readme.txt¥Õ¥¡¥¤¥ë¤ò»²¾È
+# ç®±åº­è«¸å³¶ ver2.30
+# åœ°å›³ãƒ¢ãƒ¼ãƒ‰ãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«(ver1.00)
+# ä½¿ç”¨æ¡ä»¶ã€ä½¿ç”¨æ–¹æ³•ç­‰ã¯ã€hako-readme.txtãƒ•ã‚¡ã‚¤ãƒ«ã‚’å‚ç…§
 #
-# È¢Äí½ôÅç¤Î¥Ú¡¼¥¸: http://www.bekkoame.ne.jp/~tokuoka/hakoniwa.html
+# ç®±åº­è«¸å³¶ã®ãƒšãƒ¼ã‚¸: http://www.bekkoame.ne.jp/~tokuoka/hakoniwa.html
 #----------------------------------------------------------------------
 
 
 #----------------------------------------------------------------------
-# ´Ñ¸÷¥â¡¼¥É
+# è¦³å…‰ãƒ¢ãƒ¼ãƒ‰
 #----------------------------------------------------------------------
-# ¥á¥¤¥ó
+# ãƒ¡ã‚¤ãƒ³
 sub printIslandMain {
-    # ³«Êü
+    # é–‹æ”¾
     unlock();
 
-    # id¤«¤éÅçÈÖ¹æ¤ò¼èÆÀ
+    # idã‹ã‚‰å³¶ç•ªå·ã‚’å–å¾—
     $HcurrentNumber = $HidToNumber{$HcurrentID};
 
-    # ¤Ê¤¼¤«¤½¤ÎÅç¤¬¤Ê¤¤¾ì¹ç
+    # ãªãœã‹ãã®å³¶ãŒãªã„å ´åˆ
     if($HcurrentNumber eq '') {
 	tempProblem();
 	return;
     }
 
-    # Ì¾Á°¤Î¼èÆÀ
+    # åå‰ã®å–å¾—
     $HcurrentName = $Hislands[$HcurrentNumber]->{'name'};
 
-    # ´Ñ¸÷²èÌÌ
-    tempPrintIslandHead(); # ¤è¤¦¤³¤½!!
-    islandInfo(); # Åç¤Î¾ğÊó
-    islandMap(0); # Åç¤ÎÃÏ¿Ş¡¢´Ñ¸÷¥â¡¼¥É
+    # è¦³å…‰ç”»é¢
+    tempPrintIslandHead(); # ã‚ˆã†ã“ã!!
+    islandInfo(); # å³¶ã®æƒ…å ±
+    islandMap(0); # å³¶ã®åœ°å›³ã€è¦³å…‰ãƒ¢ãƒ¼ãƒ‰
 
-    # ¡û¡ûÅç¥í¡¼¥«¥ë·Ç¼¨ÈÄ
+    # â—‹â—‹å³¶ãƒ­ãƒ¼ã‚«ãƒ«æ²ç¤ºæ¿
     if($HuseLbbs) {
-	tempLbbsHead();     # ¥í¡¼¥«¥ë·Ç¼¨ÈÄ
-	tempLbbsInput();   # ½ñ¤­¹ş¤ß¥Õ¥©¡¼¥à
-	tempLbbsContents(); # ·Ç¼¨ÈÄÆâÍÆ
+	tempLbbsHead();     # ãƒ­ãƒ¼ã‚«ãƒ«æ²ç¤ºæ¿
+	tempLbbsInput();   # æ›¸ãè¾¼ã¿ãƒ•ã‚©ãƒ¼ãƒ 
+	tempLbbsContents(); # æ²ç¤ºæ¿å†…å®¹
     }
 
-    # ¶á¶·
+    # è¿‘æ³
     tempRecent(0);
 }
 
 #----------------------------------------------------------------------
-# ³«È¯¥â¡¼¥É
+# é–‹ç™ºãƒ¢ãƒ¼ãƒ‰
 #----------------------------------------------------------------------
-# ¥á¥¤¥ó
+# ãƒ¡ã‚¤ãƒ³
 sub ownerMain {
-    # ³«Êü
+    # é–‹æ”¾
     unlock();
 
-    # ¥â¡¼¥É¤òÌÀ¼¨
+    # ãƒ¢ãƒ¼ãƒ‰ã‚’æ˜ç¤º
     $HmainMode = 'owner';
 
-    # id¤«¤éÅç¤ò¼èÆÀ
+    # idã‹ã‚‰å³¶ã‚’å–å¾—
     $HcurrentNumber = $HidToNumber{$HcurrentID};
     my($island) = $Hislands[$HcurrentNumber];
     $HcurrentName = $island->{'name'};
 
-    # ¥Ñ¥¹¥ï¡¼¥É
+    # ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰
     if(!checkPassword($island->{'password'},$HinputPassword)) {
-	# password´Ö°ã¤¤
+	# passwordé–“é•ã„
 	tempWrongPassword();
 	return;
     }
 
-    # ³«È¯²èÌÌ
-    tempOwner(); # ¡Ö³«È¯·×²è¡×
+    # é–‹ç™ºç”»é¢
+    tempOwner(); # ã€Œé–‹ç™ºè¨ˆç”»ã€
 
-    # ¡û¡ûÅç¥í¡¼¥«¥ë·Ç¼¨ÈÄ
+    # â—‹â—‹å³¶ãƒ­ãƒ¼ã‚«ãƒ«æ²ç¤ºæ¿
     if($HuseLbbs) {
-	tempLbbsHead();     # ¥í¡¼¥«¥ë·Ç¼¨ÈÄ
-	tempLbbsInputOW();   # ½ñ¤­¹ş¤ß¥Õ¥©¡¼¥à
-	tempLbbsContents(); # ·Ç¼¨ÈÄÆâÍÆ
+	tempLbbsHead();     # ãƒ­ãƒ¼ã‚«ãƒ«æ²ç¤ºæ¿
+	tempLbbsInputOW();   # æ›¸ãè¾¼ã¿ãƒ•ã‚©ãƒ¼ãƒ 
+	tempLbbsContents(); # æ²ç¤ºæ¿å†…å®¹
     }
 
-    # ¶á¶·
+    # è¿‘æ³
     tempRecent(1);
 }
 
 #----------------------------------------------------------------------
-# ¥³¥Ş¥ó¥É¥â¡¼¥É
+# ã‚³ãƒãƒ³ãƒ‰ãƒ¢ãƒ¼ãƒ‰
 #----------------------------------------------------------------------
-# ¥á¥¤¥ó
+# ãƒ¡ã‚¤ãƒ³
 sub commandMain {
-    # id¤«¤éÅç¤ò¼èÆÀ
+    # idã‹ã‚‰å³¶ã‚’å–å¾—
     $HcurrentNumber = $HidToNumber{$HcurrentID};
     my($island) = $Hislands[$HcurrentNumber];
     $HcurrentName = $island->{'name'};
 
-    # ¥Ñ¥¹¥ï¡¼¥É
+    # ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰
     if(!checkPassword($island->{'password'},$HinputPassword)) {
-	# password´Ö°ã¤¤
+	# passwordé–“é•ã„
 	unlock();
 	tempWrongPassword();
 	return;
     }
 
-    # ¥â¡¼¥É¤ÇÊ¬´ô
+    # ãƒ¢ãƒ¼ãƒ‰ã§åˆ†å²
     my($command) = $island->{'command'};
 
     if($HcommandMode eq 'delete') {
@@ -106,12 +106,12 @@ sub commandMain {
 	tempCommandDelete();
     } elsif(($HcommandKind == $HcomAutoPrepare) ||
 	    ($HcommandKind == $HcomAutoPrepare2)) {
-	# ¥Õ¥ëÀ°ÃÏ¡¢¥Õ¥ëÃÏ¤Ê¤é¤·
-	# ºÂÉ¸ÇÛÎó¤òºî¤ë
+	# ãƒ•ãƒ«æ•´åœ°ã€ãƒ•ãƒ«åœ°ãªã‚‰ã—
+	# åº§æ¨™é…åˆ—ã‚’ä½œã‚‹
 	makeRandomPointArray();
 	my($land) = $island->{'land'};
 
-	# ¥³¥Ş¥ó¥É¤Î¼ïÎà·èÄê
+	# ã‚³ãƒãƒ³ãƒ‰ã®ç¨®é¡æ±ºå®š
 	my($kind) = $HcomPrepare;
 	if($HcommandKind == $HcomAutoPrepare2) {
 	    $kind = $HcomPrepare2;
@@ -137,7 +137,7 @@ sub commandMain {
 	}
 	tempCommandAdd();
     } elsif($HcommandKind == $HcomAutoDelete) {
-	# Á´¾Ã¤·
+	# å…¨æ¶ˆã—
 	my($i);
 	for($i = 0; $i < $HcommandMax; $i++) {
 	    slideFront($command, $HcommandPlanNumber);
@@ -148,7 +148,7 @@ sub commandMain {
 	    slideBack($command, $HcommandPlanNumber);
 	}
 	tempCommandAdd();
-	# ¥³¥Ş¥ó¥É¤òÅĞÏ¿
+	# ã‚³ãƒãƒ³ãƒ‰ã‚’ç™»éŒ²
 	$command->[$HcommandPlanNumber] = {
 	    'kind' => $HcommandKind,
 	    'target' => $HcommandTarget,
@@ -158,63 +158,63 @@ sub commandMain {
 	    };
     }
 
-    # ¥Ç¡¼¥¿¤Î½ñ¤­½Ğ¤·
+    # ãƒ‡ãƒ¼ã‚¿ã®æ›¸ãå‡ºã—
     writeIslandsFile($HcurrentID);
 
-    # owner mode¤Ø
+    # owner modeã¸
     ownerMain();
 
 }
 
 #----------------------------------------------------------------------
-# ¥³¥á¥ó¥ÈÆşÎÏ¥â¡¼¥É
+# ã‚³ãƒ¡ãƒ³ãƒˆå…¥åŠ›ãƒ¢ãƒ¼ãƒ‰
 #----------------------------------------------------------------------
-# ¥á¥¤¥ó
+# ãƒ¡ã‚¤ãƒ³
 sub commentMain {
-    # id¤«¤éÅç¤ò¼èÆÀ
+    # idã‹ã‚‰å³¶ã‚’å–å¾—
     $HcurrentNumber = $HidToNumber{$HcurrentID};
     my($island) = $Hislands[$HcurrentNumber];
     $HcurrentName = $island->{'name'};
 
-    # ¥Ñ¥¹¥ï¡¼¥É
+    # ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰
     if(!checkPassword($island->{'password'},$HinputPassword)) {
-	# password´Ö°ã¤¤
+	# passwordé–“é•ã„
 	unlock();
 	tempWrongPassword();
 	return;
     }
 
-    # ¥á¥Ã¥»¡¼¥¸¤ò¹¹¿·
+    # ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’æ›´æ–°
     $island->{'comment'} = htmlEscape($Hmessage);
 
-    # ¥Ç¡¼¥¿¤Î½ñ¤­½Ğ¤·
+    # ãƒ‡ãƒ¼ã‚¿ã®æ›¸ãå‡ºã—
     writeIslandsFile($HcurrentID);
 
-    # ¥³¥á¥ó¥È¹¹¿·¥á¥Ã¥»¡¼¥¸
+    # ã‚³ãƒ¡ãƒ³ãƒˆæ›´æ–°ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
     tempComment();
 
-    # owner mode¤Ø
+    # owner modeã¸
     ownerMain();
 }
 
 #----------------------------------------------------------------------
-# ¥í¡¼¥«¥ë·Ç¼¨ÈÄ¥â¡¼¥É
+# ãƒ­ãƒ¼ã‚«ãƒ«æ²ç¤ºæ¿ãƒ¢ãƒ¼ãƒ‰
 #----------------------------------------------------------------------
-# ¥á¥¤¥ó
+# ãƒ¡ã‚¤ãƒ³
 
 sub localBbsMain {
-    # id¤«¤éÅçÈÖ¹æ¤ò¼èÆÀ
+    # idã‹ã‚‰å³¶ç•ªå·ã‚’å–å¾—
     $HcurrentNumber = $HidToNumber{$HcurrentID};
     my($island) = $Hislands[$HcurrentNumber];
 
-    # ¤Ê¤¼¤«¤½¤ÎÅç¤¬¤Ê¤¤¾ì¹ç
+    # ãªãœã‹ãã®å³¶ãŒãªã„å ´åˆ
     if($HcurrentNumber eq '') {
 	unlock();
 	tempProblem();
 	return;
     }
 
-    # ºï½ü¥â¡¼¥É¤¸¤ã¤Ê¤¯¤ÆÌ¾Á°¤«¥á¥Ã¥»¡¼¥¸¤¬¤Ê¤¤¾ì¹ç
+    # å‰Šé™¤ãƒ¢ãƒ¼ãƒ‰ã˜ã‚ƒãªãã¦åå‰ã‹ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒãªã„å ´åˆ
     if($HlbbsMode != 2) {
 	if(($HlbbsName eq '') || ($HlbbsName eq '')) {
 	    unlock();
@@ -223,10 +223,10 @@ sub localBbsMain {
 	}
     }
 
-    # ´Ñ¸÷¼Ô¥â¡¼¥É¤¸¤ã¤Ê¤¤»ş¤Ï¥Ñ¥¹¥ï¡¼¥É¥Á¥§¥Ã¥¯
+    # è¦³å…‰è€…ãƒ¢ãƒ¼ãƒ‰ã˜ã‚ƒãªã„æ™‚ã¯ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãƒã‚§ãƒƒã‚¯
     if($HlbbsMode != 0) {
 	if(!checkPassword($island->{'password'},$HinputPassword)) {
-	    # password´Ö°ã¤¤
+	    # passwordé–“é•ã„
 	    unlock();
 	    tempWrongPassword();
 	    return;
@@ -236,35 +236,35 @@ sub localBbsMain {
     my($lbbs);
     $lbbs = $island->{'lbbs'};
 
-    # ¥â¡¼¥É¤ÇÊ¬´ô
+    # ãƒ¢ãƒ¼ãƒ‰ã§åˆ†å²
     if($HlbbsMode == 2) {
-	# ºï½ü¥â¡¼¥É
-	# ¥á¥Ã¥»¡¼¥¸¤òÁ°¤Ë¤º¤é¤¹
+	# å‰Šé™¤ãƒ¢ãƒ¼ãƒ‰
+	# ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å‰ã«ãšã‚‰ã™
 	slideBackLbbsMessage($lbbs, $HcommandPlanNumber);
 	tempLbbsDelete();
     } else {
-	# µ­Ä¢¥â¡¼¥É
-	# ¥á¥Ã¥»¡¼¥¸¤ò¸å¤í¤Ë¤º¤é¤¹
+	# è¨˜å¸³ãƒ¢ãƒ¼ãƒ‰
+	# ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å¾Œã‚ã«ãšã‚‰ã™
 	slideLbbsMessage($lbbs);
 
-	# ¥á¥Ã¥»¡¼¥¸½ñ¤­¹ş¤ß
+	# ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸æ›¸ãè¾¼ã¿
 	my($message);
 	if($HlbbsMode == 0) {
 	    $message = '0';
 	} else {
 	    $message = '1';
 	}
-	$HlbbsName = "$HislandTurn¡§" . htmlEscape($HlbbsName);
+	$HlbbsName = "$HislandTurnï¼š" . htmlEscape($HlbbsName);
 	$HlbbsMessage = htmlEscape($HlbbsMessage);
 	$lbbs->[0] = "$message>$HlbbsName>$HlbbsMessage";
 
 	tempLbbsAdd();
     }
 
-    # ¥Ç¡¼¥¿½ñ¤­½Ğ¤·
+    # ãƒ‡ãƒ¼ã‚¿æ›¸ãå‡ºã—
     writeIslandsFile($HcurrentID);
 
-    # ¤â¤È¤Î¥â¡¼¥É¤Ø
+    # ã‚‚ã¨ã®ãƒ¢ãƒ¼ãƒ‰ã¸
     if($HlbbsMode == 0) {
 	printIslandMain();
     } else {
@@ -272,7 +272,7 @@ sub localBbsMain {
     }
 }
 
-# ¥í¡¼¥«¥ë·Ç¼¨ÈÄ¤Î¥á¥Ã¥»¡¼¥¸¤ò°ì¤Ä¸å¤í¤Ë¤º¤é¤¹
+# ãƒ­ãƒ¼ã‚«ãƒ«æ²ç¤ºæ¿ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ä¸€ã¤å¾Œã‚ã«ãšã‚‰ã™
 sub slideLbbsMessage {
     my($lbbs) = @_;
     my($i);
@@ -282,7 +282,7 @@ sub slideLbbsMessage {
     unshift(@$lbbs, $lbbs->[0]);
 }
 
-# ¥í¡¼¥«¥ë·Ç¼¨ÈÄ¤Î¥á¥Ã¥»¡¼¥¸¤ò°ì¤ÄÁ°¤Ë¤º¤é¤¹
+# ãƒ­ãƒ¼ã‚«ãƒ«æ²ç¤ºæ¿ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ä¸€ã¤å‰ã«ãšã‚‰ã™
 sub slideBackLbbsMessage {
     my($lbbs, $number) = @_;
     my($i);
@@ -291,46 +291,46 @@ sub slideBackLbbsMessage {
 }
 
 #----------------------------------------------------------------------
-# Åç¤ÎÃÏ¿Ş
+# å³¶ã®åœ°å›³
 #----------------------------------------------------------------------
 
-# ¾ğÊó¤ÎÉ½¼¨
+# æƒ…å ±ã®è¡¨ç¤º
 sub islandInfo {
     my($island) = $Hislands[$HcurrentNumber];
-    # ¾ğÊóÉ½¼¨
+    # æƒ…å ±è¡¨ç¤º
     my($rank) = $HcurrentNumber + 1;
     my($farm) = $island->{'farm'};
     my($factory) = $island->{'factory'};
     my($mountain) = $island->{'mountain'};
-    $farm = ($farm == 0) ? "ÊİÍ­¤»¤º" : "${farm}0$HunitPop";
-    $factory = ($factory == 0) ? "ÊİÍ­¤»¤º" : "${factory}0$HunitPop";
-    $mountain = ($mountain == 0) ? "ÊİÍ­¤»¤º" : "${mountain}0$HunitPop";
+    $farm = ($farm == 0) ? "ä¿æœ‰ã›ãš" : "${farm}0$HunitPop";
+    $factory = ($factory == 0) ? "ä¿æœ‰ã›ãš" : "${factory}0$HunitPop";
+    $mountain = ($mountain == 0) ? "ä¿æœ‰ã›ãš" : "${mountain}0$HunitPop";
 
     my($mStr1) = '';
     my($mStr2) = '';
     if(($HhideMoneyMode == 1) || ($HmainMode eq 'owner')) {
-	# Ìµ¾ò·ï¤Ş¤¿¤Ïowner¥â¡¼¥É
-	$mStr1 = "<TH $HbgTitleCell nowrap=nowrap><NOBR>${HtagTH_}»ñ¶â${H_tagTH}</NOBR></TH>";
+	# ç„¡æ¡ä»¶ã¾ãŸã¯ownerãƒ¢ãƒ¼ãƒ‰
+	$mStr1 = "<TH $HbgTitleCell nowrap=nowrap><NOBR>${HtagTH_}è³‡é‡‘${H_tagTH}</NOBR></TH>";
 	$mStr2 = "<TD $HbgInfoCell align=right nowrap=nowrap><NOBR>$island->{'money'}$HunitMoney</NOBR></TD>";
     } elsif($HhideMoneyMode == 2) {
 	my($mTmp) = aboutMoney($island->{'money'});
 
-	# 1000²¯Ã±°Ì¥â¡¼¥É
-	$mStr1 = "<TH $HbgTitleCell nowrap=nowrap><NOBR>${HtagTH_}»ñ¶â${H_tagTH}</NOBR></TH>";
+	# 1000å„„å˜ä½ãƒ¢ãƒ¼ãƒ‰
+	$mStr1 = "<TH $HbgTitleCell nowrap=nowrap><NOBR>${HtagTH_}è³‡é‡‘${H_tagTH}</NOBR></TH>";
 	$mStr2 = "<TD $HbgInfoCell align=right nowrap=nowrap><NOBR>$mTmp</NOBR></TD>";
     }
     out(<<END);
 <CENTER>
 <TABLE BORDER>
 <TR>
-<TH $HbgTitleCell nowrap=nowrap><NOBR>${HtagTH_}½ç°Ì${H_tagTH}</NOBR></TH>
-<TH $HbgTitleCell nowrap=nowrap><NOBR>${HtagTH_}¿Í¸ı${H_tagTH}</NOBR></TH>
+<TH $HbgTitleCell nowrap=nowrap><NOBR>${HtagTH_}é †ä½${H_tagTH}</NOBR></TH>
+<TH $HbgTitleCell nowrap=nowrap><NOBR>${HtagTH_}äººå£${H_tagTH}</NOBR></TH>
 $mStr1
-<TH $HbgTitleCell nowrap=nowrap><NOBR>${HtagTH_}¿©ÎÁ${H_tagTH}</NOBR></TH>
-<TH $HbgTitleCell nowrap=nowrap><NOBR>${HtagTH_}ÌÌÀÑ${H_tagTH}</NOBR></TH>
-<TH $HbgTitleCell nowrap=nowrap><NOBR>${HtagTH_}ÇÀ¾ìµ¬ÌÏ${H_tagTH}</NOBR></TH>
-<TH $HbgTitleCell nowrap=nowrap><NOBR>${HtagTH_}¹©¾ìµ¬ÌÏ${H_tagTH}</NOBR></TH>
-<TH $HbgTitleCell nowrap=nowrap><NOBR>${HtagTH_}ºÎ·¡¾ìµ¬ÌÏ${H_tagTH}</NOBR></TH>
+<TH $HbgTitleCell nowrap=nowrap><NOBR>${HtagTH_}é£Ÿæ–™${H_tagTH}</NOBR></TH>
+<TH $HbgTitleCell nowrap=nowrap><NOBR>${HtagTH_}é¢ç©${H_tagTH}</NOBR></TH>
+<TH $HbgTitleCell nowrap=nowrap><NOBR>${HtagTH_}è¾²å ´è¦æ¨¡${H_tagTH}</NOBR></TH>
+<TH $HbgTitleCell nowrap=nowrap><NOBR>${HtagTH_}å·¥å ´è¦æ¨¡${H_tagTH}</NOBR></TH>
+<TH $HbgTitleCell nowrap=nowrap><NOBR>${HtagTH_}æ¡æ˜å ´è¦æ¨¡${H_tagTH}</NOBR></TH>
 </TR>
 <TR>
 <TD $HbgNumberCell align=middle nowrap=nowrap><NOBR>${HtagNumber_}$rank${H_tagNumber}</NOBR></TD>
@@ -346,8 +346,8 @@ $mStr2
 END
 }
 
-# ÃÏ¿Ş¤ÎÉ½¼¨
-# °ú¿ô¤¬1¤Ê¤é¡¢¥ß¥µ¥¤¥ë´ğÃÏÅù¤ò¤½¤Î¤Ş¤ŞÉ½¼¨
+# åœ°å›³ã®è¡¨ç¤º
+# å¼•æ•°ãŒ1ãªã‚‰ã€ãƒŸã‚µã‚¤ãƒ«åŸºåœ°ç­‰ã‚’ãã®ã¾ã¾è¡¨ç¤º
 sub islandMap {
     my($mode) = @_;
     my($island);
@@ -356,12 +356,12 @@ sub islandMap {
     out(<<END);
 <CENTER><TABLE BORDER><TR><TD>
 END
-    # ÃÏ·Á¡¢ÃÏ·ÁÃÍ¤ò¼èÆÀ
+    # åœ°å½¢ã€åœ°å½¢å€¤ã‚’å–å¾—
     my($land) = $island->{'land'};
     my($landValue) = $island->{'landValue'};
     my($l, $lv);
 
-    # ¥³¥Ş¥ó¥É¼èÆÀ
+    # ã‚³ãƒãƒ³ãƒ‰å–å¾—
     my($command) = $island->{'command'};
     my($com, @comStr, $i);
     if($HmainMode eq 'owner') {
@@ -375,30 +375,30 @@ END
 	}
     }
 
-    # ºÂÉ¸(¾å)¤ò½ĞÎÏ
+    # åº§æ¨™(ä¸Š)ã‚’å‡ºåŠ›
     out("<IMG SRC=\"xbar.gif\" width=400 height=16><BR>");
 
-    # ³ÆÃÏ·Á¤ª¤è¤Ó²ş¹Ô¤ò½ĞÎÏ
+    # å„åœ°å½¢ãŠã‚ˆã³æ”¹è¡Œã‚’å‡ºåŠ›
     my($x, $y);
     for($y = 0; $y < $HislandSize; $y++) {
-	# ¶ö¿ô¹ÔÌÜ¤Ê¤éÈÖ¹æ¤ò½ĞÎÏ
+	# å¶æ•°è¡Œç›®ãªã‚‰ç•ªå·ã‚’å‡ºåŠ›
         if(($y % 2) == 0) {
 	    out("<IMG SRC=\"space${y}.gif\" width=16 height=32>");
 	}
 
-	# ³ÆÃÏ·Á¤ò½ĞÎÏ
+	# å„åœ°å½¢ã‚’å‡ºåŠ›
 	for($x = 0; $x < $HislandSize; $x++) {
 	    $l = $land->[$x][$y];
 	    $lv = $landValue->[$x][$y];
 	    landString($l, $lv, $x, $y, $mode, $comStr[$x][$y]);
 	}
 
-	# ´ñ¿ô¹ÔÌÜ¤Ê¤éÈÖ¹æ¤ò½ĞÎÏ
+	# å¥‡æ•°è¡Œç›®ãªã‚‰ç•ªå·ã‚’å‡ºåŠ›
         if(($y % 2) == 1) {
 	    out("<IMG SRC=\"space${y}.gif\" width=16 height=32>");
 	}
 
-	# ²ş¹Ô¤ò½ĞÎÏ
+	# æ”¹è¡Œã‚’å‡ºåŠ›
 	out("<BR>");
     }
     out("</TD></TR></TABLE></CENTER>\n");
@@ -412,139 +412,139 @@ sub landString {
     if($l == $HlandSea) {
 
 	if($lv == 1) {
-	    # ÀõÀ¥
+	    # æµ…ç€¬
 	    $image = 'land14.gif';
-	    $alt = '³¤(ÀõÀ¥)';
+	    $alt = 'æµ·(æµ…ç€¬)';
         } else {
-            # ³¤
+            # æµ·
 	    $image = 'land0.gif';
-	    $alt = '³¤';
+	    $alt = 'æµ·';
         }
     } elsif($l == $HlandWaste) {
-	# ¹ÓÃÏ
+	# è’åœ°
 	if($lv == 1) {
-	    $image = 'land13.gif'; # ÃåÃÆÅÀ
-	    $alt = '¹ÓÃÏ';
+	    $image = 'land13.gif'; # ç€å¼¾ç‚¹
+	    $alt = 'è’åœ°';
 	} else {
 	    $image = 'land1.gif';
-	    $alt = '¹ÓÃÏ';
+	    $alt = 'è’åœ°';
 	}
     } elsif($l == $HlandPlains) {
-	# Ê¿ÃÏ
+	# å¹³åœ°
 	$image = 'land2.gif';
-	$alt = 'Ê¿ÃÏ';
+	$alt = 'å¹³åœ°';
     } elsif($l == $HlandForest) {
-	# ¿¹
+	# æ£®
 	if($mode == 1) {
 	    $image = 'land6.gif';
-	    $alt = "¿¹(${lv}$HunitTree)";
+	    $alt = "æ£®(${lv}$HunitTree)";
 	} else {
-	    # ´Ñ¸÷¼Ô¤Î¾ì¹ç¤ÏÌÚ¤ÎËÜ¿ô±£¤¹
+	    # è¦³å…‰è€…ã®å ´åˆã¯æœ¨ã®æœ¬æ•°éš ã™
 	    $image = 'land6.gif';
-	    $alt = '¿¹';
+	    $alt = 'æ£®';
 	}
     } elsif($l == $HlandTown) {
-	# Ä®
+	# ç”º
 	my($p, $n);
 	if($lv < 30) {
 	    $p = 3;
-	    $n = 'Â¼';
+	    $n = 'æ‘';
 	} elsif($lv < 100) {
 	    $p = 4;
-	    $n = 'Ä®';
+	    $n = 'ç”º';
 	} else {
 	    $p = 5;
-	    $n = 'ÅÔ»Ô';
+	    $n = 'éƒ½å¸‚';
 	}
 
 	$image = "land${p}.gif";
 	$alt = "$n(${lv}$HunitPop)";
     } elsif($l == $HlandFarm) {
-	# ÇÀ¾ì
+	# è¾²å ´
 	$image = 'land7.gif';
-	$alt = "ÇÀ¾ì(${lv}0${HunitPop}µ¬ÌÏ)";
+	$alt = "è¾²å ´(${lv}0${HunitPop}è¦æ¨¡)";
     } elsif($l == $HlandFactory) {
-	# ¹©¾ì
+	# å·¥å ´
 	$image = 'land8.gif';
-	$alt = "¹©¾ì(${lv}0${HunitPop}µ¬ÌÏ)";
+	$alt = "å·¥å ´(${lv}0${HunitPop}è¦æ¨¡)";
     } elsif($l == $HlandBase) {
 	if($mode == 0) {
-	    # ´Ñ¸÷¼Ô¤Î¾ì¹ç¤Ï¿¹¤Î¤Õ¤ê
+	    # è¦³å…‰è€…ã®å ´åˆã¯æ£®ã®ãµã‚Š
 	    $image = 'land6.gif';
-	    $alt = '¿¹';
+	    $alt = 'æ£®';
 	} else {
-	    # ¥ß¥µ¥¤¥ë´ğÃÏ
+	    # ãƒŸã‚µã‚¤ãƒ«åŸºåœ°
 	    my($level) = expToLevel($l, $lv);
 	    $image = 'land9.gif';
-	    $alt = "¥ß¥µ¥¤¥ë´ğÃÏ (¥ì¥Ù¥ë ${level}/·Ğ¸³ÃÍ $lv)";
+	    $alt = "ãƒŸã‚µã‚¤ãƒ«åŸºåœ° (ãƒ¬ãƒ™ãƒ« ${level}/çµŒé¨“å€¤ $lv)";
 	}
     } elsif($l == $HlandSbase) {
-	# ³¤Äì´ğÃÏ
+	# æµ·åº•åŸºåœ°
 	if($mode == 0) {
-	    # ´Ñ¸÷¼Ô¤Î¾ì¹ç¤Ï³¤¤Î¤Õ¤ê
+	    # è¦³å…‰è€…ã®å ´åˆã¯æµ·ã®ãµã‚Š
 	    $image = 'land0.gif';
-	    $alt = '³¤';
+	    $alt = 'æµ·';
 	} else {
 	    my($level) = expToLevel($l, $lv);
 	    $image = 'land12.gif';
-	    $alt = "³¤Äì´ğÃÏ (¥ì¥Ù¥ë ${level}/·Ğ¸³ÃÍ $lv)";
+	    $alt = "æµ·åº•åŸºåœ° (ãƒ¬ãƒ™ãƒ« ${level}/çµŒé¨“å€¤ $lv)";
 	}
     } elsif($l == $HlandDefence) {
-	# ËÉ±Ò»ÜÀß
+	# é˜²è¡›æ–½è¨­
 	$image = 'land10.gif';
-	$alt = 'ËÉ±Ò»ÜÀß';
+	$alt = 'é˜²è¡›æ–½è¨­';
     } elsif($l == $HlandHaribote) {
-	# ¥Ï¥ê¥Ü¥Æ
+	# ãƒãƒªãƒœãƒ†
 	$image = 'land10.gif';
 	if($mode == 0) {
-	    # ´Ñ¸÷¼Ô¤Î¾ì¹ç¤ÏËÉ±Ò»ÜÀß¤Î¤Õ¤ê
-	    $alt = 'ËÉ±Ò»ÜÀß';
+	    # è¦³å…‰è€…ã®å ´åˆã¯é˜²è¡›æ–½è¨­ã®ãµã‚Š
+	    $alt = 'é˜²è¡›æ–½è¨­';
 	} else {
-	    $alt = '¥Ï¥ê¥Ü¥Æ';
+	    $alt = 'ãƒãƒªãƒœãƒ†';
 	}
     } elsif($l == $HlandOil) {
-	# ³¤ÄìÌıÅÄ
+	# æµ·åº•æ²¹ç”°
 	$image = 'land16.gif';
-	$alt = '³¤ÄìÌıÅÄ';
+	$alt = 'æµ·åº•æ²¹ç”°';
     } elsif($l == $HlandMountain) {
-	# »³
+	# å±±
 	my($str);
 	$str = '';
 	if($lv > 0) {
 	    $image = 'land15.gif';
-	    $alt = "»³(ºÎ·¡¾ì${lv}0${HunitPop}µ¬ÌÏ)";
+	    $alt = "å±±(æ¡æ˜å ´${lv}0${HunitPop}è¦æ¨¡)";
 	} else {
 	    $image = 'land11.gif';
-	    $alt = '»³';
+	    $alt = 'å±±';
 	}
     } elsif($l == $HlandMonument) {
-	# µ­Ç°Èê
+	# è¨˜å¿µç¢‘
 	$image = $HmonumentImage[$lv];
 	$alt = $HmonumentName[$lv];
     } elsif($l == $HlandMonster) {
-	# ²ø½Ã
+	# æ€ªç£
 	my($kind, $name, $hp) = monsterSpec($lv);
 	my($special) = $HmonsterSpecial[$kind];
 	$image = $HmonsterImage[$kind];
 
-	# ¹Å²½Ãæ?
+	# ç¡¬åŒ–ä¸­?
 	if((($special == 3) && (($HislandTurn % 2) == 1)) ||
 	   (($special == 4) && (($HislandTurn % 2) == 0))) {
-	    # ¹Å²½Ãæ
+	    # ç¡¬åŒ–ä¸­
 	    $image = $HmonsterImage2[$kind];
 	}
-	$alt = "²ø½Ã$name(ÂÎÎÏ${hp})";
+	$alt = "æ€ªç£$name(ä½“åŠ›${hp})";
     }
 
 
-    # ³«È¯²èÌÌ¤Î¾ì¹ç¤Ï¡¢ºÂÉ¸ÀßÄê
+    # é–‹ç™ºç”»é¢ã®å ´åˆã¯ã€åº§æ¨™è¨­å®š
     if($mode == 1) {
 	out("<A HREF=\"JavaScript:void(0);\" onclick=\"ps($x,$y)\">");
     }
 
     out("<IMG SRC=\"$image\" ALT=\"$point $alt $comStr\" width=32 height=32 BORDER=0>");
 
-    # ºÂÉ¸ÀßÄêÊÄ¤¸
+    # åº§æ¨™è¨­å®šé–‰ã˜
     if($mode == 1) {
 	out("</A>");
     }
@@ -552,9 +552,9 @@ sub landString {
 
 
 #----------------------------------------------------------------------
-# ¥Æ¥ó¥×¥ì¡¼¥È¤½¤ÎÂ¾
+# ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆãã®ä»–
 #----------------------------------------------------------------------
-# ¸ÄÊÌ¥í¥°É½¼¨
+# å€‹åˆ¥ãƒ­ã‚°è¡¨ç¤º
 sub logPrintLocal {
     my($mode) = @_;
     my($i);
@@ -563,21 +563,21 @@ sub logPrintLocal {
     }
 }
 
-# ¡û¡ûÅç¤Ø¤è¤¦¤³¤½¡ª¡ª
+# â—‹â—‹å³¶ã¸ã‚ˆã†ã“ãï¼ï¼
 sub tempPrintIslandHead {
     out(<<END);
 <CENTER>
-${HtagBig_}${HtagName_}¡Ö${HcurrentName}Åç¡×${H_tagName}¤Ø¤è¤¦¤³¤½¡ª¡ª${H_tagBig}<BR>
+${HtagBig_}${HtagName_}ã€Œ${HcurrentName}å³¶ã€${H_tagName}ã¸ã‚ˆã†ã“ãï¼ï¼${H_tagBig}<BR>
 $HtempBack<BR>
 </CENTER>
 END
 }
 
-# ¡û¡ûÅç³«È¯·×²è
+# â—‹â—‹å³¶é–‹ç™ºè¨ˆç”»
 sub tempOwner {
     out(<<END);
 <CENTER>
-${HtagBig_}${HtagName_}${HcurrentName}Åç${H_tagName}³«È¯·×²è${H_tagBig}<BR>
+${HtagBig_}${HtagName_}${HcurrentName}å³¶${H_tagName}é–‹ç™ºè¨ˆç”»${H_tagBig}<BR>
 $HtempBack<BR>
 </CENTER>
 <SCRIPT Language="JavaScript">
@@ -606,14 +606,14 @@ END
 <TD $HbgInputCell >
 <CENTER>
 <FORM action="$HthisFile" method=POST>
-<INPUT TYPE=submit VALUE="·×²èÁ÷¿®" NAME=CommandButton$Hislands[$HcurrentNumber]->{'id'}>
+<INPUT TYPE=submit VALUE="è¨ˆç”»é€ä¿¡" NAME=CommandButton$Hislands[$HcurrentNumber]->{'id'}>
 <HR>
-<B>¥Ñ¥¹¥ï¡¼¥É</B></BR>
+<B>ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰</B></BR>
 <INPUT TYPE=password NAME=PASSWORD VALUE="$HdefaultPassword">
 <HR>
-<B>·×²èÈÖ¹æ</B><SELECT NAME=NUMBER>
+<B>è¨ˆç”»ç•ªå·</B><SELECT NAME=NUMBER>
 END
-    # ·×²èÈÖ¹æ
+    # è¨ˆç”»ç•ªå·
     my($j, $i);
     for($i = 0; $i < $HcommandMax; $i++) {
 	$j = $i + 1;
@@ -623,17 +623,17 @@ END
     out(<<END);
 </SELECT><BR>
 <HR>
-<B>³«È¯·×²è</B><BR>
+<B>é–‹ç™ºè¨ˆç”»</B><BR>
 <SELECT NAME=COMMAND>
 END
 
-    #¥³¥Ş¥ó¥É
+    #ã‚³ãƒãƒ³ãƒ‰
     my($kind, $cost, $s);
     for($i = 0; $i < $HcommandTotal; $i++) {
 	$kind = $HcomList[$i];
 	$cost = $HcomCost[$kind];
 	if($cost == 0) {
-	    $cost = 'ÌµÎÁ'
+	    $cost = 'ç„¡æ–™'
 	} elsif($cost < 0) {
 	    $cost = - $cost;
 	    $cost .= $HunitFood;
@@ -651,7 +651,7 @@ END
     out(<<END);
 </SELECT>
 <HR>
-<B>ºÂÉ¸(</B>
+<B>åº§æ¨™(</B>
 <SELECT NAME=POINTX>
 
 END
@@ -677,10 +677,10 @@ END
     out(<<END);
 </SELECT><B>)</B>
 <HR>
-<B>¿ôÎÌ</B><SELECT NAME=AMOUNT>
+<B>æ•°é‡</B><SELECT NAME=AMOUNT>
 END
 
-    # ¿ôÎÌ
+    # æ•°é‡
     for($i = 0; $i < 100; $i++) {
 	out("<OPTION VALUE=$i>$i\n");
     }
@@ -688,24 +688,24 @@ END
     out(<<END);
 </SELECT>
 <HR>
-<B>ÌÜÉ¸¤ÎÅç</B><BR>
+<B>ç›®æ¨™ã®å³¶</B><BR>
 <SELECT NAME=TARGETID>
 $HtargetList<BR>
 </SELECT>
 <HR>
-<B>Æ°ºî</B><BR>
-<INPUT TYPE=radio NAME=COMMANDMODE VALUE=insert CHECKED>ÁŞÆş
-<INPUT TYPE=radio NAME=COMMANDMODE VALUE=write>¾å½ñ¤­<BR>
-<INPUT TYPE=radio NAME=COMMANDMODE VALUE=delete>ºï½ü
+<B>å‹•ä½œ</B><BR>
+<INPUT TYPE=radio NAME=COMMANDMODE VALUE=insert CHECKED>æŒ¿å…¥
+<INPUT TYPE=radio NAME=COMMANDMODE VALUE=write>ä¸Šæ›¸ã<BR>
+<INPUT TYPE=radio NAME=COMMANDMODE VALUE=delete>å‰Šé™¤
 <HR>
-<INPUT TYPE=submit VALUE="·×²èÁ÷¿®" NAME=CommandButton$Hislands[$HcurrentNumber]->{'id'}>
+<INPUT TYPE=submit VALUE="è¨ˆç”»é€ä¿¡" NAME=CommandButton$Hislands[$HcurrentNumber]->{'id'}>
 
 </CENTER>
 </FORM>
 </TD>
 <TD $HbgMapCell>
 END
-    islandMap(1);    # Åç¤ÎÃÏ¿Ş¡¢½êÍ­¼Ô¥â¡¼¥É
+    islandMap(1);    # å³¶ã®åœ°å›³ã€æ‰€æœ‰è€…ãƒ¢ãƒ¼ãƒ‰
     out(<<END);
 </TD>
 <TD $HbgCommandCell>
@@ -722,18 +722,18 @@ END
 </CENTER>
 <HR>
 <CENTER>
-${HtagBig_}¥³¥á¥ó¥È¹¹¿·${H_tagBig}<BR>
+${HtagBig_}ã‚³ãƒ¡ãƒ³ãƒˆæ›´æ–°${H_tagBig}<BR>
 <FORM action="$HthisFile" method="POST">
-¥³¥á¥ó¥È<INPUT TYPE=text NAME=MESSAGE SIZE=80><BR>
-¥Ñ¥¹¥ï¡¼¥É<INPUT TYPE=password NAME=PASSWORD VALUE="$HdefaultPassword">
-<INPUT TYPE=submit VALUE="¥³¥á¥ó¥È¹¹¿·" NAME=MessageButton$Hislands[$HcurrentNumber]->{'id'}>
+ã‚³ãƒ¡ãƒ³ãƒˆ<INPUT TYPE=text NAME=MESSAGE SIZE=80><BR>
+ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰<INPUT TYPE=password NAME=PASSWORD VALUE="$HdefaultPassword">
+<INPUT TYPE=submit VALUE="ã‚³ãƒ¡ãƒ³ãƒˆæ›´æ–°" NAME=MessageButton$Hislands[$HcurrentNumber]->{'id'}>
 </FORM>
 </CENTER>
 END
 
 }
 
-# ÆşÎÏºÑ¤ß¥³¥Ş¥ó¥ÉÉ½¼¨
+# å…¥åŠ›æ¸ˆã¿ã‚³ãƒãƒ³ãƒ‰è¡¨ç¤º
 sub tempCommand {
     my($number, $command) = @_;
     my($kind, $target, $x, $y, $arg) =
@@ -748,9 +748,9 @@ sub tempCommand {
     my($point) = "$HtagName_($x,$y)$H_tagName";
     $target = $HidToName{$target};
     if($target eq '') {
-	$target = "Ìµ¿Í";
+	$target = "ç„¡äºº";
     }
-    $target = "$HtagName_${target}Åç$H_tagName";
+    $target = "$HtagName_${target}å³¶$H_tagName";
     my($value) = $arg * $HcomCost[$kind];
     if($value == 0) {
 	$value = $HcomCost[$kind];
@@ -763,7 +763,7 @@ sub tempCommand {
     }
     $value = "$HtagName_$value$H_tagName";
 
-    my($j) = sprintf("%02d¡§", $number + 1);
+    my($j) = sprintf("%02dï¼š", $number + 1);
 
     out("<A STYlE=\"text-decoration:none\" HREF=\"JavaScript:void(0);\" onClick=\"ns($number)\"><NOBR>$HtagNumber_$j$H_tagNumber<FONT COLOR=\"$HnormalColor\">");
 
@@ -774,71 +774,71 @@ sub tempCommand {
 	    ($kind == $HcomMissilePP) ||
 	    ($kind == $HcomMissileST) ||
 	    ($kind == $HcomMissileLD)) {
-	# ¥ß¥µ¥¤¥ë·Ï
-	my($n) = ($arg == 0 ? 'ÌµÀ©¸Â' : "${arg}È¯");
-	out("$target$point¤Ø$name($HtagName_$n$H_tagName)");
+	# ãƒŸã‚µã‚¤ãƒ«ç³»
+	my($n) = ($arg == 0 ? 'ç„¡åˆ¶é™' : "${arg}ç™º");
+	out("$target$pointã¸$name($HtagName_$n$H_tagName)");
     } elsif($kind == $HcomSendMonster) {
-	# ²ø½ÃÇÉ¸¯
-	out("$target¤Ø$name");
+	# æ€ªç£æ´¾é£
+	out("$targetã¸$name");
     } elsif($kind == $HcomSell) {
-	# ¿©ÎÁÍ¢½Ğ
+	# é£Ÿæ–™è¼¸å‡º
 	out("$name$value");
     } elsif($kind == $HcomPropaganda) {
-	# Í¶Ã×³èÆ°
+	# èª˜è‡´æ´»å‹•
 	out("$name");
     } elsif(($kind == $HcomMoney) ||
 	    ($kind == $HcomFood)) {
-	# ±ç½õ
-	out("$target¤Ø$name$value");
+	# æ´åŠ©
+	out("$targetã¸$name$value");
     } elsif($kind == $HcomDestroy) {
-	# ·¡ºï
+	# æ˜å‰Š
 	if($arg != 0) {
-	    out("$point¤Ç$name(Í½»»${value})");
+	    out("$pointã§$name(äºˆç®—${value})");
 	} else {
-	    out("$point¤Ç$name");
+	    out("$pointã§$name");
 	}
     } elsif(($kind == $HcomFarm) ||
 	     ($kind == $HcomFactory) ||
 	     ($kind == $HcomMountain)) {	
-	# ²ó¿ôÉÕ¤­
+	# å›æ•°ä»˜ã
 	if($arg == 0) {
-	    out("$point¤Ç$name");
+	    out("$pointã§$name");
 	} else {
-	    out("$point¤Ç$name($arg²ó)");
+	    out("$pointã§$name($argå›)");
 	}
     } else {
-	# ºÂÉ¸ÉÕ¤­
-	out("$point¤Ç$name");
+	# åº§æ¨™ä»˜ã
+	out("$pointã§$name");
     }
 
     out("</FONT></NOBR></A><BR>");
 }
 
-# ¥í¡¼¥«¥ë·Ç¼¨ÈÄ
+# ãƒ­ãƒ¼ã‚«ãƒ«æ²ç¤ºæ¿
 sub tempLbbsHead {
     out(<<END);
 <HR>
 <CENTER>
-${HtagBig_}${HtagName_}${HcurrentName}Åç${H_tagName}´Ñ¸÷¼ÔÄÌ¿®${H_tagBig}<BR>
+${HtagBig_}${HtagName_}${HcurrentName}å³¶${H_tagName}è¦³å…‰è€…é€šä¿¡${H_tagBig}<BR>
 </CENTER>
 END
 }
 
-# ¥í¡¼¥«¥ë·Ç¼¨ÈÄÆşÎÏ¥Õ¥©¡¼¥à
+# ãƒ­ãƒ¼ã‚«ãƒ«æ²ç¤ºæ¿å…¥åŠ›ãƒ•ã‚©ãƒ¼ãƒ 
 sub tempLbbsInput {
     out(<<END);
 <CENTER>
 <FORM action="$HthisFile" method="POST">
 <TABLE BORDER>
 <TR>
-<TH>Ì¾Á°</TH>
-<TH>ÆâÍÆ</TH>
-<TH>Æ°ºî</TH>
+<TH>åå‰</TH>
+<TH>å†…å®¹</TH>
+<TH>å‹•ä½œ</TH>
 </TR>
 <TR>
 <TD><INPUT TYPE="text" SIZE=32 MAXLENGTH=32 NAME="LBBSNAME" VALUE="$HdefaultName"></TD>
 <TD><INPUT TYPE="text" SIZE=80 NAME="LBBSMESSAGE"></TD>
-<TD><INPUT TYPE="submit" VALUE="µ­Ä¢¤¹¤ë" NAME="LbbsButtonSS$HcurrentID"></TD>
+<TD><INPUT TYPE="submit" VALUE="è¨˜å¸³ã™ã‚‹" NAME="LbbsButtonSS$HcurrentID"></TD>
 </TR>
 </TABLE>
 </FORM>
@@ -846,34 +846,34 @@ sub tempLbbsInput {
 END
 }
 
-# ¥í¡¼¥«¥ë·Ç¼¨ÈÄÆşÎÏ¥Õ¥©¡¼¥à owner modeÍÑ
+# ãƒ­ãƒ¼ã‚«ãƒ«æ²ç¤ºæ¿å…¥åŠ›ãƒ•ã‚©ãƒ¼ãƒ  owner modeç”¨
 sub tempLbbsInputOW {
     out(<<END);
 <CENTER>
 <FORM action="$HthisFile" method="POST">
 <TABLE BORDER>
 <TR>
-<TH>Ì¾Á°</TH>
-<TH COLSPAN=2>ÆâÍÆ</TH>
+<TH>åå‰</TH>
+<TH COLSPAN=2>å†…å®¹</TH>
 </TR>
 <TR>
 <TD><INPUT TYPE="text" SIZE=32 MAXLENGTH=32 NAME="LBBSNAME" VALUE="$HdefaultName"></TD>
 <TD COLSPAN=2><INPUT TYPE="text" SIZE=80 NAME="LBBSMESSAGE"></TD>
 </TR>
 <TR>
-<TH>¥Ñ¥¹¥ï¡¼¥É</TH>
-<TH COLSPAN=2>Æ°ºî</TH>
+<TH>ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰</TH>
+<TH COLSPAN=2>å‹•ä½œ</TH>
 </TR>
 <TR>
 <TD><INPUT TYPE=password SIZE=32 MAXLENGTH=32 NAME=PASSWORD VALUE="$HdefaultPassword"></TD>
 <TD align=right>
-<INPUT TYPE="submit" VALUE="µ­Ä¢¤¹¤ë" NAME="LbbsButtonOW$HcurrentID">
+<INPUT TYPE="submit" VALUE="è¨˜å¸³ã™ã‚‹" NAME="LbbsButtonOW$HcurrentID">
 </TD>
 <TD align=right>
-ÈÖ¹æ
+ç•ªå·
 <SELECT NAME=NUMBER>
 END
-    # È¯¸ÀÈÖ¹æ
+    # ç™ºè¨€ç•ªå·
     my($j, $i);
     for($i = 0; $i < $HlbbsMax; $i++) {
 	$j = $i + 1;
@@ -881,7 +881,7 @@ END
     }
     out(<<END);
 </SELECT>
-<INPUT TYPE="submit" VALUE="ºï½ü¤¹¤ë" NAME="LbbsButtonDL$HcurrentID">
+<INPUT TYPE="submit" VALUE="å‰Šé™¤ã™ã‚‹" NAME="LbbsButtonDL$HcurrentID">
 </TD>
 </TR>
 </TABLE>
@@ -890,7 +890,7 @@ END
 END
 }
 
-# ¥í¡¼¥«¥ë·Ç¼¨ÈÄÆâÍÆ
+# ãƒ­ãƒ¼ã‚«ãƒ«æ²ç¤ºæ¿å†…å®¹
 sub tempLbbsContents {
     my($lbbs, $line);
     $lbbs = $Hislands[$HcurrentNumber]->{'lbbs'};
@@ -898,8 +898,8 @@ sub tempLbbsContents {
 <CENTER>
 <TABLE BORDER>
 <TR>
-<TH>ÈÖ¹æ</TH>
-<TH>µ­Ä¢ÆâÍÆ</TH>
+<TH>ç•ªå·</TH>
+<TH>è¨˜å¸³å†…å®¹</TH>
 </TR>
 END
 
@@ -910,10 +910,10 @@ END
 	    my($j) = $i + 1;
 	    out("<TR><TD align=center>$HtagNumber_$j$H_tagNumber</TD>");
 	    if($1 == 0) {
-		# ´Ñ¸÷¼Ô
+		# è¦³å…‰è€…
 		out("<TD>$HtagLbbsSS_$2 > $3$H_tagLbbsSS</TD></TR>");
 	    } else {
-		# Åç¼ç
+		# å³¶ä¸»
 		out("<TD>$HtagLbbsOW_$2 > $3$H_tagLbbsOW</TD></TR>");
 	    }
 	}
@@ -924,54 +924,54 @@ END
 END
 }
 
-# ¥í¡¼¥«¥ë·Ç¼¨ÈÄ¤ÇÌ¾Á°¤«¥á¥Ã¥»¡¼¥¸¤¬¤Ê¤¤¾ì¹ç
+# ãƒ­ãƒ¼ã‚«ãƒ«æ²ç¤ºæ¿ã§åå‰ã‹ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒãªã„å ´åˆ
 sub tempLbbsNoMessage {
     out(<<END);
-${HtagBig_}Ì¾Á°¤Ş¤¿¤ÏÆâÍÆ¤ÎÍó¤¬¶õÍó¤Ç¤¹¡£${H_tagBig}$HtempBack
+${HtagBig_}åå‰ã¾ãŸã¯å†…å®¹ã®æ¬„ãŒç©ºæ¬„ã§ã™ã€‚${H_tagBig}$HtempBack
 END
 }
 
-# ½ñ¤­¤³¤ßºï½ü
+# æ›¸ãã“ã¿å‰Šé™¤
 sub tempLbbsDelete {
     out(<<END);
-${HtagBig_}µ­Ä¢ÆâÍÆ¤òºï½ü¤·¤Ş¤·¤¿${H_tagBig}<HR>
+${HtagBig_}è¨˜å¸³å†…å®¹ã‚’å‰Šé™¤ã—ã¾ã—ãŸ${H_tagBig}<HR>
 END
 }
 
-# ¥³¥Ş¥ó¥ÉÅĞÏ¿
+# ã‚³ãƒãƒ³ãƒ‰ç™»éŒ²
 sub tempLbbsAdd {
     out(<<END);
-${HtagBig_}µ­Ä¢¤ò¹Ô¤¤¤Ş¤·¤¿${H_tagBig}<HR>
+${HtagBig_}è¨˜å¸³ã‚’è¡Œã„ã¾ã—ãŸ${H_tagBig}<HR>
 END
 }
 
-# ¥³¥Ş¥ó¥Éºï½ü
+# ã‚³ãƒãƒ³ãƒ‰å‰Šé™¤
 sub tempCommandDelete {
     out(<<END);
-${HtagBig_}¥³¥Ş¥ó¥É¤òºï½ü¤·¤Ş¤·¤¿${H_tagBig}<HR>
+${HtagBig_}ã‚³ãƒãƒ³ãƒ‰ã‚’å‰Šé™¤ã—ã¾ã—ãŸ${H_tagBig}<HR>
 END
 }
 
-# ¥³¥Ş¥ó¥ÉÅĞÏ¿
+# ã‚³ãƒãƒ³ãƒ‰ç™»éŒ²
 sub tempCommandAdd {
     out(<<END);
-${HtagBig_}¥³¥Ş¥ó¥É¤òÅĞÏ¿¤·¤Ş¤·¤¿${H_tagBig}<HR>
+${HtagBig_}ã‚³ãƒãƒ³ãƒ‰ã‚’ç™»éŒ²ã—ã¾ã—ãŸ${H_tagBig}<HR>
 END
 }
 
-# ¥³¥á¥ó¥ÈÊÑ¹¹À®¸ù
+# ã‚³ãƒ¡ãƒ³ãƒˆå¤‰æ›´æˆåŠŸ
 sub tempComment {
     out(<<END);
-${HtagBig_}¥³¥á¥ó¥È¤ò¹¹¿·¤·¤Ş¤·¤¿${H_tagBig}<HR>
+${HtagBig_}ã‚³ãƒ¡ãƒ³ãƒˆã‚’æ›´æ–°ã—ã¾ã—ãŸ${H_tagBig}<HR>
 END
 }
 
-# ¶á¶·
+# è¿‘æ³
 sub tempRecent {
     my($mode) = @_;
     out(<<END);
 <HR>
-${HtagBig_}${HtagName_}${HcurrentName}Åç${H_tagName}¤Î¶á¶·${H_tagBig}<BR>
+${HtagBig_}${HtagName_}${HcurrentName}å³¶${H_tagName}ã®è¿‘æ³${H_tagBig}<BR>
 END
     logPrintLocal($mode);
 }
