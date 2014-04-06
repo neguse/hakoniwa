@@ -30,11 +30,11 @@
 # とする。最後にスラッシュ(/)は付けない。
 
 # my($baseDir) = 'http://サーバー/ディレクトリ';
-my($baseDir) = 'http://localhost/cgi-bin';
+my($baseDir) = 'http://localhost:5000/cgi-bin';
 
 # 画像ファイルを置くディレクトリ
 # my($imageDir) = 'http://サーバー/ディレクトリ';
-my($imageDir) = 'http://localhost/image';
+my($imageDir) = 'http://localhost:5000/image';
 
 # マスターパスワード
 # このパスワードは、すべての島のパスワードを代用できます。

@@ -25,7 +25,7 @@ my($dirMode) = 0755;
 
 # このファイル
 # my($thisFile) = 'http://場所/cgi-bin/hako-mente.cgi';
-my($thisFile) = 'http://localhost/cgi-bin/hako-mente.cgi';
+my($thisFile) = 'http://localhost:5000/cgi-bin/hako-mente.cgi';
 
 # データディレクトリの名前
 # hakojima.cgi中のものと合わせてください。
