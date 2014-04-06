@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl
+#!/usr/bin/perl
 # ↑はサーバーに合わせて変更して下さい。
 # perl5用です。
 
@@ -29,11 +29,12 @@
 # my($baseDir) = 'http://cgi2.bekkoame.ne.jp/cgi-bin/user/u5534/hakoniwa';
 # とする。最後にスラッシュ(/)は付けない。
 
-my($baseDir) = 'http://サーバー/ディレクトリ';
+# my($baseDir) = 'http://サーバー/ディレクトリ';
+my($baseDir) = 'http://localhost/cgi-bin';
 
 # 画像ファイルを置くディレクトリ
 # my($imageDir) = 'http://サーバー/ディレクトリ';
-my($imageDir) = 'http://サーバー/ディレクトリ';
+my($imageDir) = 'http://localhost/image';
 
 # jcode.plの位置
 

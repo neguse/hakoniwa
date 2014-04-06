@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl
+#!/usr/bin/perl
 # ↑はサーバーに合わせて変更して下さい。
 
 #----------------------------------------------------------------------
@@ -24,7 +24,8 @@ my($unitTime) = 21600; # 6時間
 my($dirMode) = 0755;
 
 # このファイル
-my($thisFile) = 'http://場所/hako-mente.cgi';
+# my($thisFile) = 'http://場所/cgi-bin/hako-mente.cgi';
+my($thisFile) = 'http://localhost/cgi-bin/hako-mente.cgi';
 
 # データディレクトリの名前
 # hakojima.cgi中のものと合わせてください。
