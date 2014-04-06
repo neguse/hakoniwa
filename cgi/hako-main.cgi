@@ -34,7 +34,7 @@ my($baseDir) = 'http://localhost:5000/cgi-bin';
 
 # 画像ファイルを置くディレクトリ
 # my($imageDir) = 'http://サーバー/ディレクトリ';
-my($imageDir) = 'http://localhost:5000/image';
+my($imageDir) = 'http://localhost:5000/images';
 
 # マスターパスワード
 # このパスワードは、すべての島のパスワードを代用できます。
