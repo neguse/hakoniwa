@@ -36,12 +36,6 @@ my($baseDir) = 'http://localhost/cgi-bin';
 # my($imageDir) = 'http://サーバー/ディレクトリ';
 my($imageDir) = 'http://localhost/image';
 
-# jcode.plの位置
-
-# my($jcode) = '/usr/libperl/jcode.pl';  # ベッコアメの場合
-# my($jcode) = './jcode.pl';             # 同じディレクトリに置く場合
-my($jcode) = './jcode.pl';
-
 # マスターパスワード
 # このパスワードは、すべての島のパスワードを代用できます。
 # 例えば、「他の島のパスワード変更」等もできます。
@@ -556,9 +550,6 @@ $HpointNumber = $HislandSize * $HislandSize;
 # メイン
 #----------------------------------------------------------------------
 
-# jcode.plをrequire
-require($jcode);
-
 # 「戻る」リンク
 $HtempBack = "<A HREF=\"$HthisFile\">${HtagBig_}トップへ戻る${H_tagBig}</A>";
 
@@ -934,7 +925,7 @@ sub writeIsland {
 
 # 標準出力への出力
 sub out {
-    print STDOUT jcode::sjis($_[0]);
+    print STDOUT $_[0];
 }
 
 # デバッグログ
@@ -952,7 +943,7 @@ sub cgiInput {
     $line = <>;
     $line =~ tr/+/ /;
     $line =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
-    $line = jcode::euc($line);
+    $line = $line;
     $line =~ s/[\x00-\x1f\,]//g;
 
     # GETのやつも受け取る
@@ -1071,7 +1062,7 @@ sub cgiInput {
 sub cookieInput {
     my($cookie);
 
-    $cookie = jcode::euc($ENV{'HTTP_COOKIE'});
+    $cookie = $ENV{'HTTP_COOKIE'};
 
     if($cookie =~ /${HthisFile}OWNISLANDID=\(([^\)]*)\)/) {
 	$defaultID = $1;
