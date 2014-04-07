@@ -1523,6 +1523,7 @@ Content-type: text/html
 
 <HTML>
 <HEAD>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <TITLE>
 $Htitle
 </TITLE>
