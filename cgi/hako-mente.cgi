@@ -9,28 +9,26 @@
 # 箱庭諸島のページ: http://www.bekkoame.ne.jp/~tokuoka/hakoniwa.html
 #----------------------------------------------------------------------
 
-
 # ――――――――――――――――――――――――――――――
 # 各種設定値
 # ――――――――――――――――――――――――――――――
 
 # マスターパスワード
-my($masterpassword) = 'yourpassword';
+my ($masterpassword) = 'yourpassword';
 
 # 1ターンが何秒か
-my($unitTime) = 21600; # 6時間
+my ($unitTime) = 21600;    # 6時間
 
 # ディレクトリのパーミッション
-my($dirMode) = 0755;
+my ($dirMode) = 0755;
 
 # このファイル
 # my($thisFile) = 'http://場所/cgi-bin/hako-mente.cgi';
-my($thisFile) = 'http://localhost:5000/cgi-bin/hako-mente.cgi';
+my ($thisFile) = 'http://localhost:5000/cgi-bin/hako-mente.cgi';
 
 # データディレクトリの名前
 # hakojima.cgi中のものと合わせてください。
-my($dirName) = 'data';
-
+my ($dirName) = 'data';
 
 # use Time::Localが使えない環境では、'use Time::Local'の行を消して下さい。
 # ただし、更新時間の変更が'秒指定で変更'しかできなくなります。
@@ -41,16 +39,16 @@ use Time::Local;
 # ――――――――――――――――――――――――――――――
 
 # 各種変数
-my($mainMode);
-my($inputPass);
-my($deleteID);
-my($currentID);
-my($ctYear);
-my($ctMon);
-my($ctDate);
-my($ctHour);
-my($ctMin);
-my($ctSec);
+my ($mainMode);
+my ($inputPass);
+my ($deleteID);
+my ($currentID);
+my ($ctYear);
+my ($ctMon);
+my ($ctDate);
+my ($ctHour);
+my ($ctMin);
+my ($ctSec);
 
 print <<END;
 Content-type: text/html
@@ -65,25 +63,29 @@ END
 
 cgiInput();
 
-if($mainMode eq 'delete') {
-    if(passCheck()) {
-	deleteMode();
+if ( $mainMode eq 'delete' ) {
+    if ( passCheck() ) {
+        deleteMode();
     }
-} elsif($mainMode eq 'current') {
-    if(passCheck()) {
-	currentMode();
+}
+elsif ( $mainMode eq 'current' ) {
+    if ( passCheck() ) {
+        currentMode();
     }
-} elsif($mainMode eq 'time') {
-    if(passCheck()) {
-	timeMode();
+}
+elsif ( $mainMode eq 'time' ) {
+    if ( passCheck() ) {
+        timeMode();
     }
-} elsif($mainMode eq 'stime') {
-    if(passCheck()) {
-	stimeMode();
+}
+elsif ( $mainMode eq 'stime' ) {
+    if ( passCheck() ) {
+        stimeMode();
     }
-} elsif($mainMode eq 'new') {
-    if(passCheck()) {
-	newMode();
+}
+elsif ( $mainMode eq 'new' ) {
+    if ( passCheck() ) {
+        newMode();
     }
 }
 mainMode();
@@ -95,48 +97,50 @@ print <<END;
 END
 
 sub myrmtree {
-    my($dn) = @_;
-    opendir(DIN, "$dn/");
-    my($fileName);
-    while($fileName = readdir(DIN)) {
-	unlink("$dn/$fileName");
-    } 
+    my ($dn) = @_;
+    opendir( DIN, "$dn/" );
+    my ($fileName);
+    while ( $fileName = readdir(DIN) ) {
+        unlink("$dn/$fileName");
+    }
     closedir(DIN);
     rmdir($dn);
 }
 
 sub currentMode {
     myrmtree "${dirName}";
-    mkdir("${dirName}", $dirMode);
-    opendir(DIN, "${dirName}.bak$currentID/");
-    my($fileName);
-    while($fileName = readdir(DIN)) {
-	fileCopy("${dirName}.bak$currentID/$fileName", "${dirName}/$fileName");
-    } 
+    mkdir( "${dirName}", $dirMode );
+    opendir( DIN, "${dirName}.bak$currentID/" );
+    my ($fileName);
+    while ( $fileName = readdir(DIN) ) {
+        fileCopy( "${dirName}.bak$currentID/$fileName",
+            "${dirName}/$fileName" );
+    }
     closedir(DIN);
 }
 
 sub deleteMode {
-    if($deleteID eq '') {
-	myrmtree "${dirName}";
-    } else {
-	myrmtree "${dirName}.bak$deleteID";
+    if ( $deleteID eq '' ) {
+        myrmtree "${dirName}";
+    }
+    else {
+        myrmtree "${dirName}.bak$deleteID";
     }
     unlink "hakojimalockflock";
 }
 
 sub newMode {
-    mkdir($dirName, $dirMode);
+    mkdir( $dirName, $dirMode );
 
     # 現在の時間を取得
-    my($now) = time;
-    $now = $now - ($now % ($unitTime));
+    my ($now) = time;
+    $now = $now - ( $now % ($unitTime) );
 
-    open(OUT, ">$dirName/hakojima.dat"); # ファイルを開く
-    print OUT "1\n";         # ターン数1
-    print OUT "$now\n";      # 開始時間
-    print OUT "0\n";         # 島の数
-    print OUT "1\n";         # 次に割り当てるID
+    open( OUT, ">$dirName/hakojima.dat" );    # ファイルを開く
+    print OUT "1\n";                          # ターン数1
+    print OUT "$now\n";                       # 開始時間
+    print OUT "0\n";                          # 島の数
+    print OUT "1\n";                          # 次に割り当てるID
 
     # ファイルを閉じる
     close(OUT);
@@ -145,26 +149,26 @@ sub newMode {
 sub timeMode {
     $ctMon--;
     $ctYear -= 1900;
-    $ctSec = timelocal($ctSec, $ctMin, $ctHour, $ctDate, $ctMon, $ctYear);
+    $ctSec = timelocal( $ctSec, $ctMin, $ctHour, $ctDate, $ctMon, $ctYear );
     stimeMode();
 }
 
 sub stimeMode {
-    my($t) = $ctSec;
-    open(IN, "${dirName}/hakojima.dat");
-    my(@lines);
+    my ($t) = $ctSec;
+    open( IN, "${dirName}/hakojima.dat" );
+    my (@lines);
     @lines = <IN>;
     close(IN);
 
     $lines[1] = "$t\n";
 
-    open(OUT, ">${dirName}/hakojima.dat");
+    open( OUT, ">${dirName}/hakojima.dat" );
     print OUT @lines;
     close(OUT);
 }
 
 sub mainMode {
-    opendir(DIN, "./");
+    opendir( DIN, "./" );
 
     print <<END;
 <FORM action="$thisFile" method="POST">
@@ -173,44 +177,46 @@ sub mainMode {
 END
 
     # 現役データ
-    if(-d "${dirName}") {
-	dataPrint("");
-    } else {
-	print <<END;
+    if ( -d "${dirName}" ) {
+        dataPrint("");
+    }
+    else {
+        print <<END;
     <HR>
     <INPUT TYPE="submit" VALUE="新しいデータを作る" NAME="NEW">
 END
     }
 
     # バックアップデータ
-    my($dn);
-    while($dn = readdir(DIN)) {
-	if($dn =~ /^${dirName}.bak(.*)/) {
-	    dataPrint($1);
-	}
-    } 
+    my ($dn);
+    while ( $dn = readdir(DIN) ) {
+        if ( $dn =~ /^${dirName}.bak(.*)/ ) {
+            dataPrint($1);
+        }
+    }
     closedir(DIN);
 }
 
 # 表示モード
 sub dataPrint {
-    my($suf) = @_;
+    my ($suf) = @_;
 
     print "<HR>";
-    if($suf eq "") {
-	open(IN, "${dirName}/hakojima.dat");
-	print "<H1>現役データ</H1>";
-    } else {
-	open(IN, "${dirName}.bak$suf/hakojima.dat");
-	print "<H1>バックアップ$suf</H1>";
+    if ( $suf eq "" ) {
+        open( IN, "${dirName}/hakojima.dat" );
+        print "<H1>現役データ</H1>";
+    }
+    else {
+        open( IN, "${dirName}.bak$suf/hakojima.dat" );
+        print "<H1>バックアップ$suf</H1>";
     }
 
-    my($lastTurn);
+    my ($lastTurn);
     $lastTurn = <IN>;
-    my($lastTime);
+    my ($lastTime);
     $lastTime = <IN>;
 
-    my($timeString) = timeToString($lastTime);
+    my ($timeString) = timeToString($lastTime);
 
     print <<END;
     <B>ターン$lastTurn</B><BR>
@@ -219,13 +225,13 @@ sub dataPrint {
     <INPUT TYPE="submit" VALUE="このデータを削除" NAME="DELETE$suf">
 END
 
-    if($suf eq "") {
-	my($sec, $min, $hour, $date, $mon, $year, $day, $yday, $dummy) =
-	    localtime($lastTime);
-	$mon++;
-	$year += 1900;
+    if ( $suf eq "" ) {
+        my ( $sec, $min, $hour, $date, $mon, $year, $day, $yday, $dummy )
+            = localtime($lastTime);
+        $mon++;
+        $year += 1900;
 
-	print <<END;
+        print <<END;
     <H2>最終更新時間の変更</H2>
     <INPUT TYPE="text" SIZE=4 NAME="YEAR" VALUE="$year">年
     <INPUT TYPE="text" SIZE=2 NAME="MON" VALUE="$mon">月
@@ -238,16 +244,17 @@ END
     <INPUT TYPE="submit" VALUE="秒指定で変更" NAME="STIME">
 
 END
-    } else {
-	print <<END;
+    }
+    else {
+        print <<END;
 	<INPUT TYPE="submit" VALUE="このデータを現役に" NAME="CURRENT$suf">
 END
     }
 }
 
 sub timeToString {
-    my($sec, $min, $hour, $date, $mon, $year, $day, $yday, $dummy) =
-	localtime($_[0]);
+    my ( $sec, $min, $hour, $date, $mon, $year, $day, $yday, $dummy )
+        = localtime( $_[0] );
     $mon++;
     $year += 1900;
 
@@ -256,60 +263,64 @@ sub timeToString {
 
 # CGIの読みこみ
 sub cgiInput {
-    my($line);
+    my ($line);
 
     # 入力を受け取る
     $line = <>;
     $line =~ tr/+/ /;
     $line =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
 
-    if($line =~ /DELETE([0-9]*)/) {
-	$mainMode = 'delete';
-	$deleteID = $1;
-    } elsif($line =~ /CURRENT([0-9]*)/) {
-	$mainMode = 'current';
-	$currentID = $1;
-    } elsif($line =~ /NEW/) {
-	$mainMode = 'new';
-    } elsif($line =~ /NTIME/) {
-	$mainMode = 'time';
-	if($line =~ /YEAR=([0-9]*)/) {
-	    $ctYear = $1; 
-	}
-	if($line =~ /MON=([0-9]*)/) {
-	    $ctMon = $1; 
-	}
-	if($line =~ /DATE=([0-9]*)/) {
-	    $ctDate = $1; 
-	}
-	if($line =~ /HOUR=([0-9]*)/) {
-	    $ctHour = $1; 
-	}
-	if($line =~ /MIN=([0-9]*)/) {
-	    $ctMin = $1; 
-	}
-	if($line =~ /NSEC=([0-9]*)/) {
-	    $ctSec = $1; 
-	}
-    } elsif($line =~ /STIME/) {
-	$mainMode = 'stime';
-	if($line =~ /SSEC=([0-9]*)/) {
-	    $ctSec = $1; 
-	}
+    if ( $line =~ /DELETE([0-9]*)/ ) {
+        $mainMode = 'delete';
+        $deleteID = $1;
+    }
+    elsif ( $line =~ /CURRENT([0-9]*)/ ) {
+        $mainMode  = 'current';
+        $currentID = $1;
+    }
+    elsif ( $line =~ /NEW/ ) {
+        $mainMode = 'new';
+    }
+    elsif ( $line =~ /NTIME/ ) {
+        $mainMode = 'time';
+        if ( $line =~ /YEAR=([0-9]*)/ ) {
+            $ctYear = $1;
+        }
+        if ( $line =~ /MON=([0-9]*)/ ) {
+            $ctMon = $1;
+        }
+        if ( $line =~ /DATE=([0-9]*)/ ) {
+            $ctDate = $1;
+        }
+        if ( $line =~ /HOUR=([0-9]*)/ ) {
+            $ctHour = $1;
+        }
+        if ( $line =~ /MIN=([0-9]*)/ ) {
+            $ctMin = $1;
+        }
+        if ( $line =~ /NSEC=([0-9]*)/ ) {
+            $ctSec = $1;
+        }
+    }
+    elsif ( $line =~ /STIME/ ) {
+        $mainMode = 'stime';
+        if ( $line =~ /SSEC=([0-9]*)/ ) {
+            $ctSec = $1;
+        }
     }
 
-    if($line =~ /PASSWORD=([^\&]*)\&/) {
-	$inputPass = $1;
+    if ( $line =~ /PASSWORD=([^\&]*)\&/ ) {
+        $inputPass = $1;
     }
 }
 
 # ファイルのコピー
 sub fileCopy {
-    my($src, $dist) = @_;
-    open(IN, $src);
-    open(OUT, ">$dist");
-    while(<IN>) {
-	print OUT;
+    my ( $src, $dist ) = @_;
+    open( IN,  $src );
+    open( OUT, ">$dist" );
+    while (<IN>) {
+        print OUT;
     }
     close(IN);
     close(OUT);
@@ -317,10 +328,11 @@ sub fileCopy {
 
 # パスチェック
 sub passCheck {
-    if($inputPass eq $masterpassword) {
-	return 1;
-    } else {
-	print <<END;
+    if ( $inputPass eq $masterpassword ) {
+        return 1;
+    }
+    else {
+        print <<END;
    <FONT SIZE=7>パスワードが違います。</FONT>
 END
         return 0;

@@ -6,12 +6,12 @@
 # 箱庭諸島のページ: http://www.bekkoame.ne.jp/~tokuoka/hakoniwa.html
 #----------------------------------------------------------------------
 
-
 #----------------------------------------------------------------------
 # 観光モード
 #----------------------------------------------------------------------
 # メイン
 sub printIslandMain {
+
     # 開放
     unlock();
 
@@ -19,24 +19,24 @@ sub printIslandMain {
     $HcurrentNumber = $HidToNumber{$HcurrentID};
 
     # なぜかその島がない場合
-    if($HcurrentNumber eq '') {
-	tempProblem();
-	return;
+    if ( $HcurrentNumber eq '' ) {
+        tempProblem();
+        return;
     }
 
     # 名前の取得
     $HcurrentName = $Hislands[$HcurrentNumber]->{'name'};
 
     # 観光画面
-    tempPrintIslandHead(); # ようこそ!!
-    islandInfo(); # 島の情報
-    islandMap(0); # 島の地図、観光モード
+    tempPrintIslandHead();    # ようこそ!!
+    islandInfo();             # 島の情報
+    islandMap(0);             # 島の地図、観光モード
 
     # ○○島ローカル掲示板
-    if($HuseLbbs) {
-	tempLbbsHead();     # ローカル掲示板
-	tempLbbsInput();   # 書き込みフォーム
-	tempLbbsContents(); # 掲示板内容
+    if ($HuseLbbs) {
+        tempLbbsHead();        # ローカル掲示板
+        tempLbbsInput();       # 書き込みフォーム
+        tempLbbsContents();    # 掲示板内容
     }
 
     # 近況
@@ -48,6 +48,7 @@ sub printIslandMain {
 #----------------------------------------------------------------------
 # メイン
 sub ownerMain {
+
     # 開放
     unlock();
 
@@ -56,24 +57,25 @@ sub ownerMain {
 
     # idから島を取得
     $HcurrentNumber = $HidToNumber{$HcurrentID};
-    my($island) = $Hislands[$HcurrentNumber];
+    my ($island) = $Hislands[$HcurrentNumber];
     $HcurrentName = $island->{'name'};
 
     # パスワード
-    if(!checkPassword($island->{'password'},$HinputPassword)) {
-	# password間違い
-	tempWrongPassword();
-	return;
+    if ( !checkPassword( $island->{'password'}, $HinputPassword ) ) {
+
+        # password間違い
+        tempWrongPassword();
+        return;
     }
 
     # 開発画面
-    tempOwner(); # 「開発計画」
+    tempOwner();    # 「開発計画」
 
     # ○○島ローカル掲示板
-    if($HuseLbbs) {
-	tempLbbsHead();     # ローカル掲示板
-	tempLbbsInputOW();   # 書き込みフォーム
-	tempLbbsContents(); # 掲示板内容
+    if ($HuseLbbs) {
+        tempLbbsHead();        # ローカル掲示板
+        tempLbbsInputOW();     # 書き込みフォーム
+        tempLbbsContents();    # 掲示板内容
     }
 
     # 近況
@@ -85,77 +87,85 @@ sub ownerMain {
 #----------------------------------------------------------------------
 # メイン
 sub commandMain {
+
     # idから島を取得
     $HcurrentNumber = $HidToNumber{$HcurrentID};
-    my($island) = $Hislands[$HcurrentNumber];
+    my ($island) = $Hislands[$HcurrentNumber];
     $HcurrentName = $island->{'name'};
 
     # パスワード
-    if(!checkPassword($island->{'password'},$HinputPassword)) {
-	# password間違い
-	unlock();
-	tempWrongPassword();
-	return;
+    if ( !checkPassword( $island->{'password'}, $HinputPassword ) ) {
+
+        # password間違い
+        unlock();
+        tempWrongPassword();
+        return;
     }
 
     # モードで分岐
-    my($command) = $island->{'command'};
+    my ($command) = $island->{'command'};
 
-    if($HcommandMode eq 'delete') {
-	slideFront($command, $HcommandPlanNumber);
-	tempCommandDelete();
-    } elsif(($HcommandKind == $HcomAutoPrepare) ||
-	    ($HcommandKind == $HcomAutoPrepare2)) {
-	# フル整地、フル地ならし
-	# 座標配列を作る
-	makeRandomPointArray();
-	my($land) = $island->{'land'};
+    if ( $HcommandMode eq 'delete' ) {
+        slideFront( $command, $HcommandPlanNumber );
+        tempCommandDelete();
+    }
+    elsif (( $HcommandKind == $HcomAutoPrepare )
+        || ( $HcommandKind == $HcomAutoPrepare2 ) )
+    {
+        # フル整地、フル地ならし
+        # 座標配列を作る
+        makeRandomPointArray();
+        my ($land) = $island->{'land'};
 
-	# コマンドの種類決定
-	my($kind) = $HcomPrepare;
-	if($HcommandKind == $HcomAutoPrepare2) {
-	    $kind = $HcomPrepare2;
-	}
+        # コマンドの種類決定
+        my ($kind) = $HcomPrepare;
+        if ( $HcommandKind == $HcomAutoPrepare2 ) {
+            $kind = $HcomPrepare2;
+        }
 
-	my($i) = 0;
-	my($j) = 0;
-	while(($j < $HpointNumber) && ($i < $HcommandMax)) {
-	    my($x) = $Hrpx[$j];
-	    my($y) = $Hrpy[$j];
-	    if($land->[$x][$y] == $HlandWaste) {
-		slideBack($command, $HcommandPlanNumber);
-		$command->[$HcommandPlanNumber] = {
-		    'kind' => $kind,
-		    'target' => 0,
-		    'x' => $x,
-		    'y' => $y,
-		    'arg' => 0
-		    };
-		$i++;
-	    }
-	    $j++;
-	}
-	tempCommandAdd();
-    } elsif($HcommandKind == $HcomAutoDelete) {
-	# 全消し
-	my($i);
-	for($i = 0; $i < $HcommandMax; $i++) {
-	    slideFront($command, $HcommandPlanNumber);
-	}
-	tempCommandDelete();
-    } else {
-	if($HcommandMode eq 'insert') {
-	    slideBack($command, $HcommandPlanNumber);
-	}
-	tempCommandAdd();
-	# コマンドを登録
-	$command->[$HcommandPlanNumber] = {
-	    'kind' => $HcommandKind,
-	    'target' => $HcommandTarget,
-	    'x' => $HcommandX,
-	    'y' => $HcommandY,
-	    'arg' => $HcommandArg
-	    };
+        my ($i) = 0;
+        my ($j) = 0;
+        while ( ( $j < $HpointNumber ) && ( $i < $HcommandMax ) ) {
+            my ($x) = $Hrpx[$j];
+            my ($y) = $Hrpy[$j];
+            if ( $land->[$x][$y] == $HlandWaste ) {
+                slideBack( $command, $HcommandPlanNumber );
+                $command->[$HcommandPlanNumber] = {
+                    'kind'   => $kind,
+                    'target' => 0,
+                    'x'      => $x,
+                    'y'      => $y,
+                    'arg'    => 0
+                };
+                $i++;
+            }
+            $j++;
+        }
+        tempCommandAdd();
+    }
+    elsif ( $HcommandKind == $HcomAutoDelete ) {
+
+        # 全消し
+        my ($i);
+        for ( $i = 0; $i < $HcommandMax; $i++ ) {
+            slideFront( $command, $HcommandPlanNumber );
+        }
+        tempCommandDelete();
+    }
+    else {
+        if ( $HcommandMode eq 'insert' ) {
+            slideBack( $command, $HcommandPlanNumber );
+        }
+        tempCommandAdd();
+
+        # コマンドを登録
+        $command->[$HcommandPlanNumber] = {
+            'kind'   => $HcommandKind,
+            'target' => $HcommandTarget,
+            'x'      => $HcommandX,
+            'y'      => $HcommandY,
+            'arg'    => $HcommandArg
+        };
     }
 
     # データの書き出し
@@ -171,17 +181,19 @@ sub commandMain {
 #----------------------------------------------------------------------
 # メイン
 sub commentMain {
+
     # idから島を取得
     $HcurrentNumber = $HidToNumber{$HcurrentID};
-    my($island) = $Hislands[$HcurrentNumber];
+    my ($island) = $Hislands[$HcurrentNumber];
     $HcurrentName = $island->{'name'};
 
     # パスワード
-    if(!checkPassword($island->{'password'},$HinputPassword)) {
-	# password間違い
-	unlock();
-	tempWrongPassword();
-	return;
+    if ( !checkPassword( $island->{'password'}, $HinputPassword ) ) {
+
+        # password間違い
+        unlock();
+        tempWrongPassword();
+        return;
     }
 
     # メッセージを更新
@@ -203,91 +215,98 @@ sub commentMain {
 # メイン
 
 sub localBbsMain {
+
     # idから島番号を取得
     $HcurrentNumber = $HidToNumber{$HcurrentID};
-    my($island) = $Hislands[$HcurrentNumber];
+    my ($island) = $Hislands[$HcurrentNumber];
 
     # なぜかその島がない場合
-    if($HcurrentNumber eq '') {
-	unlock();
-	tempProblem();
-	return;
+    if ( $HcurrentNumber eq '' ) {
+        unlock();
+        tempProblem();
+        return;
     }
 
     # 削除モードじゃなくて名前かメッセージがない場合
-    if($HlbbsMode != 2) {
-	if(($HlbbsName eq '') || ($HlbbsName eq '')) {
-	    unlock();
-	    tempLbbsNoMessage();
-	    return;
-	}
+    if ( $HlbbsMode != 2 ) {
+        if ( ( $HlbbsName eq '' ) || ( $HlbbsName eq '' ) ) {
+            unlock();
+            tempLbbsNoMessage();
+            return;
+        }
     }
 
     # 観光者モードじゃない時はパスワードチェック
-    if($HlbbsMode != 0) {
-	if(!checkPassword($island->{'password'},$HinputPassword)) {
-	    # password間違い
-	    unlock();
-	    tempWrongPassword();
-	    return;
-	}
+    if ( $HlbbsMode != 0 ) {
+        if ( !checkPassword( $island->{'password'}, $HinputPassword ) ) {
+
+            # password間違い
+            unlock();
+            tempWrongPassword();
+            return;
+        }
     }
 
-    my($lbbs);
+    my ($lbbs);
     $lbbs = $island->{'lbbs'};
 
     # モードで分岐
-    if($HlbbsMode == 2) {
-	# 削除モード
-	# メッセージを前にずらす
-	slideBackLbbsMessage($lbbs, $HcommandPlanNumber);
-	tempLbbsDelete();
-    } else {
-	# 記帳モード
-	# メッセージを後ろにずらす
-	slideLbbsMessage($lbbs);
+    if ( $HlbbsMode == 2 ) {
 
-	# メッセージ書き込み
-	my($message);
-	if($HlbbsMode == 0) {
-	    $message = '0';
-	} else {
-	    $message = '1';
-	}
-	$HlbbsName = "$HislandTurn：" . htmlEscape($HlbbsName);
-	$HlbbsMessage = htmlEscape($HlbbsMessage);
-	$lbbs->[0] = "$message>$HlbbsName>$HlbbsMessage";
+        # 削除モード
+        # メッセージを前にずらす
+        slideBackLbbsMessage( $lbbs, $HcommandPlanNumber );
+        tempLbbsDelete();
+    }
+    else {
+        # 記帳モード
+        # メッセージを後ろにずらす
+        slideLbbsMessage($lbbs);
 
-	tempLbbsAdd();
+        # メッセージ書き込み
+        my ($message);
+        if ( $HlbbsMode == 0 ) {
+            $message = '0';
+        }
+        else {
+            $message = '1';
+        }
+        $HlbbsName    = "$HislandTurn：" . htmlEscape($HlbbsName);
+        $HlbbsMessage = htmlEscape($HlbbsMessage);
+        $lbbs->[0]    = "$message>$HlbbsName>$HlbbsMessage";
+
+        tempLbbsAdd();
     }
 
     # データ書き出し
     writeIslandsFile($HcurrentID);
 
     # もとのモードへ
-    if($HlbbsMode == 0) {
-	printIslandMain();
-    } else {
-	ownerMain();
+    if ( $HlbbsMode == 0 ) {
+        printIslandMain();
+    }
+    else {
+        ownerMain();
     }
 }
 
 # ローカル掲示板のメッセージを一つ後ろにずらす
 sub slideLbbsMessage {
-    my($lbbs) = @_;
-    my($i);
-#    pop(@$lbbs);
-#    push(@$lbbs, $lbbs->[0]);
+    my ($lbbs) = @_;
+    my ($i);
+
+    #    pop(@$lbbs);
+    #    push(@$lbbs, $lbbs->[0]);
     pop(@$lbbs);
-    unshift(@$lbbs, $lbbs->[0]);
+    unshift( @$lbbs, $lbbs->[0] );
 }
 
 # ローカル掲示板のメッセージを一つ前にずらす
 sub slideBackLbbsMessage {
-    my($lbbs, $number) = @_;
-    my($i);
-    splice(@$lbbs, $number, 1);
-    $lbbs->[$HlbbsMax - 1] = '0>>';
+    my ( $lbbs, $number ) = @_;
+    my ($i);
+    splice( @$lbbs, $number, 1 );
+    $lbbs->[ $HlbbsMax - 1 ] = '0>>';
 }
 
 #----------------------------------------------------------------------
@@ -296,28 +315,35 @@ sub slideBackLbbsMessage {
 
 # 情報の表示
 sub islandInfo {
-    my($island) = $Hislands[$HcurrentNumber];
+    my ($island) = $Hislands[$HcurrentNumber];
+
     # 情報表示
-    my($rank) = $HcurrentNumber + 1;
-    my($farm) = $island->{'farm'};
-    my($factory) = $island->{'factory'};
-    my($mountain) = $island->{'mountain'};
-    $farm = ($farm == 0) ? "保有せず" : "${farm}0$HunitPop";
-    $factory = ($factory == 0) ? "保有せず" : "${factory}0$HunitPop";
-    $mountain = ($mountain == 0) ? "保有せず" : "${mountain}0$HunitPop";
+    my ($rank)     = $HcurrentNumber + 1;
+    my ($farm)     = $island->{'farm'};
+    my ($factory)  = $island->{'factory'};
+    my ($mountain) = $island->{'mountain'};
+    $farm     = ( $farm == 0 )     ? "保有せず" : "${farm}0$HunitPop";
+    $factory  = ( $factory == 0 )  ? "保有せず" : "${factory}0$HunitPop";
+    $mountain = ( $mountain == 0 ) ? "保有せず" : "${mountain}0$HunitPop";
 
-    my($mStr1) = '';
-    my($mStr2) = '';
-    if(($HhideMoneyMode == 1) || ($HmainMode eq 'owner')) {
-	# 無条件またはownerモード
-	$mStr1 = "<TH $HbgTitleCell nowrap=nowrap><NOBR>${HtagTH_}資金${H_tagTH}</NOBR></TH>";
-	$mStr2 = "<TD $HbgInfoCell align=right nowrap=nowrap><NOBR>$island->{'money'}$HunitMoney</NOBR></TD>";
-    } elsif($HhideMoneyMode == 2) {
-	my($mTmp) = aboutMoney($island->{'money'});
+    my ($mStr1) = '';
+    my ($mStr2) = '';
+    if ( ( $HhideMoneyMode == 1 ) || ( $HmainMode eq 'owner' ) ) {
 
-	# 1000億単位モード
-	$mStr1 = "<TH $HbgTitleCell nowrap=nowrap><NOBR>${HtagTH_}資金${H_tagTH}</NOBR></TH>";
-	$mStr2 = "<TD $HbgInfoCell align=right nowrap=nowrap><NOBR>$mTmp</NOBR></TD>";
+        # 無条件またはownerモード
+        $mStr1
+            = "<TH $HbgTitleCell nowrap=nowrap><NOBR>${HtagTH_}資金${H_tagTH}</NOBR></TH>";
+        $mStr2
+            = "<TD $HbgInfoCell align=right nowrap=nowrap><NOBR>$island->{'money'}$HunitMoney</NOBR></TD>";
+    }
+    elsif ( $HhideMoneyMode == 2 ) {
+        my ($mTmp) = aboutMoney( $island->{'money'} );
+
+        # 1000億単位モード
+        $mStr1
+            = "<TH $HbgTitleCell nowrap=nowrap><NOBR>${HtagTH_}資金${H_tagTH}</NOBR></TH>";
+        $mStr2
+            = "<TD $HbgInfoCell align=right nowrap=nowrap><NOBR>$mTmp</NOBR></TD>";
     }
     out(<<END);
 <CENTER>
@@ -349,217 +375,259 @@ END
 # 地図の表示
 # 引数が1なら、ミサイル基地等をそのまま表示
 sub islandMap {
-    my($mode) = @_;
-    my($island);
+    my ($mode) = @_;
+    my ($island);
     $island = $Hislands[$HcurrentNumber];
 
     out(<<END);
 <CENTER><TABLE BORDER><TR><TD>
 END
+
     # 地形、地形値を取得
-    my($land) = $island->{'land'};
-    my($landValue) = $island->{'landValue'};
-    my($l, $lv);
+    my ($land)      = $island->{'land'};
+    my ($landValue) = $island->{'landValue'};
+    my ( $l, $lv );
 
     # コマンド取得
-    my($command) = $island->{'command'};
-    my($com, @comStr, $i);
-    if($HmainMode eq 'owner') {
-	for($i = 0; $i < $HcommandMax; $i++) {
-	    my($j) = $i + 1;
-	    $com = $command->[$i];
-	    if($com->{'kind'} < 20) {
-		$comStr[$com->{'x'}][$com->{'y'}] .=
-		    " [${j}]$HcomName[$com->{'kind'}]";
-	    }
-	}
+    my ($command) = $island->{'command'};
+    my ( $com, @comStr, $i );
+    if ( $HmainMode eq 'owner' ) {
+        for ( $i = 0; $i < $HcommandMax; $i++ ) {
+            my ($j) = $i + 1;
+            $com = $command->[$i];
+            if ( $com->{'kind'} < 20 ) {
+                $comStr[ $com->{'x'} ][ $com->{'y'} ]
+                    .= " [${j}]$HcomName[$com->{'kind'}]";
+            }
+        }
     }
 
     # 座標(上)を出力
     out("<IMG SRC=\"xbar.gif\" width=400 height=16><BR>");
 
     # 各地形および改行を出力
-    my($x, $y);
-    for($y = 0; $y < $HislandSize; $y++) {
-	# 偶数行目なら番号を出力
-        if(($y % 2) == 0) {
-	    out("<IMG SRC=\"space${y}.gif\" width=16 height=32>");
-	}
+    my ( $x, $y );
+    for ( $y = 0; $y < $HislandSize; $y++ ) {
 
-	# 各地形を出力
-	for($x = 0; $x < $HislandSize; $x++) {
-	    $l = $land->[$x][$y];
-	    $lv = $landValue->[$x][$y];
-	    landString($l, $lv, $x, $y, $mode, $comStr[$x][$y]);
-	}
+        # 偶数行目なら番号を出力
+        if ( ( $y % 2 ) == 0 ) {
+            out("<IMG SRC=\"space${y}.gif\" width=16 height=32>");
+        }
 
-	# 奇数行目なら番号を出力
-        if(($y % 2) == 1) {
-	    out("<IMG SRC=\"space${y}.gif\" width=16 height=32>");
-	}
+        # 各地形を出力
+        for ( $x = 0; $x < $HislandSize; $x++ ) {
+            $l  = $land->[$x][$y];
+            $lv = $landValue->[$x][$y];
+            landString( $l, $lv, $x, $y, $mode, $comStr[$x][$y] );
+        }
 
-	# 改行を出力
-	out("<BR>");
+        # 奇数行目なら番号を出力
+        if ( ( $y % 2 ) == 1 ) {
+            out("<IMG SRC=\"space${y}.gif\" width=16 height=32>");
+        }
+
+        # 改行を出力
+        out("<BR>");
     }
     out("</TD></TR></TABLE></CENTER>\n");
 }
 
 sub landString {
-    my($l, $lv, $x, $y, $mode, $comStr) = @_;
-    my($point) = "($x,$y)";
-    my($image, $alt);
+    my ( $l, $lv, $x, $y, $mode, $comStr ) = @_;
+    my ($point) = "($x,$y)";
+    my ( $image, $alt );
 
-    if($l == $HlandSea) {
+    if ( $l == $HlandSea ) {
 
-	if($lv == 1) {
-	    # 浅瀬
-	    $image = 'land14.gif';
-	    $alt = '海(浅瀬)';
-        } else {
-            # 海
-	    $image = 'land0.gif';
-	    $alt = '海';
+        if ( $lv == 1 ) {
+
+            # 浅瀬
+            $image = 'land14.gif';
+            $alt   = '海(浅瀬)';
         }
-    } elsif($l == $HlandWaste) {
-	# 荒地
-	if($lv == 1) {
-	    $image = 'land13.gif'; # 着弾点
-	    $alt = '荒地';
-	} else {
-	    $image = 'land1.gif';
-	    $alt = '荒地';
-	}
-    } elsif($l == $HlandPlains) {
-	# 平地
-	$image = 'land2.gif';
-	$alt = '平地';
-    } elsif($l == $HlandForest) {
-	# 森
-	if($mode == 1) {
-	    $image = 'land6.gif';
-	    $alt = "森(${lv}$HunitTree)";
-	} else {
-	    # 観光者の場合は木の本数隠す
-	    $image = 'land6.gif';
-	    $alt = '森';
-	}
-    } elsif($l == $HlandTown) {
-	# 町
-	my($p, $n);
-	if($lv < 30) {
-	    $p = 3;
-	    $n = '村';
-	} elsif($lv < 100) {
-	    $p = 4;
-	    $n = '町';
-	} else {
-	    $p = 5;
-	    $n = '都市';
-	}
-
-	$image = "land${p}.gif";
-	$alt = "$n(${lv}$HunitPop)";
-    } elsif($l == $HlandFarm) {
-	# 農場
-	$image = 'land7.gif';
-	$alt = "農場(${lv}0${HunitPop}規模)";
-    } elsif($l == $HlandFactory) {
-	# 工場
-	$image = 'land8.gif';
-	$alt = "工場(${lv}0${HunitPop}規模)";
-    } elsif($l == $HlandBase) {
-	if($mode == 0) {
-	    # 観光者の場合は森のふり
-	    $image = 'land6.gif';
-	    $alt = '森';
-	} else {
-	    # ミサイル基地
-	    my($level) = expToLevel($l, $lv);
-	    $image = 'land9.gif';
-	    $alt = "ミサイル基地 (レベル ${level}/経験値 $lv)";
-	}
-    } elsif($l == $HlandSbase) {
-	# 海底基地
-	if($mode == 0) {
-	    # 観光者の場合は海のふり
-	    $image = 'land0.gif';
-	    $alt = '海';
-	} else {
-	    my($level) = expToLevel($l, $lv);
-	    $image = 'land12.gif';
-	    $alt = "海底基地 (レベル ${level}/経験値 $lv)";
-	}
-    } elsif($l == $HlandDefence) {
-	# 防衛施設
-	$image = 'land10.gif';
-	$alt = '防衛施設';
-    } elsif($l == $HlandHaribote) {
-	# ハリボテ
-	$image = 'land10.gif';
-	if($mode == 0) {
-	    # 観光者の場合は防衛施設のふり
-	    $alt = '防衛施設';
-	} else {
-	    $alt = 'ハリボテ';
-	}
-    } elsif($l == $HlandOil) {
-	# 海底油田
-	$image = 'land16.gif';
-	$alt = '海底油田';
-    } elsif($l == $HlandMountain) {
-	# 山
-	my($str);
-	$str = '';
-	if($lv > 0) {
-	    $image = 'land15.gif';
-	    $alt = "山(採掘場${lv}0${HunitPop}規模)";
-	} else {
-	    $image = 'land11.gif';
-	    $alt = '山';
-	}
-    } elsif($l == $HlandMonument) {
-	# 記念碑
-	$image = $HmonumentImage[$lv];
-	$alt = $HmonumentName[$lv];
-    } elsif($l == $HlandMonster) {
-	# 怪獣
-	my($kind, $name, $hp) = monsterSpec($lv);
-	my($special) = $HmonsterSpecial[$kind];
-	$image = $HmonsterImage[$kind];
-
-	# 硬化中?
-	if((($special == 3) && (($HislandTurn % 2) == 1)) ||
-	   (($special == 4) && (($HislandTurn % 2) == 0))) {
-	    # 硬化中
-	    $image = $HmonsterImage2[$kind];
-	}
-	$alt = "怪獣$name(体力${hp})";
+        else {
+            # 海
+            $image = 'land0.gif';
+            $alt   = '海';
+        }
     }
+    elsif ( $l == $HlandWaste ) {
 
+        # 荒地
+        if ( $lv == 1 ) {
+            $image = 'land13.gif';    # 着弾点
+            $alt   = '荒地';
+        }
+        else {
+            $image = 'land1.gif';
+            $alt   = '荒地';
+        }
+    }
+    elsif ( $l == $HlandPlains ) {
+
+        # 平地
+        $image = 'land2.gif';
+        $alt   = '平地';
+    }
+    elsif ( $l == $HlandForest ) {
+
+        # 森
+        if ( $mode == 1 ) {
+            $image = 'land6.gif';
+            $alt   = "森(${lv}$HunitTree)";
+        }
+        else {
+            # 観光者の場合は木の本数隠す
+            $image = 'land6.gif';
+            $alt   = '森';
+        }
+    }
+    elsif ( $l == $HlandTown ) {
+
+        # 町
+        my ( $p, $n );
+        if ( $lv < 30 ) {
+            $p = 3;
+            $n = '村';
+        }
+        elsif ( $lv < 100 ) {
+            $p = 4;
+            $n = '町';
+        }
+        else {
+            $p = 5;
+            $n = '都市';
+        }
+
+        $image = "land${p}.gif";
+        $alt   = "$n(${lv}$HunitPop)";
+    }
+    elsif ( $l == $HlandFarm ) {
+
+        # 農場
+        $image = 'land7.gif';
+        $alt   = "農場(${lv}0${HunitPop}規模)";
+    }
+    elsif ( $l == $HlandFactory ) {
+
+        # 工場
+        $image = 'land8.gif';
+        $alt   = "工場(${lv}0${HunitPop}規模)";
+    }
+    elsif ( $l == $HlandBase ) {
+        if ( $mode == 0 ) {
+
+            # 観光者の場合は森のふり
+            $image = 'land6.gif';
+            $alt   = '森';
+        }
+        else {
+            # ミサイル基地
+            my ($level) = expToLevel( $l, $lv );
+            $image = 'land9.gif';
+            $alt   = "ミサイル基地 (レベル ${level}/経験値 $lv)";
+        }
+    }
+    elsif ( $l == $HlandSbase ) {
+
+        # 海底基地
+        if ( $mode == 0 ) {
+
+            # 観光者の場合は海のふり
+            $image = 'land0.gif';
+            $alt   = '海';
+        }
+        else {
+            my ($level) = expToLevel( $l, $lv );
+            $image = 'land12.gif';
+            $alt   = "海底基地 (レベル ${level}/経験値 $lv)";
+        }
+    }
+    elsif ( $l == $HlandDefence ) {
+
+        # 防衛施設
+        $image = 'land10.gif';
+        $alt   = '防衛施設';
+    }
+    elsif ( $l == $HlandHaribote ) {
+
+        # ハリボテ
+        $image = 'land10.gif';
+        if ( $mode == 0 ) {
+
+            # 観光者の場合は防衛施設のふり
+            $alt = '防衛施設';
+        }
+        else {
+            $alt = 'ハリボテ';
+        }
+    }
+    elsif ( $l == $HlandOil ) {
+
+        # 海底油田
+        $image = 'land16.gif';
+        $alt   = '海底油田';
+    }
+    elsif ( $l == $HlandMountain ) {
+
+        # 山
+        my ($str);
+        $str = '';
+        if ( $lv > 0 ) {
+            $image = 'land15.gif';
+            $alt   = "山(採掘場${lv}0${HunitPop}規模)";
+        }
+        else {
+            $image = 'land11.gif';
+            $alt   = '山';
+        }
+    }
+    elsif ( $l == $HlandMonument ) {
+
+        # 記念碑
+        $image = $HmonumentImage[$lv];
+        $alt   = $HmonumentName[$lv];
+    }
+    elsif ( $l == $HlandMonster ) {
+
+        # 怪獣
+        my ( $kind, $name, $hp ) = monsterSpec($lv);
+        my ($special) = $HmonsterSpecial[$kind];
+        $image = $HmonsterImage[$kind];
+
+        # 硬化中?
+        if (   ( ( $special == 3 ) && ( ( $HislandTurn % 2 ) == 1 ) )
+            || ( ( $special == 4 ) && ( ( $HislandTurn % 2 ) == 0 ) ) )
+        {
+            # 硬化中
+            $image = $HmonsterImage2[$kind];
+        }
+        $alt = "怪獣$name(体力${hp})";
+    }
 
     # 開発画面の場合は、座標設定
-    if($mode == 1) {
-	out("<A HREF=\"JavaScript:void(0);\" onclick=\"ps($x,$y)\">");
+    if ( $mode == 1 ) {
+        out("<A HREF=\"JavaScript:void(0);\" onclick=\"ps($x,$y)\">");
     }
 
-    out("<IMG SRC=\"$image\" ALT=\"$point $alt $comStr\" width=32 height=32 BORDER=0>");
+    out("<IMG SRC=\"$image\" ALT=\"$point $alt $comStr\" width=32 height=32 BORDER=0>"
+    );
 
     # 座標設定閉じ
-    if($mode == 1) {
-	out("</A>");
+    if ( $mode == 1 ) {
+        out("</A>");
     }
 }
-
 
 #----------------------------------------------------------------------
 # テンプレートその他
 #----------------------------------------------------------------------
 # 個別ログ表示
 sub logPrintLocal {
-    my($mode) = @_;
-    my($i);
-    for($i = 0; $i < $HlogMax; $i++) {
-	logFilePrint($i, $HcurrentID, $mode);
+    my ($mode) = @_;
+    my ($i);
+    for ( $i = 0; $i < $HlogMax; $i++ ) {
+        logFilePrint( $i, $HcurrentID, $mode );
     }
 }
 
@@ -613,11 +681,12 @@ END
 <HR>
 <B>計画番号</B><SELECT NAME=NUMBER>
 END
+
     # 計画番号
-    my($j, $i);
-    for($i = 0; $i < $HcommandMax; $i++) {
-	$j = $i + 1;
-	out("<OPTION VALUE=$i>$j\n");
+    my ( $j, $i );
+    for ( $i = 0; $i < $HcommandMax; $i++ ) {
+        $j = $i + 1;
+        out("<OPTION VALUE=$i>$j\n");
     }
 
     out(<<END);
@@ -628,24 +697,27 @@ END
 END
 
     #コマンド
-    my($kind, $cost, $s);
-    for($i = 0; $i < $HcommandTotal; $i++) {
-	$kind = $HcomList[$i];
-	$cost = $HcomCost[$kind];
-	if($cost == 0) {
-	    $cost = '無料'
-	} elsif($cost < 0) {
-	    $cost = - $cost;
-	    $cost .= $HunitFood;
-	} else {
-	    $cost .= $HunitMoney;
-	}
-	if($kind == $HdefaultKind) {
-	    $s = 'SELECTED';
-	} else {
-	    $s = '';
-	}
-	out("<OPTION VALUE=$kind $s>$HcomName[$kind]($cost)\n");
+    my ( $kind, $cost, $s );
+    for ( $i = 0; $i < $HcommandTotal; $i++ ) {
+        $kind = $HcomList[$i];
+        $cost = $HcomCost[$kind];
+        if ( $cost == 0 ) {
+            $cost = '無料';
+        }
+        elsif ( $cost < 0 ) {
+            $cost = -$cost;
+            $cost .= $HunitFood;
+        }
+        else {
+            $cost .= $HunitMoney;
+        }
+        if ( $kind == $HdefaultKind ) {
+            $s = 'SELECTED';
+        }
+        else {
+            $s = '';
+        }
+        out("<OPTION VALUE=$kind $s>$HcomName[$kind]($cost)\n");
     }
 
     out(<<END);
@@ -655,11 +727,12 @@ END
 <SELECT NAME=POINTX>
 
 END
-    for($i = 0; $i < $HislandSize; $i++) {
-	if($i == $HdefaultX) {
-	    out("<OPTION VALUE=$i SELECTED>$i\n");
-        } else {
-	    out("<OPTION VALUE=$i>$i\n");
+    for ( $i = 0; $i < $HislandSize; $i++ ) {
+        if ( $i == $HdefaultX ) {
+            out("<OPTION VALUE=$i SELECTED>$i\n");
+        }
+        else {
+            out("<OPTION VALUE=$i>$i\n");
         }
     }
 
@@ -667,11 +740,12 @@ END
 </SELECT>, <SELECT NAME=POINTY>
 END
 
-    for($i = 0; $i < $HislandSize; $i++) {
-	if($i == $HdefaultY) {
-	    out("<OPTION VALUE=$i SELECTED>$i\n");
-        } else {
-	    out("<OPTION VALUE=$i>$i\n");
+    for ( $i = 0; $i < $HislandSize; $i++ ) {
+        if ( $i == $HdefaultY ) {
+            out("<OPTION VALUE=$i SELECTED>$i\n");
+        }
+        else {
+            out("<OPTION VALUE=$i>$i\n");
         }
     }
     out(<<END);
@@ -681,8 +755,8 @@ END
 END
 
     # 数量
-    for($i = 0; $i < 100; $i++) {
-	out("<OPTION VALUE=$i>$i\n");
+    for ( $i = 0; $i < 100; $i++ ) {
+        out("<OPTION VALUE=$i>$i\n");
     }
 
     out(<<END);
@@ -710,8 +784,8 @@ END
 </TD>
 <TD $HbgCommandCell>
 END
-    for($i = 0; $i < $HcommandMax; $i++) {
-	tempCommand($i, $Hislands[$HcurrentNumber]->{'command'}->[$i]);
+    for ( $i = 0; $i < $HcommandMax; $i++ ) {
+        tempCommand( $i, $Hislands[$HcurrentNumber]->{'command'}->[$i] );
     }
 
     out(<<END);
@@ -735,80 +809,96 @@ END
 
 # 入力済みコマンド表示
 sub tempCommand {
-    my($number, $command) = @_;
-    my($kind, $target, $x, $y, $arg) =
-	(
-	 $command->{'kind'},
-	 $command->{'target'},
-	 $command->{'x'},
-	 $command->{'y'},
-	 $command->{'arg'}
-	 );
-    my($name) = "$HtagComName_${HcomName[$kind]}$H_tagComName";
-    my($point) = "$HtagName_($x,$y)$H_tagName";
+    my ( $number, $command ) = @_;
+    my ( $kind, $target, $x, $y, $arg ) = (
+        $command->{'kind'}, $command->{'target'}, $command->{'x'},
+        $command->{'y'},    $command->{'arg'}
+    );
+    my ($name)  = "$HtagComName_${HcomName[$kind]}$H_tagComName";
+    my ($point) = "$HtagName_($x,$y)$H_tagName";
     $target = $HidToName{$target};
-    if($target eq '') {
-	$target = "無人";
+    if ( $target eq '' ) {
+        $target = "無人";
     }
     $target = "$HtagName_${target}島$H_tagName";
-    my($value) = $arg * $HcomCost[$kind];
-    if($value == 0) {
-	$value = $HcomCost[$kind];
+    my ($value) = $arg * $HcomCost[$kind];
+    if ( $value == 0 ) {
+        $value = $HcomCost[$kind];
     }
-    if($value < 0) {
-	$value = -$value;
-	$value = "$value$HunitFood";
-    } else {
-	$value = "$value$HunitMoney";
+    if ( $value < 0 ) {
+        $value = -$value;
+        $value = "$value$HunitFood";
+    }
+    else {
+        $value = "$value$HunitMoney";
     }
     $value = "$HtagName_$value$H_tagName";
 
-    my($j) = sprintf("%02d：", $number + 1);
+    my ($j) = sprintf( "%02d：", $number + 1 );
 
-    out("<A STYlE=\"text-decoration:none\" HREF=\"JavaScript:void(0);\" onClick=\"ns($number)\"><NOBR>$HtagNumber_$j$H_tagNumber<FONT COLOR=\"$HnormalColor\">");
+    out("<A STYlE=\"text-decoration:none\" HREF=\"JavaScript:void(0);\" onClick=\"ns($number)\"><NOBR>$HtagNumber_$j$H_tagNumber<FONT COLOR=\"$HnormalColor\">"
+    );
 
-    if(($kind == $HcomDoNothing) ||
-       ($kind == $HcomGiveup)) {
-	out("$name");
-    } elsif(($kind == $HcomMissileNM) ||
-	    ($kind == $HcomMissilePP) ||
-	    ($kind == $HcomMissileST) ||
-	    ($kind == $HcomMissileLD)) {
-	# ミサイル系
-	my($n) = ($arg == 0 ? '無制限' : "${arg}発");
-	out("$target$pointへ$name($HtagName_$n$H_tagName)");
-    } elsif($kind == $HcomSendMonster) {
-	# 怪獣派遣
-	out("$targetへ$name");
-    } elsif($kind == $HcomSell) {
-	# 食料輸出
-	out("$name$value");
-    } elsif($kind == $HcomPropaganda) {
-	# 誘致活動
-	out("$name");
-    } elsif(($kind == $HcomMoney) ||
-	    ($kind == $HcomFood)) {
-	# 援助
-	out("$targetへ$name$value");
-    } elsif($kind == $HcomDestroy) {
-	# 掘削
-	if($arg != 0) {
-	    out("$pointで$name(予算${value})");
-	} else {
-	    out("$pointで$name");
-	}
-    } elsif(($kind == $HcomFarm) ||
-	     ($kind == $HcomFactory) ||
-	     ($kind == $HcomMountain)) {	
-	# 回数付き
-	if($arg == 0) {
-	    out("$pointで$name");
-	} else {
-	    out("$pointで$name($arg回)");
-	}
-    } else {
-	# 座標付き
-	out("$pointで$name");
+    if (   ( $kind == $HcomDoNothing )
+        || ( $kind == $HcomGiveup ) )
+    {
+        out("$name");
+    }
+    elsif (( $kind == $HcomMissileNM )
+        || ( $kind == $HcomMissilePP )
+        || ( $kind == $HcomMissileST )
+        || ( $kind == $HcomMissileLD ) )
+    {
+        # ミサイル系
+        my ($n) = ( $arg == 0 ? '無制限' : "${arg}発" );
+        out("$target$pointへ$name($HtagName_$n$H_tagName)");
+    }
+    elsif ( $kind == $HcomSendMonster ) {
+
+        # 怪獣派遣
+        out("$targetへ$name");
+    }
+    elsif ( $kind == $HcomSell ) {
+
+        # 食料輸出
+        out("$name$value");
+    }
+    elsif ( $kind == $HcomPropaganda ) {
+
+        # 誘致活動
+        out("$name");
+    }
+    elsif (( $kind == $HcomMoney )
+        || ( $kind == $HcomFood ) )
+    {
+        # 援助
+        out("$targetへ$name$value");
+    }
+    elsif ( $kind == $HcomDestroy ) {
+
+        # 掘削
+        if ( $arg != 0 ) {
+            out("$pointで$name(予算${value})");
+        }
+        else {
+            out("$pointで$name");
+        }
+    }
+    elsif (( $kind == $HcomFarm )
+        || ( $kind == $HcomFactory )
+        || ( $kind == $HcomMountain ) )
+    {
+        # 回数付き
+        if ( $arg == 0 ) {
+            out("$pointで$name");
+        }
+        else {
+            out("$pointで$name($arg回)");
+        }
+    }
+    else {
+        # 座標付き
+        out("$pointで$name");
     }
 
     out("</FONT></NOBR></A><BR>");
@@ -873,11 +963,12 @@ sub tempLbbsInputOW {
 番号
 <SELECT NAME=NUMBER>
 END
+
     # 発言番号
-    my($j, $i);
-    for($i = 0; $i < $HlbbsMax; $i++) {
-	$j = $i + 1;
-	out("<OPTION VALUE=$i>$j\n");
+    my ( $j, $i );
+    for ( $i = 0; $i < $HlbbsMax; $i++ ) {
+        $j = $i + 1;
+        out("<OPTION VALUE=$i>$j\n");
     }
     out(<<END);
 </SELECT>
@@ -892,7 +983,7 @@ END
 
 # ローカル掲示板内容
 sub tempLbbsContents {
-    my($lbbs, $line);
+    my ( $lbbs, $line );
     $lbbs = $Hislands[$HcurrentNumber]->{'lbbs'};
     out(<<END);
 <CENTER>
@@ -903,20 +994,22 @@ sub tempLbbsContents {
 </TR>
 END
 
-    my($i);
-    for($i = 0; $i < $HlbbsMax; $i++) {
-	$line = $lbbs->[$i];
-	if($line =~ /([0-9]*)\>(.*)\>(.*)$/) {
-	    my($j) = $i + 1;
-	    out("<TR><TD align=center>$HtagNumber_$j$H_tagNumber</TD>");
-	    if($1 == 0) {
-		# 観光者
-		out("<TD>$HtagLbbsSS_$2 > $3$H_tagLbbsSS</TD></TR>");
-	    } else {
-		# 島主
-		out("<TD>$HtagLbbsOW_$2 > $3$H_tagLbbsOW</TD></TR>");
-	    }
-	}
+    my ($i);
+    for ( $i = 0; $i < $HlbbsMax; $i++ ) {
+        $line = $lbbs->[$i];
+        if ( $line =~ /([0-9]*)\>(.*)\>(.*)$/ ) {
+            my ($j) = $i + 1;
+            out("<TR><TD align=center>$HtagNumber_$j$H_tagNumber</TD>");
+            if ( $1 == 0 ) {
+
+                # 観光者
+                out("<TD>$HtagLbbsSS_$2 > $3$H_tagLbbsSS</TD></TR>");
+            }
+            else {
+                # 島主
+                out("<TD>$HtagLbbsOW_$2 > $3$H_tagLbbsOW</TD></TR>");
+            }
+        }
     }
 
     out(<<END);
@@ -968,7 +1061,7 @@ END
 
 # 近況
 sub tempRecent {
-    my($mode) = @_;
+    my ($mode) = @_;
     out(<<END);
 <HR>
 ${HtagBig_}${HtagName_}${HcurrentName}島${H_tagName}の近況${H_tagBig}<BR>
