@@ -11,6 +11,9 @@
 #----------------------------------------------------------------------
 
 require('hako-const.cgi');
+require('hako-map.cgi');
+require('hako-top.cgi');
+require('hako-turn.cgi');
 
 #----------------------------------------------------------------------
 # 変数
@@ -69,67 +72,39 @@ cookieOutput();
 tempHeader();
 
 if ( $HmainMode eq 'turn' ) {
-
     # ターン進行
-    require('hako-turn.cgi');
-    require('hako-top.cgi');
     turnMain();
-
 }
 elsif ( $HmainMode eq 'new' ) {
-
     # 島の新規作成
-    require('hako-turn.cgi');
-    require('hako-map.cgi');
     newIslandMain();
-
 }
 elsif ( $HmainMode eq 'print' ) {
-
     # 観光モード
-    require('hako-map.cgi');
     printIslandMain();
-
 }
 elsif ( $HmainMode eq 'owner' ) {
-
     # 開発モード
-    require('hako-map.cgi');
     ownerMain();
-
 }
 elsif ( $HmainMode eq 'command' ) {
-
     # コマンド入力モード
-    require('hako-map.cgi');
     commandMain();
-
 }
 elsif ( $HmainMode eq 'comment' ) {
-
     # コメント入力モード
-    require('hako-map.cgi');
     commentMain();
-
 }
 elsif ( $HmainMode eq 'lbbs' ) {
-
     # ローカル掲示板モード
-    require('hako-map.cgi');
     localBbsMain();
-
 }
 elsif ( $HmainMode eq 'change' ) {
-
     # 情報変更モード
-    require('hako-turn.cgi');
-    require('hako-top.cgi');
     changeMain();
-
 }
 else {
     # その他の場合はトップページモード
-    require('hako-top.cgi');
     topPageMain();
 }
 
