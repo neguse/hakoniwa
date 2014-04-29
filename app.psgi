@@ -1,4 +1,9 @@
 #!/usr/bin/env plackup
+
+use strict;
+use warnings;
+use utf8;
+
 use Plack::Builder;
 use Plack::App::WrapCGI;
 use Plack::App::File;

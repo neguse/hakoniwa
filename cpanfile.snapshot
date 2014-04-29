@@ -77,6 +77,13 @@ DISTRIBUTIONS
       ExtUtils::MakeMaker 0
       Test 0
       perl 5.008
+  Exporter-Easy-0.16
+    pathname: F/FD/FDALY/Exporter-Easy-0.16.tar.gz
+    provides:
+      Exporter::Easiest undef
+      Exporter::Easy 0.16
+    requirements:
+      ExtUtils::MakeMaker 0
   File-ShareDir-1.03
     pathname: A/AD/ADAMK/File-ShareDir-1.03.tar.gz
     provides:
@@ -227,6 +234,20 @@ DISTRIBUTIONS
       POSIX 0
       Time::Local 0
       perl 5.008004
+  Perl-Tidy-20140328
+    pathname: S/SH/SHANCOCK/Perl-Tidy-20140328.tar.gz
+    provides:
+      Perl::Tidy 20140328
+      Perl::Tidy::DevNull 20140328
+      Perl::Tidy::Diagnostics 20140328
+      Perl::Tidy::HtmlWriter 20140328
+      Perl::Tidy::IOScalar 20140328
+      Perl::Tidy::IOScalarArray 20140328
+      Perl::Tidy::LineSink 20140328
+      Perl::Tidy::LineSource 20140328
+      Perl::Tidy::Logger 20140328
+    requirements:
+      ExtUtils::MakeMaker 0
   Plack-1.0030
     pathname: M/MI/MIYAGAWA/Plack-1.0030.tar.gz
     provides:

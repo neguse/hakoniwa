@@ -1,3 +1,19 @@
+package Hako::Top;
+
+use strict;
+use warnings;
+use utf8;
+
+use Exporter::Easy (
+  EXPORT => [qw(
+    topPageMain
+  )],
+);
+
+use Hako::Const;
+use Hako::Variable;
+use Hako::Main;
+
 #----------------------------------------------------------------------
 # 箱庭諸島 ver2.30
 # トップモジュール(ver1.00)

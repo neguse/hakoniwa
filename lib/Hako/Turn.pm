@@ -1,3 +1,21 @@
+package Hako::Turn;
+
+use strict;
+use warnings;
+use utf8;
+
+use Exporter::Easy (
+  EXPORT => [qw(
+    newIslandMain
+    changeMain
+    turnMain
+  )],
+);
+
+use Hako::Const;
+use Hako::Variable;
+use Hako::Main;
+
 #----------------------------------------------------------------------
 # 箱庭諸島 ver2.30
 # ターン進行モジュール(ver1.02)
@@ -3130,7 +3148,7 @@ sub logFire {
 sub logMaizo {
     my ( $id, $name, $comName, $value ) = @_;
     logOut(
-        "${HtagName_}${name}島${H_tagName}での${HtagComName_}$comName${H_tagComName}中に、<B>$value$HunitMoneyもの埋蔵金</B>が発見されました。",
+        "${HtagName_}${name}島${H_tagName}での${HtagComName_}$comName${H_tagComName}中に、<B>$value$HunitMoney" . "もの埋蔵金</B>が発見されました。",
         $id
     );
 }

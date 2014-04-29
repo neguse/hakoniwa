@@ -1,3 +1,23 @@
+package Hako::Map;
+
+use strict;
+use warnings;
+use utf8;
+
+use Exporter::Easy (
+  EXPORT => [qw(
+    printIslandMain
+    ownerMain
+    commandMain
+    commentMain
+    localBbsMain
+  )],
+);
+
+use Hako::Const;
+use Hako::Variable;
+use Hako::Main;
+
 #----------------------------------------------------------------------
 # 箱庭諸島 ver2.30
 # 地図モードモジュール(ver1.00)
@@ -851,12 +871,12 @@ sub tempCommand {
     {
         # ミサイル系
         my ($n) = ( $arg == 0 ? '無制限' : "${arg}発" );
-        out("$target$pointへ$name($HtagName_$n$H_tagName)");
+        out("$target$point" . "へ$name($HtagName_$n$H_tagName)");
     }
     elsif ( $kind == $HcomSendMonster ) {
 
         # 怪獣派遣
-        out("$targetへ$name");
+        out("$target" . "へ$name");
     }
     elsif ( $kind == $HcomSell ) {
 
@@ -872,16 +892,16 @@ sub tempCommand {
         || ( $kind == $HcomFood ) )
     {
         # 援助
-        out("$targetへ$name$value");
+        out("$target" . "へ$name$value");
     }
     elsif ( $kind == $HcomDestroy ) {
 
         # 掘削
         if ( $arg != 0 ) {
-            out("$pointで$name(予算${value})");
+            out("$point" . "で$name(予算${value})");
         }
         else {
-            out("$pointで$name");
+            out("$point" . "で$name");
         }
     }
     elsif (( $kind == $HcomFarm )
@@ -890,15 +910,15 @@ sub tempCommand {
     {
         # 回数付き
         if ( $arg == 0 ) {
-            out("$pointで$name");
+            out("$point" . "で$name");
         }
         else {
-            out("$pointで$name($arg回)");
+            out("$point" . "で$name($arg" . "回)");
         }
     }
     else {
         # 座標付き
-        out("$pointで$name");
+        out("$point" . "で$name");
     }
 
     out("</FONT></NOBR></A><BR>");

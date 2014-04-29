@@ -1,4 +1,172 @@
-#!/usr/bin/perl
+package Hako::Const;
+
+use strict;
+use warnings;
+use utf8;
+
+use Exporter::Easy (
+  EXPORT => [qw(
+    $baseDir
+    $imageDir
+    $masterPassword
+    $HspecialPassword
+    $adminName
+    $email
+    $bbs
+    $toppage
+    $HdirMode
+    $HdirName
+    $lockMode
+    $HunitTime
+    $unlockTime
+    $HmaxIsland
+    $HtopLogTurn
+    $HlogMax
+    $HbackupTurn
+    $HbackupTimes
+    $HhistoryMax
+    $HgiveupTurn
+    $HcommandMax
+    $HuseLbbs
+    $HlbbsMax
+    $HislandSize
+    $HhideMoneyMode
+    $cryptOn
+    $Hdebug
+    $HinitialMoney
+    $HinitialFood
+    $HunitMoney
+    $HunitFood
+    $HunitPop
+    $HunitArea
+    $HunitTree
+    $HtreeValue
+    $HcostChangeName
+    $HeatenFood
+    $HmaxExpPoint
+    $maxBaseLevel
+    $maxSBaseLevel
+    @baseLevelUp
+    @sBaseLevelUp
+    $HdBaseAuto
+    $HdisEarthquake
+    $HdisTsunami
+    $HdisTyphoon
+    $HdisMeteo
+    $HdisHugeMeteo
+    $HdisEruption
+    $HdisFire
+    $HdisMaizo
+    $HdisFallBorder
+    $HdisFalldown
+    $HdisMonsBorder1
+    $HdisMonsBorder2
+    $HdisMonsBorder3
+    $HdisMonster
+    $HmonsterNumber
+    $HmonsterLevel1
+    $HmonsterLevel2
+    $HmonsterLevel3
+    @HmonsterName
+    @HmonsterBHP
+    @HmonsterDHP
+    @HmonsterSpecial
+    @HmonsterExp
+    @HmonsterValue
+    @HmonsterImage
+    @HmonsterImage2
+    $HoilMoney
+    $HoilRatio
+    $HmonumentNumber
+    @HmonumentName
+    @HmonumentImage
+    $HturnPrizeUnit
+    @Hprize
+    $htmlBody
+    $Htitle
+    $HtagTitle_
+    $H_tagTitle
+    $HtagHeader_
+    $H_tagHeader
+    $HtagBig_
+    $H_tagBig
+    $HtagName_
+    $H_tagName
+    $HtagName2_
+    $H_tagName2
+    $HtagNumber_
+    $H_tagNumber
+    $HtagTH_
+    $H_tagTH
+    $HtagComName_
+    $H_tagComName
+    $HtagDisaster_
+    $H_tagDisaster
+    $HtagLbbsSS_
+    $H_tagLbbsSS
+    $HtagLbbsOW_
+    $H_tagLbbsOW
+    $HnormalColor
+    $HbgTitleCell
+    $HbgNumberCell
+    $HbgNameCell
+    $HbgInfoCell
+    $HbgCommentCell
+    $HbgInputCell
+    $HbgMapCell
+    $HbgCommandCell
+    $HthisFile
+    $HlandSea
+    $HlandWaste
+    $HlandPlains
+    $HlandTown
+    $HlandForest
+    $HlandFarm
+    $HlandFactory
+    $HlandBase
+    $HlandDefence
+    $HlandMountain
+    $HlandMonster
+    $HlandSbase
+    $HlandOil
+    $HlandMonument
+    $HlandHaribote
+    $HcommandTotal
+    $HcomPrepare
+    $HcomPrepare2
+    $HcomReclaim
+    $HcomDestroy
+    $HcomSellTree
+    $HcomPlant
+    $HcomFarm
+    $HcomFactory
+    $HcomMountain
+    $HcomBase
+    $HcomDbase
+    $HcomSbase
+    $HcomMonument
+    $HcomHaribote
+    $HcomMissileNM
+    $HcomMissilePP
+    $HcomMissileST
+    $HcomMissileLD
+    $HcomSendMonster
+    $HcomDoNothing
+    $HcomSell
+    $HcomMoney
+    $HcomFood
+    $HcomPropaganda
+    $HcomGiveup
+    $HcomAutoPrepare
+    $HcomAutoPrepare2
+    $HcomAutoDelete
+    @HcomList
+    @HcomName
+    @HcomCost
+    $HpointNumber
+    $HtempBack
+  )],
+);
 
 #----------------------------------------------------------------------
 # 各種設定値
@@ -179,8 +347,8 @@ our ($maxSBaseLevel) = 3;    # 海底基地
 
 # 経験値がいくつでレベルアップか
 our ( @baseLevelUp, @sBaseLevelUp );
-our @baseLevelUp = ( 20, 60, 120, 200 );    # ミサイル基地
-our @sBaseLevelUp = ( 50, 200 );            # 海底基地
+@baseLevelUp = ( 20, 60, 120, 200 );    # ミサイル基地
+@sBaseLevelUp = ( 50, 200 );            # 海底基地
 
 #----------------------------------------
 # 防衛施設の自爆
@@ -513,4 +681,6 @@ our $HpointNumber = $HislandSize * $HislandSize;
 # 「戻る」リンク
 our $HtempBack
     = "<A HREF=\"$HthisFile\">${HtagBig_}トップへ戻る${H_tagBig}</A>";
+
+1;
 
