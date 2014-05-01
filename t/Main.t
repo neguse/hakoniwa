@@ -56,7 +56,8 @@ subtest '新しい島を探す', sub {
         }
     );
     $mech->content_like(qr|島を発見しました！！|);
-    $mech->content_like(qr|「$island_name」|);
+    my $inner = $island_name . '島';
+    $mech->content_like(qr|「$inner」|);
 };
 
 done_testing;
