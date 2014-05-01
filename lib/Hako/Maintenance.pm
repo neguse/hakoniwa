@@ -3,6 +3,7 @@ package Hako::Maintenance;
 use strict;
 use warnings;
 use utf8;
+use open ':encoding(utf8)';
 
 use Exporter::Easy (
   EXPORT => [qw(

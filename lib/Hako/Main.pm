@@ -3,6 +3,7 @@ package Hako::Main;
 use strict;
 use warnings;
 use utf8;
+use open ':encoding(utf8)';
 
 use Exporter::Easy (
   EXPORT => [qw(
@@ -443,7 +444,7 @@ sub cgiInput {
     $line = <>;
     $line =~ tr/+/ /;
     $line =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
-    $line = $line;
+    $line = Encode::decode_utf8($line);
     $line =~ s/[\x00-\x1f\,]//g;
 
     # GETのやつも受け取る
