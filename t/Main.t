@@ -14,6 +14,7 @@ my $app = Plack::Util::load_psgi('./app.psgi');
 my $mech = Test::WWW::Mechanize::PSGI->new( app => $app );
 
 my $island_name = 'てすとじま';
+my $island_name_full = 'てすとじま島';
 my $pass        = 'testpass';
 my $mente_pass  = 'yourpassword';
 
@@ -23,6 +24,22 @@ sub initialize_data {
     $mech->submit_form_ok(
         +{  fields => +{ PASSWORD => $mente_pass, },
             button => 'NEW',
+        }
+    );
+}
+
+sub new_data {
+    initialize_data;
+    $mech->get_ok($path);
+    $mech->content_like(qr|箱庭諸島２|);
+    $mech->submit_form_ok(
+        +{  form_number => 2,
+            fields      => +{
+                ISLANDNAME => $island_name,
+                PASSWORD   => $pass,
+                PASSWORD2  => $pass,
+            },
+            button => 'NewIslandButton',
         }
     );
 }
@@ -56,8 +73,24 @@ subtest '新しい島を探す', sub {
         }
     );
     $mech->content_like(qr|島を発見しました！！|);
-    my $inner = $island_name . '島';
-    $mech->content_like(qr|「$inner」|);
+    $mech->content_like(qr|「${island_name_full}」|);
+};
+
+subtest '自分の島へ', sub {
+    new_data;
+    $mech->get_ok($path);
+    $mech->submit_form_ok(
+        +{
+            form_number => 1,
+            fields => +{
+                ISLANDID => 1,
+                PASSWORD => $pass,
+            },
+            button => 'OwnerButton',
+        }
+    );
+    $mech->content_like(qr|${island_name_full}.*開発計画|);
+    $mech->content_like(qr|${island_name_full}.*の近況|);
 };
 
 done_testing;
