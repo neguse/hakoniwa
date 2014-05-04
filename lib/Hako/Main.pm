@@ -426,7 +426,7 @@ sub writeIsland {
 
 # 標準出力への出力
 sub out {
-    print STDOUT $_[0];
+    print STDOUT Encode::encode_utf8($_[0]);
 }
 
 # デバッグログ
