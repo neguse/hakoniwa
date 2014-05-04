@@ -286,8 +286,11 @@ sub cgiInput {
 
     # 入力を受け取る
     $line = <>;
+    $line = '' if (!defined $line);
     $line =~ tr/+/ /;
     $line =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+
+    $mainMode = '';
 
     if ( $line =~ /DELETE([0-9]*)/ ) {
         $mainMode = 'delete';
