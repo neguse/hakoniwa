@@ -16,6 +16,7 @@ use Exporter::Easy (
 use Hako::Const;
 use Hako::Variable;
 use Hako::Main;
+use Hako::Map;
 
 #----------------------------------------------------------------------
 # 箱庭諸島 ver2.30

@@ -12,6 +12,8 @@ use Exporter::Easy (
     commandMain
     commentMain
     localBbsMain
+    islandInfo
+    islandMap
   )],
 );
 
