@@ -60,9 +60,14 @@ my ($ctHour);
 my ($ctMin);
 my ($ctSec);
 
+# 標準出力への出力
+sub out {
+    print STDOUT Encode::encode_utf8($_[0]);
+}
+
 sub run_maintenance {
 
-  print <<END;
+  out <<END;
 Content-type: text/html
 
 <HTML>
@@ -102,7 +107,7 @@ END
   }
   mainMode();
 
-  print <<END;
+  out <<END;
 </FORM>
 </BODY>
 </HTML>
@@ -184,7 +189,7 @@ sub stimeMode {
 sub mainMode {
     opendir( DIN, "./" );
 
-    print <<END;
+    out <<END;
 <FORM action="$thisFile" method="POST">
 <H1>箱島２ メンテナンスツール</H1>
 <B>パスワード:</B><INPUT TYPE=password SIZE=32 MAXLENGTH=32 NAME=PASSWORD></TD>
@@ -195,7 +200,7 @@ END
         dataPrint("");
     }
     else {
-        print <<END;
+        out <<END;
     <HR>
     <INPUT TYPE="submit" VALUE="新しいデータを作る" NAME="NEW">
 END
@@ -215,14 +220,14 @@ END
 sub dataPrint {
     my ($suf) = @_;
 
-    print "<HR>";
+    out "<HR>";
     if ( $suf eq "" ) {
         open( IN, "${dirName}/hakojima.dat" );
-        print "<H1>現役データ</H1>";
+        out "<H1>現役データ</H1>";
     }
     else {
         open( IN, "${dirName}.bak$suf/hakojima.dat" );
-        print "<H1>バックアップ$suf</H1>";
+        out "<H1>バックアップ$suf</H1>";
     }
 
     my ($lastTurn);
@@ -232,7 +237,7 @@ sub dataPrint {
 
     my ($timeString) = timeToString($lastTime);
 
-    print <<END;
+    out <<END;
     <B>ターン$lastTurn</B><BR>
     <B>最終更新時間</B>:$timeString<BR>
     <B>最終更新時間(秒数表示)</B>:1970年1月1日から$lastTime 秒<BR>
@@ -245,7 +250,7 @@ END
         $mon++;
         $year += 1900;
 
-        print <<END;
+        out <<END;
     <H2>最終更新時間の変更</H2>
     <INPUT TYPE="text" SIZE=4 NAME="YEAR" VALUE="$year">年
     <INPUT TYPE="text" SIZE=2 NAME="MON" VALUE="$mon">月
@@ -260,7 +265,7 @@ END
 END
     }
     else {
-        print <<END;
+        out <<END;
 	<INPUT TYPE="submit" VALUE="このデータを現役に" NAME="CURRENT$suf">
 END
     }
@@ -346,7 +351,7 @@ sub passCheck {
         return 1;
     }
     else {
-        print <<END;
+        out <<END;
    <FONT SIZE=7>パスワードが違います。</FONT>
 END
         return 0;
