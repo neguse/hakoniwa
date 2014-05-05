@@ -9,7 +9,8 @@ use Plack::App::WrapCGI;
 use Plack::App::File;
 
 builder {
-    mount '/images' => Plack::App::File->new( root => './public/images' );
+    mount '/images' =>
+        Plack::App::File->new( root => './public/images' )->to_app;
     mount '/cgi-bin/hako-main.cgi' => Plack::App::WrapCGI->new(
         script  => './cgi/hako-main.cgi',
         execute => 1
