@@ -17,6 +17,7 @@ use Hako::Const;
 use Hako::Variable;
 use Hako::Main;
 use Hako::Map;
+use Hako::Top;
 
 #----------------------------------------------------------------------
 # 箱庭諸島 ver2.30
