@@ -6,9 +6,11 @@ use utf8;
 use open ':encoding(utf8)';
 
 use Exporter::Easy (
-  EXPORT => [qw(
-    run_maintenance
-  )],
+    EXPORT => [
+        qw(
+            run_maintenance
+            )
+    ],
 );
 
 #----------------------------------------------------------------------
@@ -62,12 +64,12 @@ my ($ctSec);
 
 # 標準出力への出力
 sub out {
-    print STDOUT Encode::encode_utf8($_[0]);
+    print STDOUT Encode::encode_utf8( $_[0] );
 }
 
 sub run_maintenance {
 
-  out <<END;
+    out <<END;
 Content-type: text/html
 
 <HTML>
@@ -78,36 +80,36 @@ Content-type: text/html
 <BODY>
 END
 
-  cgiInput();
+    cgiInput();
 
-  if ( $mainMode eq 'delete' ) {
-      if ( passCheck() ) {
-          deleteMode();
-      }
-  }
-  elsif ( $mainMode eq 'current' ) {
-      if ( passCheck() ) {
-          currentMode();
-      }
-  }
-  elsif ( $mainMode eq 'time' ) {
-      if ( passCheck() ) {
-          timeMode();
-      }
-  }
-  elsif ( $mainMode eq 'stime' ) {
-      if ( passCheck() ) {
-          stimeMode();
-      }
-  }
-  elsif ( $mainMode eq 'new' ) {
-      if ( passCheck() ) {
-          newMode();
-      }
-  }
-  mainMode();
+    if ( $mainMode eq 'delete' ) {
+        if ( passCheck() ) {
+            deleteMode();
+        }
+    }
+    elsif ( $mainMode eq 'current' ) {
+        if ( passCheck() ) {
+            currentMode();
+        }
+    }
+    elsif ( $mainMode eq 'time' ) {
+        if ( passCheck() ) {
+            timeMode();
+        }
+    }
+    elsif ( $mainMode eq 'stime' ) {
+        if ( passCheck() ) {
+            stimeMode();
+        }
+    }
+    elsif ( $mainMode eq 'new' ) {
+        if ( passCheck() ) {
+            newMode();
+        }
+    }
+    mainMode();
 
-  out <<END;
+    out <<END;
 </FORM>
 </BODY>
 </HTML>
@@ -286,7 +288,7 @@ sub cgiInput {
 
     # 入力を受け取る
     $line = <>;
-    $line = '' if (!defined $line);
+    $line = '' if ( !defined $line );
     $line =~ tr/+/ /;
     $line =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
 

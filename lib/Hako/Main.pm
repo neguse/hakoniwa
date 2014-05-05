@@ -6,48 +6,50 @@ use utf8;
 use open ':encoding(utf8)';
 
 use Exporter::Easy (
-  EXPORT => [qw(
-    run_main
-    slideFront
-    slideBack
+    EXPORT => [
+        qw(
+            run_main
+            slideFront
+            slideBack
 
-    readIslandsFile
-    readIsland
-    writeIslandsFile
-    writeIsland
+            readIslandsFile
+            readIsland
+            writeIslandsFile
+            writeIsland
 
-    out
-    HdebugOut
-    cgiInput
-    cookieInput
-    cookieOutput
+            out
+            HdebugOut
+            cgiInput
+            cookieInput
+            cookieOutput
 
-    hakolock
-    unlock
-    min
-    encode
-    checkPassword
-    aboutMoney
-    htmlEscape
-    cutColumn
-    nameToNumber
-    monsterSpec
-    expToLevel
-    makeRandomPointArray
-    random
+            hakolock
+            unlock
+            min
+            encode
+            checkPassword
+            aboutMoney
+            htmlEscape
+            cutColumn
+            nameToNumber
+            monsterSpec
+            expToLevel
+            makeRandomPointArray
+            random
 
-    logFilePrint
+            logFilePrint
 
-    tempInitialize
-    getIslandList
-    tempHeader
-    tempFooter
-    tempLockFail
-    tempUnlock
-    tempNoDataFile
-    tempWrongPassword
-    tempProblem
-  )],
+            tempInitialize
+            getIslandList
+            tempHeader
+            tempFooter
+            tempLockFail
+            tempUnlock
+            tempNoDataFile
+            tempWrongPassword
+            tempProblem
+            )
+    ],
 );
 
 use Hako::Const;
@@ -61,92 +63,101 @@ use Hako::Turn;
 #----------------------------------------------------------------------
 
 sub run_main {
-  # ロックをかける
-  if ( !hakolock() ) {
-  
-      # ロック失敗
-      # ヘッダ出力
-      tempHeader();
-  
-      # ロック失敗メッセージ
-      tempLockFail();
-  
-      # フッタ出力
-      tempFooter();
-  
-      # 終了
-      exit(0);
-  }
-  
-  # 乱数の初期化
-  srand( time ^ $$ );
-  
-  # COOKIE読みこみ
-  cookieInput();
-  
-  # CGI読みこみ
-  cgiInput();
-  
-  # 島データの読みこみ
-  if ( readIslandsFile($HcurrentID) == 0 ) {
-      unlock();
-      tempHeader();
-      tempNoDataFile();
-      tempFooter();
-      exit(0);
-  }
-  
-  # テンプレートを初期化
-  tempInitialize();
-  
-  # COOKIE出力
-  cookieOutput();
-  
-  # ヘッダ出力
-  tempHeader();
-  
-  if ( $HmainMode eq 'turn' ) {
-      # ターン進行
-      turnMain();
-  }
-  elsif ( $HmainMode eq 'new' ) {
-      # 島の新規作成
-      newIslandMain();
-  }
-  elsif ( $HmainMode eq 'print' ) {
-      # 観光モード
-      printIslandMain();
-  }
-  elsif ( $HmainMode eq 'owner' ) {
-      # 開発モード
-      ownerMain();
-  }
-  elsif ( $HmainMode eq 'command' ) {
-      # コマンド入力モード
-      commandMain();
-  }
-  elsif ( $HmainMode eq 'comment' ) {
-      # コメント入力モード
-      commentMain();
-  }
-  elsif ( $HmainMode eq 'lbbs' ) {
-      # ローカル掲示板モード
-      localBbsMain();
-  }
-  elsif ( $HmainMode eq 'change' ) {
-      # 情報変更モード
-      changeMain();
-  }
-  else {
-      # その他の場合はトップページモード
-      topPageMain();
-  }
-  
-  # フッタ出力
-  tempFooter();
-  
-  # 終了
-  exit(0);
+
+    # ロックをかける
+    if ( !hakolock() ) {
+
+        # ロック失敗
+        # ヘッダ出力
+        tempHeader();
+
+        # ロック失敗メッセージ
+        tempLockFail();
+
+        # フッタ出力
+        tempFooter();
+
+        # 終了
+        exit(0);
+    }
+
+    # 乱数の初期化
+    srand( time ^ $$ );
+
+    # COOKIE読みこみ
+    cookieInput();
+
+    # CGI読みこみ
+    cgiInput();
+
+    # 島データの読みこみ
+    if ( readIslandsFile($HcurrentID) == 0 ) {
+        unlock();
+        tempHeader();
+        tempNoDataFile();
+        tempFooter();
+        exit(0);
+    }
+
+    # テンプレートを初期化
+    tempInitialize();
+
+    # COOKIE出力
+    cookieOutput();
+
+    # ヘッダ出力
+    tempHeader();
+
+    if ( $HmainMode eq 'turn' ) {
+
+        # ターン進行
+        turnMain();
+    }
+    elsif ( $HmainMode eq 'new' ) {
+
+        # 島の新規作成
+        newIslandMain();
+    }
+    elsif ( $HmainMode eq 'print' ) {
+
+        # 観光モード
+        printIslandMain();
+    }
+    elsif ( $HmainMode eq 'owner' ) {
+
+        # 開発モード
+        ownerMain();
+    }
+    elsif ( $HmainMode eq 'command' ) {
+
+        # コマンド入力モード
+        commandMain();
+    }
+    elsif ( $HmainMode eq 'comment' ) {
+
+        # コメント入力モード
+        commentMain();
+    }
+    elsif ( $HmainMode eq 'lbbs' ) {
+
+        # ローカル掲示板モード
+        localBbsMain();
+    }
+    elsif ( $HmainMode eq 'change' ) {
+
+        # 情報変更モード
+        changeMain();
+    }
+    else {
+        # その他の場合はトップページモード
+        topPageMain();
+    }
+
+    # フッタ出力
+    tempFooter();
+
+    # 終了
+    exit(0);
 }
 
 # コマンドを前にずらす

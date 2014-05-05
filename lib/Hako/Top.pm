@@ -6,9 +6,11 @@ use utf8;
 use open ':encoding(utf8)';
 
 use Exporter::Easy (
-  EXPORT => [qw(
-    topPageMain
-  )],
+    EXPORT => [
+        qw(
+            topPageMain
+            )
+    ],
 );
 
 use Hako::Const;

@@ -6,15 +6,17 @@ use utf8;
 use open ':encoding(utf8)';
 
 use Exporter::Easy (
-  EXPORT => [qw(
-    printIslandMain
-    ownerMain
-    commandMain
-    commentMain
-    localBbsMain
-    islandInfo
-    islandMap
-  )],
+    EXPORT => [
+        qw(
+            printIslandMain
+            ownerMain
+            commandMain
+            commentMain
+            localBbsMain
+            islandInfo
+            islandMap
+            )
+    ],
 );
 
 use Hako::Const;
@@ -874,12 +876,12 @@ sub tempCommand {
     {
         # ミサイル系
         my ($n) = ( $arg == 0 ? '無制限' : "${arg}発" );
-        out("$target$point" . "へ$name($HtagName_$n$H_tagName)");
+        out( "$target$point" . "へ$name($HtagName_$n$H_tagName)" );
     }
     elsif ( $kind == $HcomSendMonster ) {
 
         # 怪獣派遣
-        out("$target" . "へ$name");
+        out( "$target" . "へ$name" );
     }
     elsif ( $kind == $HcomSell ) {
 
@@ -895,16 +897,16 @@ sub tempCommand {
         || ( $kind == $HcomFood ) )
     {
         # 援助
-        out("$target" . "へ$name$value");
+        out( "$target" . "へ$name$value" );
     }
     elsif ( $kind == $HcomDestroy ) {
 
         # 掘削
         if ( $arg != 0 ) {
-            out("$point" . "で$name(予算${value})");
+            out( "$point" . "で$name(予算${value})" );
         }
         else {
-            out("$point" . "で$name");
+            out( "$point" . "で$name" );
         }
     }
     elsif (( $kind == $HcomFarm )
@@ -913,15 +915,15 @@ sub tempCommand {
     {
         # 回数付き
         if ( $arg == 0 ) {
-            out("$point" . "で$name");
+            out( "$point" . "で$name" );
         }
         else {
-            out("$point" . "で$name($arg" . "回)");
+            out( "$point" . "で$name($arg" . "回)" );
         }
     }
     else {
         # 座標付き
-        out("$point" . "で$name");
+        out( "$point" . "で$name" );
     }
 
     out("</FONT></NOBR></A><BR>");
