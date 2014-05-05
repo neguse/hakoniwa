@@ -635,6 +635,7 @@ sub landString {
         out("<A HREF=\"JavaScript:void(0);\" onclick=\"ps($x,$y)\">");
     }
 
+    $comStr = '' if ( !defined $comStr );
     out("<IMG SRC=\"$image\" ALT=\"$point $alt $comStr\" width=32 height=32 BORDER=0>"
     );
 
@@ -736,7 +737,7 @@ END
         else {
             $cost .= $HunitMoney;
         }
-        if ( $kind == $HdefaultKind ) {
+        if ( defined($HdefaultKind) && $kind == $HdefaultKind ) {
             $s = 'SELECTED';
         }
         else {
@@ -753,7 +754,7 @@ END
 
 END
     for ( $i = 0; $i < $HislandSize; $i++ ) {
-        if ( $i == $HdefaultX ) {
+        if ( defined($HdefaultX) && $i == $HdefaultX ) {
             out("<OPTION VALUE=$i SELECTED>$i\n");
         }
         else {
@@ -766,7 +767,7 @@ END
 END
 
     for ( $i = 0; $i < $HislandSize; $i++ ) {
-        if ( $i == $HdefaultY ) {
+        if ( defined($HdefaultY) && $i == $HdefaultY ) {
             out("<OPTION VALUE=$i SELECTED>$i\n");
         }
         else {
@@ -842,10 +843,12 @@ sub tempCommand {
     my ($name)  = "$HtagComName_${HcomName[$kind]}$H_tagComName";
     my ($point) = "$HtagName_($x,$y)$H_tagName";
     $target = $HidToName{$target};
-    if ( $target eq '' ) {
-        $target = "無人";
+    if ( defined $target ) {
+        if ( $target eq '' ) {
+            $target = "無人";
+        }
+        $target = "$HtagName_${target}島$H_tagName";
     }
-    $target = "$HtagName_${target}島$H_tagName";
     my ($value) = $arg * $HcomCost[$kind];
     if ( $value == 0 ) {
         $value = $HcomCost[$kind];

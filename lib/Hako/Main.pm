@@ -91,7 +91,7 @@ sub run_main {
     cgiInput();
 
     # 島データの読みこみ
-    if ( readIslandsFile($HcurrentID) == 0 ) {
+    if ( readIslandsFile( $HcurrentID || 0 ) == 0 ) {
         unlock();
         tempHeader();
         tempNoDataFile();
@@ -1071,8 +1071,8 @@ sub logFilePrint {
 sub tempInitialize {
 
     # 島セレクト(デフォルト自分)
-    $HislandList = getIslandList($defaultID);
-    $HtargetList = getIslandList($defaultTarget);
+    $HislandList = getIslandList( $defaultID     || -1 );
+    $HtargetList = getIslandList( $defaultTarget || -1 );
 }
 
 # 島データのプルダウンメニュー用

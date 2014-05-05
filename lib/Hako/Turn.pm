@@ -96,8 +96,9 @@ sub newIslandMain {
     my ($island) = $Hislands[$HcurrentNumber];
 
     # 各種の値を設定
-    $island->{'name'} = $HcurrentName;
-    $island->{'id'}   = $HislandNextID;
+    $island->{'name'}  = $HcurrentName;
+    $island->{'score'} = 0;
+    $island->{'id'}    = $HislandNextID;
     $HislandNextID++;
     $island->{'absent'}   = $HgiveupTurn - 3;
     $island->{'comment'}  = '(未登録)';
