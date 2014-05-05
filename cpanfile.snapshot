@@ -513,6 +513,14 @@ DISTRIBUTIONS
       Try::Tiny 0
       URI 1.59
       parent 0
+  Scope-Guard-0.20
+    pathname: C/CH/CHOCOLATE/Scope-Guard-0.20.tar.gz
+    provides:
+      Scope::Guard 0.20
+    requirements:
+      ExtUtils::MakeMaker 0
+      Test::More 0
+      perl 5.006001
   Stream-Buffered-0.02
     pathname: D/DO/DOY/Stream-Buffered-0.02.tar.gz
     provides:
@@ -536,6 +544,12 @@ DISTRIBUTIONS
       constant 0
       strict 0
       warnings 0
+  Term-Encoding-0.02
+    pathname: M/MI/MIYAGAWA/Term-Encoding-0.02.tar.gz
+    provides:
+      Term::Encoding 0.02
+    requirements:
+      ExtUtils::MakeMaker 0
   Test-Exception-0.32
     pathname: A/AD/ADIE/Test-Exception-0.32.tar.gz
     provides:
@@ -578,6 +592,37 @@ DISTRIBUTIONS
       Test::More 0.47
       Test::Tester 0.107
       perl 5.006
+  Test-Pretty-0.28
+    pathname: T/TO/TOKUHIROM/Test-Pretty-0.28.tar.gz
+    provides:
+      App::Prove::Plugin::Pretty undef
+      App::Prove::Plugin::retty undef
+      TAP::Formatter::Pretty::Multi undef
+      TAP::Formatter::Pretty::Multi::Session undef
+      TAP::Formatter::Pretty::Single undef
+      TAP::Formatter::Pretty::Single::Session undef
+      Test::Pretty 0.28
+      Test::Pretty::Harness undef
+      Test::Pretty::Parser undef
+    requirements:
+      CPAN::Meta 0
+      CPAN::Meta::Prereqs 0
+      Carp 0
+      ExtUtils::CBuilder 0
+      File::Temp 0
+      Module::Build 0.38
+      Scope::Guard 0
+      TAP::Formatter::Base 0
+      TAP::Formatter::Session 0
+      TAP::Harness 0
+      TAP::Parser 0
+      Term::ANSIColor 3.02
+      Term::Encoding 0
+      Test::Builder 0.82
+      Test::More 0.98
+      autodie 0
+      parent 0
+      perl 5.008001
   Test-Requires-0.07
     pathname: T/TO/TOKUHIROM/Test-Requires-0.07.tar.gz
     provides:
