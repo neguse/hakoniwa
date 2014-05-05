@@ -158,10 +158,10 @@ sub newMode {
     $now = $now - ( $now % ($unitTime) );
 
     open( my $OUT, ">$dirName/hakojima.dat" );    # ファイルを開く
-    print $OUT "1\n";                          # ターン数1
-    print $OUT "$now\n";                       # 開始時間
-    print $OUT "0\n";                          # 島の数
-    print $OUT "1\n";                          # 次に割り当てるID
+    print $OUT "1\n";                             # ターン数1
+    print $OUT "$now\n";                          # 開始時間
+    print $OUT "0\n";                             # 島の数
+    print $OUT "1\n";                             # 次に割り当てるID
 
     # ファイルを閉じる
     close($OUT);
