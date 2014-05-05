@@ -200,24 +200,25 @@ sub readIslandsFile {
                        # 番号だとその島の地形だけは読みこむ
 
     # データファイルを開く
-    if ( !open( IN, "${HdirName}/hakojima.dat" ) ) {
+    my $IN;
+    if ( !open( $IN, "${HdirName}/hakojima.dat" ) ) {
         rename( "${HdirName}/hakojima.tmp", "${HdirName}/hakojima.dat" );
-        if ( !open( IN, "${HdirName}/hakojima.dat" ) ) {
+        if ( !open( $IN, "${HdirName}/hakojima.dat" ) ) {
             return 0;
         }
     }
 
     # 各パラメータの読みこみ
-    $HislandTurn = int(<IN>);    # ターン数
+    $HislandTurn = int(<$IN>);    # ターン数
     if ( $HislandTurn == 0 ) {
         return 0;
     }
-    $HislandLastTime = int(<IN>);    # 最終更新時間
+    $HislandLastTime = int(<$IN>);    # 最終更新時間
     if ( $HislandLastTime == 0 ) {
         return 0;
     }
-    $HislandNumber = int(<IN>);      # 島の総数
-    $HislandNextID = int(<IN>);      # 次に割り当てるID
+    $HislandNumber = int(<$IN>);      # 島の総数
+    $HislandNextID = int(<$IN>);      # 次に割り当てるID
 
     # ターン処理判定
     my ($now) = time;
@@ -225,30 +226,30 @@ sub readIslandsFile {
         || ( ( $now - $HislandLastTime ) >= $HunitTime ) )
     {
         $HmainMode = 'turn';
-        $num       = -1;             # 全島読みこむ
+        $num       = -1;              # 全島読みこむ
     }
 
     # 島の読みこみ
     my ($i);
     for ( $i = 0; $i < $HislandNumber; $i++ ) {
-        $Hislands[$i] = readIsland($num);
+        $Hislands[$i] = readIsland( $IN, $num );
         $HidToNumber{ $Hislands[$i]->{'id'} } = $i;
     }
 
     # ファイルを閉じる
-    close(IN);
+    close($IN);
 
     return 1;
 }
 
 # 島ひとつ読みこみ
 sub readIsland {
-    my ($num) = @_;
+    my ( $IN, $num ) = @_;
     my ($name,     $id,      $prize,    $absent, $comment,
         $password, $money,   $food,     $pop,    $area,
         $farm,     $factory, $mountain, $score
     );
-    $name = <IN>;    # 島の名前
+    $name = <$IN>;    # 島の名前
     chomp($name);
     if ( $name =~ s/,(.*)$//g ) {
         $score = int($1);
@@ -256,21 +257,21 @@ sub readIsland {
     else {
         $score = 0;
     }
-    $id    = int(<IN>);    # ID番号
-    $prize = <IN>;         # 受賞
+    $id    = int(<$IN>);    # ID番号
+    $prize = <$IN>;         # 受賞
     chomp($prize);
-    $absent  = int(<IN>);    # 連続資金繰り数
-    $comment = <IN>;         # コメント
+    $absent  = int(<$IN>);    # 連続資金繰り数
+    $comment = <$IN>;         # コメント
     chomp($comment);
-    $password = <IN>;        # 暗号化パスワード
+    $password = <$IN>;        # 暗号化パスワード
     chomp($password);
-    $money    = int(<IN>);    # 資金
-    $food     = int(<IN>);    # 食料
-    $pop      = int(<IN>);    # 人口
-    $area     = int(<IN>);    # 広さ
-    $farm     = int(<IN>);    # 農場
-    $factory  = int(<IN>);    # 工場
-    $mountain = int(<IN>);    # 採掘場
+    $money    = int(<$IN>);    # 資金
+    $food     = int(<$IN>);    # 食料
+    $pop      = int(<$IN>);    # 人口
+    $area     = int(<$IN>);    # 広さ
+    $farm     = int(<$IN>);    # 農場
+    $factory  = int(<$IN>);    # 工場
+    $mountain = int(<$IN>);    # 採掘場
 
     # HidToNameテーブルへ保存
     $HidToName{$id} = $name;    #
@@ -279,15 +280,16 @@ sub readIsland {
     my ( @land, @landValue, $line, @command, @lbbs );
 
     if ( ( $num == -1 ) || ( $num == $id ) ) {
-        if ( !open( IIN, "${HdirName}/island.$id" ) ) {
+        my $IIN;
+        if ( !open( $IIN, "${HdirName}/island.$id" ) ) {
             rename( "${HdirName}/islandtmp.$id", "${HdirName}/island.$id" );
-            if ( !open( IIN, "${HdirName}/island.$id" ) ) {
+            if ( !open( $IIN, "${HdirName}/island.$id" ) ) {
                 exit(0);
             }
         }
         my ( $x, $y );
         for ( $y = 0; $y < $HislandSize; $y++ ) {
-            $line = <IIN>;
+            $line = <$IIN>;
             for ( $x = 0; $x < $HislandSize; $x++ ) {
                 $line =~ s/^(.)(..)//;
                 $land[$x][$y]      = hex($1);
@@ -298,7 +300,7 @@ sub readIsland {
         # コマンド
         my ($i);
         for ( $i = 0; $i < $HcommandMax; $i++ ) {
-            $line = <IIN>;
+            $line = <$IIN>;
             $line =~ /^([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*)$/;
             $command[$i] = {
                 'kind'   => int($1),
@@ -311,12 +313,12 @@ sub readIsland {
 
         # ローカル掲示板
         for ( $i = 0; $i < $HlbbsMax; $i++ ) {
-            $line = <IIN>;
+            $line = <$IIN>;
             chomp($line);
             $lbbs[$i] = $line;
         }
 
-        close(IIN);
+        close($IIN);
     }
 
     # 島型にして返す
@@ -347,22 +349,23 @@ sub writeIslandsFile {
     my ($num) = @_;
 
     # ファイルを開く
-    open( OUT, ">${HdirName}/hakojima.tmp" );
+    open( my $OUT, ">${HdirName}/hakojima.tmp" )
+        or die "failed to open ${HdirName}/hakojima.tmp : $!";
 
     # 各パラメータ書き込み
-    print OUT "$HislandTurn\n";
-    print OUT "$HislandLastTime\n";
-    print OUT "$HislandNumber\n";
-    print OUT "$HislandNextID\n";
+    print $OUT "$HislandTurn\n";
+    print $OUT "$HislandLastTime\n";
+    print $OUT "$HislandNumber\n";
+    print $OUT "$HislandNextID\n";
 
     # 島の書きこみ
     my ($i);
     for ( $i = 0; $i < $HislandNumber; $i++ ) {
-        writeIsland( $Hislands[$i], $num );
+        writeIsland( $OUT, $Hislands[$i], $num );
     }
 
     # ファイルを閉じる
-    close(OUT);
+    close($OUT);
 
     # 本来の名前にする
     unlink("${HdirName}/hakojima.dat");
@@ -371,26 +374,26 @@ sub writeIslandsFile {
 
 # 島ひとつ書き込み
 sub writeIsland {
-    my ( $island, $num ) = @_;
+    my ( $OUT, $island, $num ) = @_;
     my ($score);
     $score = int( $island->{'score'} );
-    print OUT $island->{'name'} . ",$score\n";
-    print OUT $island->{'id'} . "\n";
-    print OUT $island->{'prize'} . "\n";
-    print OUT $island->{'absent'} . "\n";
-    print OUT $island->{'comment'} . "\n";
-    print OUT $island->{'password'} . "\n";
-    print OUT $island->{'money'} . "\n";
-    print OUT $island->{'food'} . "\n";
-    print OUT $island->{'pop'} . "\n";
-    print OUT $island->{'area'} . "\n";
-    print OUT $island->{'farm'} . "\n";
-    print OUT $island->{'factory'} . "\n";
-    print OUT $island->{'mountain'} . "\n";
+    print $OUT $island->{'name'} . ",$score\n";
+    print $OUT $island->{'id'} . "\n";
+    print $OUT $island->{'prize'} . "\n";
+    print $OUT $island->{'absent'} . "\n";
+    print $OUT $island->{'comment'} . "\n";
+    print $OUT $island->{'password'} . "\n";
+    print $OUT $island->{'money'} . "\n";
+    print $OUT $island->{'food'} . "\n";
+    print $OUT $island->{'pop'} . "\n";
+    print $OUT $island->{'area'} . "\n";
+    print $OUT $island->{'farm'} . "\n";
+    print $OUT $island->{'factory'} . "\n";
+    print $OUT $island->{'mountain'} . "\n";
 
     # 地形
     if ( ( $num <= -1 ) || ( $num == $island->{'id'} ) ) {
-        open( IOUT, ">${HdirName}/islandtmp.$island->{'id'}" );
+        open( my $IOUT, ">${HdirName}/islandtmp.$island->{'id'}" );
 
         my ( $land, $landValue );
         $land      = $island->{'land'};
@@ -398,17 +401,17 @@ sub writeIsland {
         my ( $x, $y );
         for ( $y = 0; $y < $HislandSize; $y++ ) {
             for ( $x = 0; $x < $HislandSize; $x++ ) {
-                printf IOUT ( "%x%02x", $land->[$x][$y],
+                printf $IOUT ( "%x%02x", $land->[$x][$y],
                     $landValue->[$x][$y] );
             }
-            print IOUT "\n";
+            print $IOUT "\n";
         }
 
         # コマンド
         my ( $command, $cur, $i );
         $command = $island->{'command'};
         for ( $i = 0; $i < $HcommandMax; $i++ ) {
-            printf IOUT (
+            printf $IOUT (
                 "%d,%d,%d,%d,%d\n",         $command->[$i]->{'kind'},
                 $command->[$i]->{'target'}, $command->[$i]->{'x'},
                 $command->[$i]->{'y'},      $command->[$i]->{'arg'}
@@ -419,10 +422,10 @@ sub writeIsland {
         my ($lbbs);
         $lbbs = $island->{'lbbs'};
         for ( $i = 0; $i < $HlbbsMax; $i++ ) {
-            print IOUT $lbbs->[$i] . "\n";
+            print $IOUT $lbbs->[$i] . "\n";
         }
 
-        close(IOUT);
+        close($IOUT);
         unlink("${HdirName}/island.$island->{'id'}");
         rename(
             "${HdirName}/islandtmp.$island->{'id'}",
@@ -437,14 +440,14 @@ sub writeIsland {
 
 # 標準出力への出力
 sub out {
-    print STDOUT Encode::encode_utf8($_[0]);
+    print STDOUT Encode::encode_utf8( $_[0] );
 }
 
 # デバッグログ
 sub HdebugOut {
-    open( DOUT, ">>debug.log" );
-    print DOUT ( $_[0] );
-    close(DOUT);
+    open( my $DOUT, ">>debug.log" ) or return;
+    print $DOUT ( $_[0] );
+    close($DOUT);
 }
 
 # CGIの読みこみ
@@ -739,8 +742,8 @@ sub hakolock1 {
 }
 
 sub hakolock2 {
-    open( LOCKID, '>>hakojimalockflock' );
-    if ( flock( LOCKID, 2 ) ) {
+    open( $LOCKID, '>>hakojimalockflock' );
+    if ( flock( $LOCKID, 2 ) ) {
 
         # 成功
         return 1;
@@ -789,20 +792,21 @@ sub hakolock4 {
     if ( unlink('key-free') ) {
 
         # 成功
-        open( OUT, '>key-locked' );
-        print OUT time;
-        close(OUT);
+        open( my $OUT, '>key-locked' );
+        print $OUT time;
+        close($OUT);
         return 1;
     }
     else {
         # ロック時間チェック
-        if ( !open( IN, 'key-locked' ) ) {
+        my $IN;
+        if ( !open( $IN, 'key-locked' ) ) {
             return 0;
         }
 
         my ($t);
-        $t = <IN>;
-        close(IN);
+        $t = <$IN>;
+        close($IN);
         if ( ( $t != 0 ) && ( ( $t + $unlockTime ) < time ) ) {
 
             # 120秒以上経過してたら、強制的にロックを外す
@@ -835,7 +839,7 @@ sub unlock {
     elsif ( $lockMode == 2 ) {
 
         # flock式ロック
-        close(LOCKID);
+        close($LOCKID);
 
     }
     elsif ( $lockMode == 3 ) {
@@ -1025,9 +1029,9 @@ sub random {
 # ファイル番号指定でログ表示
 sub logFilePrint {
     my ( $fileNumber, $id, $mode ) = @_;
-    open( LIN, "${HdirName}/hakojima.log$_[0]" );
+    open( my $LIN, "${HdirName}/hakojima.log$_[0]" ) or return;
     my ( $line, $m, $turn, $id1, $id2, $message );
-    while ( $line = <LIN> ) {
+    while ( $line = <$LIN> ) {
         $line =~ /^([0-9]*),([0-9]*),([0-9]*),([0-9]*),(.*)$/;
         ( $m, $turn, $id1, $id2, $message ) = ( $1, $2, $3, $4, $5 );
 
@@ -1057,7 +1061,7 @@ sub logFilePrint {
         out("<NOBR>${HtagNumber_}ターン$turn$m${H_tagNumber}：$message</NOBR><BR>\n"
         );
     }
-    close(LIN);
+    close($LIN);
 }
 
 #----------------------------------------------------------------------

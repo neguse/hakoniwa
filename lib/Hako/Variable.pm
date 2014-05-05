@@ -8,6 +8,7 @@ use open ':encoding(utf8)';
 use Exporter::Easy (
     EXPORT => [
         qw(
+            $LOCKID
             $HcurrentNumber
             $HcommandArg
             $HcommandKind
@@ -155,6 +156,9 @@ our @HlateLogPool;
 
 # 機密ログ
 our @HsecretLogPool;
+
+# ロック用ファイルハンドル($lockMode == 2の時に利用)
+our $LOCKID;
 
 1;
 

@@ -119,25 +119,25 @@ END
 
 sub myrmtree {
     my ($dn) = @_;
-    opendir( DIN, "$dn/" );
+    opendir( my $DIN, "$dn/" );
     my ($fileName);
-    while ( $fileName = readdir(DIN) ) {
+    while ( $fileName = readdir($DIN) ) {
         unlink("$dn/$fileName");
     }
-    closedir(DIN);
+    closedir($DIN);
     rmdir($dn);
 }
 
 sub currentMode {
     myrmtree "${dirName}";
     mkdir( "${dirName}", $dirMode );
-    opendir( DIN, "${dirName}.bak$currentID/" );
+    opendir( my $DIN, "${dirName}.bak$currentID/" );
     my ($fileName);
-    while ( $fileName = readdir(DIN) ) {
+    while ( $fileName = readdir($DIN) ) {
         fileCopy( "${dirName}.bak$currentID/$fileName",
             "${dirName}/$fileName" );
     }
-    closedir(DIN);
+    closedir($DIN);
 }
 
 sub deleteMode {
@@ -157,14 +157,14 @@ sub newMode {
     my ($now) = time;
     $now = $now - ( $now % ($unitTime) );
 
-    open( OUT, ">$dirName/hakojima.dat" );    # ファイルを開く
-    print OUT "1\n";                          # ターン数1
-    print OUT "$now\n";                       # 開始時間
-    print OUT "0\n";                          # 島の数
-    print OUT "1\n";                          # 次に割り当てるID
+    open( my $OUT, ">$dirName/hakojima.dat" );    # ファイルを開く
+    print $OUT "1\n";                          # ターン数1
+    print $OUT "$now\n";                       # 開始時間
+    print $OUT "0\n";                          # 島の数
+    print $OUT "1\n";                          # 次に割り当てるID
 
     # ファイルを閉じる
-    close(OUT);
+    close($OUT);
 }
 
 sub timeMode {
@@ -176,20 +176,20 @@ sub timeMode {
 
 sub stimeMode {
     my ($t) = $ctSec;
-    open( IN, "${dirName}/hakojima.dat" );
+    open( my $IN, "${dirName}/hakojima.dat" );
     my (@lines);
-    @lines = <IN>;
-    close(IN);
+    @lines = <$IN>;
+    close($IN);
 
     $lines[1] = "$t\n";
 
-    open( OUT, ">${dirName}/hakojima.dat" );
-    print OUT @lines;
-    close(OUT);
+    open( my $OUT, ">${dirName}/hakojima.dat" );
+    print $OUT @lines;
+    close($OUT);
 }
 
 sub mainMode {
-    opendir( DIN, "./" );
+    opendir( my $DIN, "./" );
 
     out <<END;
 <FORM action="$thisFile" method="POST">
@@ -210,12 +210,12 @@ END
 
     # バックアップデータ
     my ($dn);
-    while ( $dn = readdir(DIN) ) {
+    while ( $dn = readdir($DIN) ) {
         if ( $dn =~ /^${dirName}.bak(.*)/ ) {
             dataPrint($1);
         }
     }
-    closedir(DIN);
+    closedir($DIN);
 }
 
 # 表示モード
@@ -223,19 +223,22 @@ sub dataPrint {
     my ($suf) = @_;
 
     out "<HR>";
+    my $IN;
     if ( $suf eq "" ) {
-        open( IN, "${dirName}/hakojima.dat" );
+        open( $IN, "${dirName}/hakojima.dat" );
         out "<H1>現役データ</H1>";
     }
     else {
-        open( IN, "${dirName}.bak$suf/hakojima.dat" );
+        open( $IN, "${dirName}.bak$suf/hakojima.dat" );
         out "<H1>バックアップ$suf</H1>";
     }
 
     my ($lastTurn);
-    $lastTurn = <IN>;
+    $lastTurn = <$IN>;
     my ($lastTime);
-    $lastTime = <IN>;
+    $lastTime = <$IN>;
+
+    close($IN);
 
     my ($timeString) = timeToString($lastTime);
 
@@ -341,13 +344,13 @@ sub cgiInput {
 # ファイルのコピー
 sub fileCopy {
     my ( $src, $dist ) = @_;
-    open( IN,  $src );
-    open( OUT, ">$dist" );
-    while (<IN>) {
-        print OUT;
+    open( my $IN,  $src );
+    open( my $OUT, ">$dist" );
+    while (<$IN>) {
+        print $OUT;
     }
-    close(IN);
-    close(OUT);
+    close($IN);
+    close($OUT);
 }
 
 # パスチェック

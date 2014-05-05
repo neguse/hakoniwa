@@ -504,12 +504,12 @@ sub turnMain {
 # ディレクトリ消し
 sub myrmtree {
     my ($dn) = @_;
-    opendir( DIN, "$dn/" );
+    opendir( my $DIN, "$dn/" );
     my ($fileName);
-    while ( $fileName = readdir(DIN) ) {
+    while ( $fileName = readdir($DIN) ) {
         unlink("$dn/$fileName");
     }
-    closedir(DIN);
+    closedir($DIN);
     rmdir($dn);
 }
 
@@ -2546,52 +2546,52 @@ sub logSecret {
 
 # 記録ログ
 sub logHistory {
-    open( HOUT, ">>${HdirName}/hakojima.his" );
-    print HOUT "$HislandTurn,$_[0]\n";
-    close(HOUT);
+    open( my $HOUT, ">>${HdirName}/hakojima.his" );
+    print $HOUT "$HislandTurn,$_[0]\n";
+    close($HOUT);
 }
 
 # 記録ログ調整
 sub logHistoryTrim {
-    open( HIN, "${HdirName}/hakojima.his" );
+    open( my $HIN, "${HdirName}/hakojima.his" );
     my ( @line, $l, $count );
     $count = 0;
-    while ( $l = <HIN> ) {
+    while ( $l = <$HIN> ) {
         chomp($l);
         push( @line, $l );
         $count++;
     }
-    close(HIN);
+    close($HIN);
 
     if ( $count > $HhistoryMax ) {
-        open( HOUT, ">${HdirName}/hakojima.his" );
+        open( my $HOUT, ">${HdirName}/hakojima.his" );
         my ($i);
         for ( $i = ( $count - $HhistoryMax ); $i < $count; $i++ ) {
-            print HOUT "$line[$i]\n";
+            print $HOUT "$line[$i]\n";
         }
-        close(HOUT);
+        close($HOUT);
     }
 }
 
 # ログ書き出し
 sub logFlush {
-    open( LOUT, ">${HdirName}/hakojima.log0" );
+    open( my $LOUT, ">${HdirName}/hakojima.log0" );
 
     # 全部逆順にして書き出す
     my ($i);
     for ( $i = $#HsecretLogPool; $i >= 0; $i-- ) {
-        print LOUT $HsecretLogPool[$i];
-        print LOUT "\n";
+        print $LOUT $HsecretLogPool[$i];
+        print $LOUT "\n";
     }
     for ( $i = $#HlateLogPool; $i >= 0; $i-- ) {
-        print LOUT $HlateLogPool[$i];
-        print LOUT "\n";
+        print $LOUT $HlateLogPool[$i];
+        print $LOUT "\n";
     }
     for ( $i = $#HlogPool; $i >= 0; $i-- ) {
-        print LOUT $HlogPool[$i];
-        print LOUT "\n";
+        print $LOUT $HlogPool[$i];
+        print $LOUT "\n";
     }
-    close(LOUT);
+    close($LOUT);
 }
 
 #----------------------------------------------------------------------

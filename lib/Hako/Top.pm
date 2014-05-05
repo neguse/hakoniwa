@@ -271,9 +271,9 @@ sub logPrintTop {
 
 # 記録ファイル表示
 sub historyPrint {
-    open( HIN, "${HdirName}/hakojima.his" );
+    open( my $HIN, "${HdirName}/hakojima.his" ) or return;
     my ( @line, $l );
-    while ( $l = <HIN> ) {
+    while ( $l = <$HIN> ) {
         chomp($l);
         push( @line, $l );
     }
@@ -284,7 +284,7 @@ sub historyPrint {
         out("<NOBR>${HtagNumber_}ターン${1}${H_tagNumber}：${2}</NOBR><BR>\n"
         );
     }
-    close(HIN);
+    close($HIN);
 }
 
 1;
