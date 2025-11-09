@@ -23,6 +23,11 @@ type Island struct {
 	Farm     int    // [10] 農場数
 	Factory  int    // [11] 工場数
 	Mountain int    // [12] 採掘場数
+	Score    int    // スコア（ソート用）
+
+	// Turn processing fields
+	OldPop int  // ターン開始前の人口
+	Dead   bool // 死滅フラグ
 
 	// Land data (from island.{ID})
 	Land      [][]int // 地形タイプ (11x11 or 12x12)
