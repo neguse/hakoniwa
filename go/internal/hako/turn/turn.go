@@ -600,6 +600,92 @@ func doCommand(island *types.Island) int {
 		island.Money -= cost
 		return 1
 
+	case hconst.ComDestroy:
+		// Destroy (掘削)
+		// Ref: perl/lib/Hako/Turn.pm:726-782
+		x, y := com.X, com.Y
+		if !isValidCoord(x, y) {
+			return 1
+		}
+
+		land := island.Land[x][y]
+		lv := island.LandValue[x][y]
+		cost := hconst.ComCost[com.Kind]
+
+		// Cannot destroy submarine base, oil field, or monster
+		if land == hconst.LandSbase || land == hconst.LandOil || land == hconst.LandMonster {
+			logLandFail(island.ID, island.Name, hconst.ComName[com.Kind], x, y)
+			return 0
+		}
+
+		if land == hconst.LandSea && lv == 0 {
+			// Sea - search for oil
+			// Determine investment amount
+			arg := com.Arg
+			if arg == 0 {
+				arg = 1
+			}
+			value := min(arg*cost, island.Money)
+			str := fmt.Sprintf("%d%s", value, hconst.UnitMoney)
+			p := value / cost
+			island.Money -= value
+
+			// Check if oil found
+			if p > rand.Intn(100) {
+				// Oil found
+				logOilFound(island.ID, island.Name, x, y, hconst.ComName[com.Kind], str)
+				island.Land[x][y] = hconst.LandOil
+				island.LandValue[x][y] = 0
+			} else {
+				// Oil not found
+				logOilFail(island.ID, island.Name, x, y, hconst.ComName[com.Kind], str)
+			}
+			return 1
+		}
+
+		// Turn target into sea. Mountain becomes wasteland. Shallow becomes sea.
+		if land == hconst.LandMountain {
+			island.Land[x][y] = hconst.LandWaste
+			island.LandValue[x][y] = 0
+		} else if land == hconst.LandSea {
+			island.LandValue[x][y] = 0
+		} else {
+			island.Land[x][y] = hconst.LandSea
+			island.LandValue[x][y] = 1
+			island.Area--
+		}
+		logLandSuc(island.ID, island.Name, hconst.ComName[com.Kind], x, y)
+
+		// Deduct money
+		island.Money -= cost
+		return 1
+
+	case hconst.ComSellTree:
+		// Sell tree (伐採)
+		// Ref: perl/lib/Hako/Turn.pm:783-801
+		x, y := com.X, com.Y
+		if !isValidCoord(x, y) {
+			return 1
+		}
+
+		land := island.Land[x][y]
+		lv := island.LandValue[x][y]
+
+		// Can only sell trees in forest
+		if land != hconst.LandForest {
+			logLandFail(island.ID, island.Name, hconst.ComName[com.Kind], x, y)
+			return 0
+		}
+
+		// Turn target into plains
+		island.Land[x][y] = hconst.LandPlains
+		island.LandValue[x][y] = 0
+		logLandSuc(island.ID, island.Name, hconst.ComName[com.Kind], x, y)
+
+		// Get selling price
+		island.Money += hconst.TreeValue * lv
+		return 1
+
 	default:
 		// Other commands: Phase 1 simplified - skip
 		return 1
@@ -776,6 +862,13 @@ func isValidCoord(x, y int) bool {
 	return x >= 0 && x < hconst.IslandSize && y >= 0 && y < hconst.IslandSize
 }
 
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
 func nameToNumber(name string) int {
 	for i := 0; i < variable.IslandNumber; i++ {
 		if variable.Islands[i].Name == name {
@@ -871,6 +964,20 @@ func logNoLandAround(id, name, command string, x, y int) {
 func logLandSuc(id, name, command string, x, y int) {
 	logSecret(fmt.Sprintf("0,%d,%s,0,%s島(%d,%d)で%sが行われました。",
 		variable.IslandTurn, id, name, x, y, command))
+}
+
+func logOilFound(id, name string, x, y int, command, str string) {
+	point := fmt.Sprintf("(%d,%d)", x, y)
+	logSecret(fmt.Sprintf("0,%d,%s,0,%s%s島%s%sで<B>%s</B>の予算をつぎ込んだ%s%s%sが行われ、<B>油田が掘り当てられました</B>。",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, point, hconst.TagNameEnd,
+		str, hconst.TagComNameBegin, command, hconst.TagComNameEnd))
+}
+
+func logOilFail(id, name string, x, y int, command, str string) {
+	point := fmt.Sprintf("(%d,%d)", x, y)
+	logSecret(fmt.Sprintf("0,%d,%s,0,%s%s島%s%sで<B>%s</B>の予算をつぎ込んだ%s%s%sが行われましたが、油田は見つかりませんでした。",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, point, hconst.TagNameEnd,
+		str, hconst.TagComNameBegin, command, hconst.TagComNameEnd))
 }
 
 func logSecret(msg string) {
