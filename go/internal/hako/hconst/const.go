@@ -2,7 +2,7 @@
 // This is a literal translation from Perl lib/Hako/Const.pm
 //
 // Ref: perl/lib/Hako/Const.pm
-package const
+package hconst
 
 //----------------------------------------------------------------------
 // 各種設定値

@@ -10,8 +10,8 @@ import (
 	"math/rand"
 	"strings"
 
-	"github.com/neguse/hakoniwa/go/internal/hako/const"
-	"github.com/neguse/hakoniwa/go/internal/hako/variable"
+	"github.com/neguse/hakoniwa/internal/hako/hconst"
+	"github.com/neguse/hakoniwa/internal/hako/variable"
 )
 
 // min returns the minimum of two integers
@@ -26,7 +26,7 @@ func min(a, b int) int {
 // encode encodes a password
 // Ref: perl/lib/Hako/Main.pm:863
 func encode(password string) string {
-	if const.CryptOn {
+	if hconst.CryptOn {
 		// Perl's crypt() with salt "h2"
 		// Phase 1: simplified implementation (will be improved in Phase 2)
 		return cryptCompat(password, "h2")
@@ -56,7 +56,7 @@ func checkPassword(stored, input string) bool {
 	}
 
 	// Master password check
-	if const.MasterPassword == input {
+	if hconst.MasterPassword == input {
 		return true
 	}
 
@@ -72,10 +72,10 @@ func checkPassword(stored, input string) bool {
 // Ref: perl/lib/Hako/Main.pm:895
 func aboutMoney(m int) string {
 	if m < 500 {
-		return fmt.Sprintf("推定500%s未満", const.UnitMoney)
+		return fmt.Sprintf("推定500%s未満", hconst.UnitMoney)
 	}
 	m = (m + 500) / 1000
-	return fmt.Sprintf("推定%d000%s", m, const.UnitMoney)
+	return fmt.Sprintf("推定%d000%s", m, hconst.UnitMoney)
 }
 
 // htmlEscape escapes HTML special characters
@@ -120,8 +120,8 @@ func monsterSpec(lv int) (kind int, name string, hp int) {
 	kind = lv / 10
 
 	// Name
-	if kind < len(const.MonsterName) {
-		name = const.MonsterName[kind]
+	if kind < len(hconst.MonsterName) {
+		name = hconst.MonsterName[kind]
 	}
 
 	// HP
@@ -133,18 +133,18 @@ func monsterSpec(lv int) (kind int, name string, hp int) {
 // expToLevel calculates level from experience points
 // Ref: perl/lib/Hako/Main.pm:975
 func expToLevel(landKind int, exp int) int {
-	if landKind == const.LandBase {
+	if landKind == hconst.LandBase {
 		// Missile base
-		for i := const.MaxBaseLevel; i > 1; i-- {
-			if exp >= const.BaseLevelUp[i-2] {
+		for i := hconst.MaxBaseLevel; i > 1; i-- {
+			if exp >= hconst.BaseLevelUp[i-2] {
 				return i
 			}
 		}
 		return 1
 	} else {
 		// Sea base
-		for i := const.MaxSBaseLevel; i > 1; i-- {
-			if exp >= const.SBaseLevelUp[i-2] {
+		for i := hconst.MaxSBaseLevel; i > 1; i-- {
+			if exp >= hconst.SBaseLevelUp[i-2] {
 				return i
 			}
 		}
@@ -157,12 +157,12 @@ func expToLevel(landKind int, exp int) int {
 // Ref: perl/lib/Hako/Main.pm:1002
 func makeRandomPointArray() {
 	// Initialize
-	variable.Rpx = make([]int, const.PointNumber)
-	variable.Rpy = make([]int, const.PointNumber)
+	variable.Rpx = make([]int, hconst.PointNumber)
+	variable.Rpy = make([]int, hconst.PointNumber)
 
 	idx := 0
-	for y := 0; y < const.IslandSize; y++ {
-		for x := 0; x < const.IslandSize; x++ {
+	for y := 0; y < hconst.IslandSize; y++ {
+		for x := 0; x < hconst.IslandSize; x++ {
 			variable.Rpx[idx] = x
 			variable.Rpy[idx] = y
 			idx++
@@ -170,7 +170,7 @@ func makeRandomPointArray() {
 	}
 
 	// Shuffle
-	for i := const.PointNumber - 1; i > 0; i-- {
+	for i := hconst.PointNumber - 1; i > 0; i-- {
 		j := rand.Intn(i + 1)
 		if i == j {
 			continue
