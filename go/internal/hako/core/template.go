@@ -50,15 +50,15 @@ func tempNoDataFile() {
 	out("<H1>データファイルが存在しません。</H1>\n")
 }
 
-// tempWrongPassword outputs wrong password message
+// TempWrongPassword outputs wrong password message (exported for external use)
 // Ref: perl/lib/Hako/Main.pm:1161
-func tempWrongPassword() {
+func TempWrongPassword() {
 	out("<H1>パスワードが違います。</H1>\n")
 }
 
-// tempProblem outputs generic problem message
+// TempProblem outputs generic problem message (exported for external use)
 // Ref: perl/lib/Hako/Main.pm:1168
-func tempProblem() {
+func TempProblem() {
 	out("<H1>何か問題が発生しました。</H1>\n")
 	out("しばらくしてから、リロードしてください。<P>\n")
 }

@@ -128,8 +128,13 @@ func hakoLock4() bool {
 	return false
 }
 
-// unlock releases the lock
+// Unlock releases the lock (exported for external use)
 // Ref: perl/lib/Hako/Main.pm:832
+func Unlock() {
+	unlock()
+}
+
+// unlock releases the lock (internal)
 func unlock() {
 	switch hconst.LockMode {
 	case 1:

@@ -12,6 +12,11 @@ import (
 	"github.com/neguse/hakoniwa/internal/hako/variable"
 )
 
+// out outputs a string to the output buffer
+func out(s string) {
+	variable.OutputBuffer.WriteString(s)
+}
+
 // RunMain is the main entry point for the game
 // Ref: perl/lib/Hako/Main.pm:65
 func RunMain(r *http.Request) {

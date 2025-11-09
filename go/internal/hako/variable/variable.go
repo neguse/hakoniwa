@@ -5,7 +5,11 @@
 // Ref: perl/lib/Hako/Variable.pm
 package variable
 
-import "bytes"
+import (
+	"bytes"
+
+	"github.com/neguse/hakoniwa/internal/hako/types"
+)
 
 //----------------------------------------------------------------------
 // ユーザ入力値
@@ -95,7 +99,7 @@ var IslandNextID int
 
 // Islands は島データのリスト
 // Ref: perl/lib/Hako/Variable.pm:120
-var Islands []interface{} // Phase 1: interface{} (will be []Island in Phase 2)
+var Islands []*types.Island
 
 //----------------------------------------------------------------------
 // テンポラリな情報

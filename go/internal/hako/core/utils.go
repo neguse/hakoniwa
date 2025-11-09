@@ -47,9 +47,9 @@ func cryptCompat(password, salt string) string {
 	return password // FIXME: Implement proper crypt
 }
 
-// checkPassword checks if a password matches
+// CheckPassword checks if a password matches (exported for external use)
 // Ref: perl/lib/Hako/Main.pm:873
-func checkPassword(stored, input string) bool {
+func CheckPassword(stored, input string) bool {
 	// null check
 	if input == "" {
 		return false
@@ -68,9 +68,9 @@ func checkPassword(stored, input string) bool {
 	return false
 }
 
-// aboutMoney rounds money to 1000億単位
+// AboutMoney rounds money to 1000億単位 (exported for external use)
 // Ref: perl/lib/Hako/Main.pm:895
-func aboutMoney(m int) string {
+func AboutMoney(m int) string {
 	if m < 500 {
 		return fmt.Sprintf("推定500%s未満", hconst.UnitMoney)
 	}
@@ -78,9 +78,9 @@ func aboutMoney(m int) string {
 	return fmt.Sprintf("推定%d000%s", m, hconst.UnitMoney)
 }
 
-// htmlEscape escapes HTML special characters
+// HtmlEscape escapes HTML special characters (exported for external use)
 // Ref: perl/lib/Hako/Main.pm:907
-func htmlEscape(s string) string {
+func HtmlEscape(s string) string {
 	s = strings.ReplaceAll(s, "&", "&amp;")
 	s = strings.ReplaceAll(s, "<", "&lt;")
 	s = strings.ReplaceAll(s, ">", "&gt;")
@@ -104,18 +104,18 @@ func cutColumn(s string, c int) string {
 func nameToNumber(name string) int {
 	// Search all islands
 	for i := 0; i < variable.IslandNumber; i++ {
-		// Phase 1: Islands is []interface{}, need type assertion
 		island := variable.Islands[i]
-		// TODO: access island name when Island type is defined
-		_ = island
+		if island.Name == name {
+			return i
+		}
 	}
 	// Not found
 	return -1
 }
 
-// monsterSpec returns monster information from level
+// MonsterSpec returns monster information from level (exported for external use)
 // Ref: perl/lib/Hako/Main.pm:958
-func monsterSpec(lv int) (kind int, name string, hp int) {
+func MonsterSpec(lv int) (kind int, name string, hp int) {
 	// Kind
 	kind = lv / 10
 
@@ -130,9 +130,9 @@ func monsterSpec(lv int) (kind int, name string, hp int) {
 	return kind, name, hp
 }
 
-// expToLevel calculates level from experience points
+// ExpToLevel calculates level from experience points (exported for external use)
 // Ref: perl/lib/Hako/Main.pm:975
-func expToLevel(landKind int, exp int) int {
+func ExpToLevel(landKind int, exp int) int {
 	if landKind == hconst.LandBase {
 		// Missile base
 		for i := hconst.MaxBaseLevel; i > 1; i-- {
