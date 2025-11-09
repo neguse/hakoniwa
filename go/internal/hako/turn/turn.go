@@ -686,6 +686,156 @@ func doCommand(island *types.Island) int {
 		island.Money += hconst.TreeValue * lv
 		return 1
 
+	case hconst.ComPlant, hconst.ComFarm, hconst.ComFactory, hconst.ComBase, hconst.ComMonument, hconst.ComHaribote, hconst.ComDbase:
+		// Ground construction commands (地上建設系)
+		// Ref: perl/lib/Hako/Turn.pm:802-958
+		x, y := com.X, com.Y
+		if !isValidCoord(x, y) {
+			return 1
+		}
+
+		land := island.Land[x][y]
+		lv := island.LandValue[x][y]
+		cost := hconst.ComCost[com.Kind]
+		comName := hconst.ComName[com.Kind]
+		point := fmt.Sprintf("(%d,%d)", x, y)
+
+		// Check if money is sufficient
+		if island.Money < cost {
+			logNoMoney(island.ID, island.Name, comName, x, y)
+			return 1
+		}
+
+		// Check if terrain is suitable for construction
+		// Can build on: plains, town, or same type of facility
+		suitable := false
+		if land == hconst.LandPlains || land == hconst.LandTown {
+			suitable = true
+		} else if land == hconst.LandMonument && com.Kind == hconst.ComMonument {
+			suitable = true
+		} else if land == hconst.LandFarm && com.Kind == hconst.ComFarm {
+			suitable = true
+		} else if land == hconst.LandFactory && com.Kind == hconst.ComFactory {
+			suitable = true
+		} else if land == hconst.LandDefence && com.Kind == hconst.ComDbase {
+			suitable = true
+		}
+
+		if !suitable {
+			// Unsuitable terrain
+			logLandFail(island.ID, island.Name, comName, x, y)
+			return 0
+		}
+
+		// Process by command type
+		switch com.Kind {
+		case hconst.ComPlant:
+			// Plant - turn target into forest
+			island.Land[x][y] = hconst.LandForest
+			island.LandValue[x][y] = 1 // Minimum trees
+			logPBSuc(island.ID, island.Name, comName, point)
+
+		case hconst.ComBase:
+			// Missile base - turn target into base
+			island.Land[x][y] = hconst.LandBase
+			island.LandValue[x][y] = 0 // Experience 0
+			logPBSuc(island.ID, island.Name, comName, point)
+
+		case hconst.ComHaribote:
+			// Haribote - turn target into fake defense
+			island.Land[x][y] = hconst.LandHaribote
+			island.LandValue[x][y] = 0
+			logHariSuc(island.ID, island.Name, comName, hconst.ComName[hconst.ComDbase], point)
+
+		case hconst.ComFarm:
+			// Farm
+			if land == hconst.LandFarm {
+				// Already a farm - expand
+				island.LandValue[x][y] += 2 // +2000 people
+				if island.LandValue[x][y] > 50 {
+					island.LandValue[x][y] = 50 // Maximum 50000 people
+				}
+			} else {
+				// Turn target into farm
+				island.Land[x][y] = hconst.LandFarm
+				island.LandValue[x][y] = 10 // Scale = 10000 people
+			}
+			logLandSuc(island.ID, island.Name, comName, x, y)
+
+		case hconst.ComFactory:
+			// Factory
+			if land == hconst.LandFactory {
+				// Already a factory - expand
+				island.LandValue[x][y] += 10 // +10000 people
+				if island.LandValue[x][y] > 100 {
+					island.LandValue[x][y] = 100 // Maximum 100000 people
+				}
+			} else {
+				// Turn target into factory
+				island.Land[x][y] = hconst.LandFactory
+				island.LandValue[x][y] = 30 // Scale = 30000 people
+			}
+			logLandSuc(island.ID, island.Name, comName, x, y)
+
+		case hconst.ComDbase:
+			// Defense facility
+			if land == hconst.LandDefence {
+				// Already defense - set self-destruct
+				island.LandValue[x][y] = 1 // Self-destruct set
+				lName := landName(land, lv)
+				logBombSet(island.ID, island.Name, lName, point)
+			} else {
+				// Turn target into defense facility
+				island.Land[x][y] = hconst.LandDefence
+				island.LandValue[x][y] = 0
+				logLandSuc(island.ID, island.Name, comName, x, y)
+			}
+
+		case hconst.ComMonument:
+			// Monument
+			if land == hconst.LandMonument {
+				// Already monument - launch giant missile
+				// Get target
+				targetID := com.Target
+				tn, ok := variable.IDToNumber[targetID]
+				if !ok {
+					// Target no longer exists - silently abort
+					return 0
+				}
+				tIsland := variable.Islands[tn]
+				tIsland.BigMissile++
+
+				// Turn target into wasteland
+				island.Land[x][y] = hconst.LandWaste
+				island.LandValue[x][y] = 0
+				lName := landName(land, lv)
+				logMonFly(island.ID, island.Name, lName, point)
+			} else {
+				// Turn target into monument
+				island.Land[x][y] = hconst.LandMonument
+				arg := com.Arg
+				if arg >= hconst.MonumentNumber {
+					arg = 0
+				}
+				island.LandValue[x][y] = arg
+				logLandSuc(island.ID, island.Name, comName, x, y)
+			}
+		}
+
+		// Deduct money
+		island.Money -= cost
+
+		// For repeating commands (farm, factory), put command back
+		if com.Kind == hconst.ComFarm || com.Kind == hconst.ComFactory {
+			if com.Arg > 1 {
+				com.Arg--
+				slideBack(island.Commands, 0)
+				island.Commands[0] = com
+			}
+		}
+
+		return 1
+
 	default:
 		// Other commands: Phase 1 simplified - skip
 		return 1
@@ -878,6 +1028,61 @@ func nameToNumber(name string) int {
 	return -1
 }
 
+// slideBack shifts commands backward to make room for a new command at position number
+// Ref: perl/lib/Hako/Main.pm:182
+func slideBack(commands []types.Command, number int) {
+	if number == len(commands)-1 {
+		return
+	}
+	// Shift elements from number to len-2, one position forward
+	copy(commands[number+1:], commands[number:len(commands)-1])
+}
+
+// landName returns the name of a land type
+// Ref: perl/lib/Hako/Turn.pm:3445
+func landName(land, lv int) string {
+	switch land {
+	case hconst.LandSea:
+		if lv == 1 {
+			return "浅瀬"
+		}
+		return "海"
+	case hconst.LandWaste:
+		return "荒地"
+	case hconst.LandPlains:
+		return "平地"
+	case hconst.LandTown:
+		if lv < 30 {
+			return "村"
+		} else if lv < 100 {
+			return "町"
+		}
+		return "都市"
+	case hconst.LandForest:
+		return "森"
+	case hconst.LandFarm:
+		return "農場"
+	case hconst.LandFactory:
+		return "工場"
+	case hconst.LandBase:
+		return "ミサイル基地"
+	case hconst.LandDefence:
+		return "防衛施設"
+	case hconst.LandMountain:
+		return "山"
+	case hconst.LandMonument:
+		return "記念碑"
+	case hconst.LandHaribote:
+		return "ハリボテ"
+	case hconst.LandSbase:
+		return "海底基地"
+	case hconst.LandOil:
+		return "海底油田"
+	default:
+		return "不明"
+	}
+}
+
 func encode(password string) string {
 	// Phase 1: Simple encoding (same as core.encode but local)
 	if hconst.CryptOn {
@@ -978,6 +1183,41 @@ func logOilFail(id, name string, x, y int, command, str string) {
 	logSecret(fmt.Sprintf("0,%d,%s,0,%s%s島%s%sで<B>%s</B>の予算をつぎ込んだ%s%s%sが行われましたが、油田は見つかりませんでした。",
 		variable.IslandTurn, id, hconst.TagNameBegin, name, point, hconst.TagNameEnd,
 		str, hconst.TagComNameBegin, command, hconst.TagComNameEnd))
+}
+
+// logPBSuc logs planting or base construction success
+// Ref: perl/lib/Hako/Turn.pm:2739
+func logPBSuc(id, name, comName, point string) {
+	logSecret(fmt.Sprintf("0,%d,%s,0,%s%s島%s%sで%s%s%sが行われました。",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, point, hconst.TagNameEnd,
+		hconst.TagComNameBegin, comName, hconst.TagComNameEnd))
+	logOut(fmt.Sprintf("0,%d,%s,0,こころなしか、%s%s島%sの<B>森</B>が増えたようです。",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, hconst.TagNameEnd))
+}
+
+// logHariSuc logs haribote (fake defense) success
+// Ref: perl/lib/Hako/Turn.pm:2754
+func logHariSuc(id, name, comName, comName2, point string) {
+	logSecret(fmt.Sprintf("0,%d,%s,0,%s%s島%s%sで%s%s%sが行われました。",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, point, hconst.TagNameEnd,
+		hconst.TagComNameBegin, comName, hconst.TagComNameEnd))
+	logSecret(fmt.Sprintf("0,%d,%s,0,%s%s島%s%sで%s%s%sが行われました。",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, point, hconst.TagNameEnd,
+		hconst.TagComNameBegin, comName2, hconst.TagComNameEnd))
+}
+
+// logBombSet logs self-destruct device set
+// Ref: perl/lib/Hako/Turn.pm:2697
+func logBombSet(id, name, lName, point string) {
+	logOut(fmt.Sprintf("0,%d,%s,0,%s%s島%s%sの<B>%s</B>の<B>自爆装置がセット</B>されました。",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, point, hconst.TagNameEnd, lName))
+}
+
+// logMonFly logs monument (giant missile) launch
+// Ref: perl/lib/Hako/Turn.pm:2719
+func logMonFly(id, name, lName, point string) {
+	logOut(fmt.Sprintf("0,%d,%s,0,%s%s島%s%sの<B>%s</B>が<B>轟音とともに飛び立ちました</B>。",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, point, hconst.TagNameEnd, lName))
 }
 
 func logSecret(msg string) {
