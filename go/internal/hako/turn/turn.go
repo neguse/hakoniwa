@@ -532,6 +532,74 @@ func doCommand(island *types.Island) int {
 		}
 		return 1
 
+	case hconst.ComReclaim:
+		// Reclaim (埋め立て)
+		// Ref: perl/lib/Hako/Turn.pm:652-725
+		x, y := com.X, com.Y
+		if !isValidCoord(x, y) {
+			return 1
+		}
+
+		land := island.Land[x][y]
+		lv := island.LandValue[x][y]
+		cost := hconst.ComCost[com.Kind]
+
+		// Can only reclaim sea, oil field, or submarine base
+		if land != hconst.LandSea && land != hconst.LandOil && land != hconst.LandSbase {
+			logLandFail(island.ID, island.Name, hconst.ComName[com.Kind], x, y)
+			return 0
+		}
+
+		// Check if there's land around (all sea means cannot reclaim)
+		seaCount := countAround(island.Land, x, y, hconst.LandSea, 7) +
+			countAround(island.Land, x, y, hconst.LandOil, 7) +
+			countAround(island.Land, x, y, hconst.LandSbase, 7)
+
+		if seaCount == 7 {
+			// All around is sea, cannot reclaim
+			logNoLandAround(island.ID, island.Name, hconst.ComName[com.Kind], x, y)
+			return 0
+		}
+
+		if land == hconst.LandSea && lv == 1 {
+			// Shallow sea case - turn into wasteland
+			island.Land[x][y] = hconst.LandWaste
+			island.LandValue[x][y] = 0
+			logLandSuc(island.ID, island.Name, hconst.ComName[com.Kind], x, y)
+			island.Area++
+
+			// If surrounding sea hexes <= 3, turn them into shallow
+			if seaCount <= 4 {
+				for i := 1; i < 7; i++ {
+					sx := x + ax[i]
+					sy := y + ay[i]
+
+					// Adjust position based on row parity
+					if (sy%2) == 0 && (y%2) == 1 {
+						sx--
+					}
+
+					if !isValidCoord(sx, sy) {
+						continue
+					}
+
+					// Turn surrounding sea into shallow
+					if island.Land[sx][sy] == hconst.LandSea {
+						island.LandValue[sx][sy] = 1
+					}
+				}
+			}
+		} else {
+			// Regular sea case - turn into shallow
+			island.Land[x][y] = hconst.LandSea
+			island.LandValue[x][y] = 1
+			logLandSuc(island.ID, island.Name, hconst.ComName[com.Kind], x, y)
+		}
+
+		// Deduct money
+		island.Money -= cost
+		return 1
+
 	default:
 		// Other commands: Phase 1 simplified - skip
 		return 1
@@ -792,6 +860,11 @@ func logNoMoney(id, name, command string, x, y int) {
 
 func logLandFail(id, name, command string, x, y int) {
 	logSecret(fmt.Sprintf("0,%d,%s,0,%s島(%d,%d)で予定されていた%sは、対象の地形が適していないため中止されました。",
+		variable.IslandTurn, id, name, x, y, command))
+}
+
+func logNoLandAround(id, name, command string, x, y int) {
+	logSecret(fmt.Sprintf("0,%d,%s,0,%s島(%d,%d)で予定されていた%sは、周囲に陸地がないため中止されました。",
 		variable.IslandTurn, id, name, x, y, command))
 }
 
