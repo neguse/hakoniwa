@@ -916,6 +916,234 @@ func doCommand(island *types.Island) int {
 		island.Money -= cost
 		return 1
 
+	case hconst.ComMissileNM, hconst.ComMissilePP, hconst.ComMissileST, hconst.ComMissileLD:
+		// Missile commands (ミサイル系)
+		// Ref: perl/lib/Hako/Turn.pm:1009-1495
+		// Get target
+		targetID := com.Target
+		tn, ok := variable.IDToNumber[targetID]
+		if !ok {
+			// Target no longer exists
+			logMsNoTarget(island.ID, island.Name, hconst.ComName[com.Kind])
+			return 0
+		}
+
+		flag := 0
+		arg := com.Arg
+		if arg == 0 {
+			// 0 means shoot as many as possible
+			arg = 10000
+		}
+
+		// Preparation
+		tIsland := variable.Islands[tn]
+		tName := tIsland.Name
+		tLand := tIsland.Land
+		tLandValue := tIsland.LandValue
+		var tx, ty, err int
+
+		// Number of refugees
+		boat := 0
+
+		// Error range
+		if com.Kind == hconst.ComMissilePP {
+			err = 7
+		} else {
+			err = 19
+		}
+
+		cost := hconst.ComCost[com.Kind]
+		comName := hconst.ComName[com.Kind]
+		point := fmt.Sprintf("(%d,%d)", com.X, com.Y)
+
+		// Loop until money runs out, arg is satisfied, or all bases have fired
+		var bx, by, count int
+		for arg > 0 && island.Money >= cost {
+			// Loop until a base is found
+			for count < hconst.PointNumber {
+				bx = variable.Rpx[count]
+				by = variable.Rpy[count]
+				if island.Land[bx][by] == hconst.LandBase || island.Land[bx][by] == hconst.LandSbase {
+					break
+				}
+				count++
+			}
+			if count >= hconst.PointNumber {
+				// Not found, exit
+				break
+			}
+
+			// At least one base found, set flag
+			flag = 1
+
+			// Calculate base level
+			level := expToLevel(island.Land[bx][by], island.LandValue[bx][by])
+
+			// Loop within the base
+			for level > 0 && arg > 0 && island.Money > cost {
+				// Confirmed firing, so consume values
+				level--
+				arg--
+				island.Money -= cost
+
+				// Calculate impact point
+				r := rand.Intn(err)
+				tx = com.X + ax[r]
+				ty = com.Y + ay[r]
+				if (ty%2) == 0 && (com.Y%2) == 1 {
+					tx--
+				}
+
+				// Check if impact point is in range
+				if tx < 0 || tx >= hconst.IslandSize || ty < 0 || ty >= hconst.IslandSize {
+					// Out of range
+					if com.Kind == hconst.ComMissileST {
+						// Stealth
+						logMsOutS(island.ID, targetID, island.Name, tName, comName, point)
+					} else {
+						// Normal
+						logMsOut(island.ID, targetID, island.Name, tName, comName, point)
+					}
+					continue
+				}
+
+				// Get terrain at impact point
+				tL := tLand[tx][ty]
+				tLv := tLandValue[tx][ty]
+				tLname := landName(tL, tLv)
+				tPoint := fmt.Sprintf("(%d,%d)", tx, ty)
+
+				// Phase 1: Defense facility judgment simplified (skip)
+				// defence := 0
+
+				// Check "no effect" hex first
+				if (tL == hconst.LandSea && tLv == 0) || // Deep sea
+					((tL == hconst.LandSea || tL == hconst.LandSbase || tL == hconst.LandMountain) &&
+						com.Kind != hconst.ComMissileLD) {
+					// If submarine base, pretend it's sea
+					if tL == hconst.LandSbase {
+						tL = hconst.LandSea
+					}
+					tLname = landName(tL, tLv)
+
+					// Neutralize
+					if com.Kind == hconst.ComMissileST {
+						// Stealth
+						logMsNoDamageS(island.ID, targetID, island.Name, tName, comName, tLname, point, tPoint)
+					} else {
+						// Normal
+						logMsNoDamage(island.ID, targetID, island.Name, tName, comName, tLname, point, tPoint)
+					}
+					continue
+				}
+
+				// Branch by missile type
+				if com.Kind == hconst.ComMissileLD {
+					// Land destruction missile
+					if tL == hconst.LandMountain {
+						// Mountain (becomes wasteland)
+						logMsLDMountain(island.ID, targetID, island.Name, tName, comName, tLname, point, tPoint)
+
+						// Becomes wasteland
+						tLand[tx][ty] = hconst.LandWaste
+						tLandValue[tx][ty] = 0
+						continue
+					} else if tL == hconst.LandSbase {
+						// Submarine base
+						logMsLDSbase(island.ID, targetID, island.Name, tName, comName, tLname, point, tPoint)
+					} else if tL == hconst.LandMonster {
+						// Monster (Phase 1 simplified)
+						logMsLDMonster(island.ID, targetID, island.Name, tName, comName, tLname, point, tPoint)
+					} else if tL == hconst.LandSea {
+						// Shallow
+						logMsLDSea1(island.ID, targetID, island.Name, tName, comName, tLname, point, tPoint)
+					} else {
+						// Other
+						logMsLDLand(island.ID, targetID, island.Name, tName, comName, tLname, point, tPoint)
+					}
+
+					// Experience
+					if tL == hconst.LandTown {
+						if island.Land[bx][by] == hconst.LandBase || island.Land[bx][by] == hconst.LandSbase {
+							// Only if still a base
+							island.LandValue[bx][by] += tLv / 20
+							if island.LandValue[bx][by] > hconst.MaxExpPoint {
+								island.LandValue[bx][by] = hconst.MaxExpPoint
+							}
+						}
+					}
+
+					// Becomes shallow
+					tLand[tx][ty] = hconst.LandSea
+					tIsland.Area--
+					tLandValue[tx][ty] = 1
+
+					// But if oil field, shallow, or submarine base, becomes sea
+					if tL == hconst.LandOil || tL == hconst.LandSea || tL == hconst.LandSbase {
+						tLandValue[tx][ty] = 0
+					}
+				} else {
+					// Other missiles
+					if tL == hconst.LandWaste {
+						// Wasteland (no damage)
+						if com.Kind == hconst.ComMissileST {
+							// Stealth
+							logMsWasteS(island.ID, targetID, island.Name, tName, comName, tLname, point, tPoint)
+						} else {
+							// Normal
+							logMsWaste(island.ID, targetID, island.Name, tName, comName, tLname, point, tPoint)
+						}
+					} else if tL == hconst.LandMonster {
+						// Monster (Phase 1 simplified - skip processing, just log)
+						// Phase 2 will implement monster handling
+					} else {
+						// Normal terrain
+						if com.Kind == hconst.ComMissileST {
+							// Stealth
+							logMsNormalS(island.ID, targetID, island.Name, tName, comName, tLname, point, tPoint)
+						} else {
+							// Normal
+							logMsNormal(island.ID, targetID, island.Name, tName, comName, tLname, point, tPoint)
+						}
+					}
+
+					// Experience
+					if tL == hconst.LandTown {
+						if island.Land[bx][by] == hconst.LandBase || island.Land[bx][by] == hconst.LandSbase {
+							island.LandValue[bx][by] += tLv / 20
+							boat += tLv // Add to refugees for normal missiles
+							if island.LandValue[bx][by] > hconst.MaxExpPoint {
+								island.LandValue[bx][by] = hconst.MaxExpPoint
+							}
+						}
+					}
+
+					// Becomes wasteland
+					tLand[tx][ty] = hconst.LandWaste
+					tLandValue[tx][ty] = 1 // Impact point
+
+					// But if oil field, becomes sea
+					if tL == hconst.LandOil {
+						tLand[tx][ty] = hconst.LandSea
+						tLandValue[tx][ty] = 0
+					}
+				}
+			}
+
+			// Increment count
+			count++
+		}
+
+		if flag == 0 {
+			// No base found
+			logMsNoBase(island.ID, island.Name, comName)
+			return 0
+		}
+
+		// Phase 1: Refugee processing simplified (skip)
+
+		return 1
+
 	default:
 		// Other commands: Phase 1 simplified - skip
 		return 1
@@ -1097,6 +1325,28 @@ func min(a, b int) int {
 		return a
 	}
 	return b
+}
+
+// expToLevel calculates base level from experience
+// Ref: perl/lib/Hako/Main.pm:975
+func expToLevel(kind, exp int) int {
+	if kind == hconst.LandBase {
+		// Missile base
+		for i := hconst.MaxBaseLevel; i > 1; i-- {
+			if exp >= hconst.BaseLevelUp[i-2] {
+				return i
+			}
+		}
+		return 1
+	} else {
+		// Submarine base
+		for i := hconst.MaxSBaseLevel; i > 1; i-- {
+			if exp >= hconst.SBaseLevelUp[i-2] {
+				return i
+			}
+		}
+		return 1
+	}
 }
 
 func nameToNumber(name string) int {
@@ -1312,6 +1562,237 @@ func logHistory(msg string) {
 	}
 	defer file.Close()
 	fmt.Fprintln(file, msg)
+}
+
+// Missile log functions
+// Ref: perl/lib/Hako/Turn.pm:2766-3026
+
+// logMsNoTarget logs that missile target has no people
+func logMsNoTarget(id, name, comName string) {
+	logOut(fmt.Sprintf("0,%d,%s,0,%s%s島%sで予定されていた%s%s%sは、目標の島に人が見当たらないため中止されました。",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, hconst.TagNameEnd,
+		hconst.TagComNameBegin, comName, hconst.TagComNameEnd))
+}
+
+// logMsNoBase logs that missile launch failed due to no base
+func logMsNoBase(id, name, comName string) {
+	logOut(fmt.Sprintf("0,%d,%s,0,%s%s島%sで予定されていた%s%s%sは、<B>ミサイル設備を保有していない</B>ために実行できませんでした。",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, hconst.TagNameEnd,
+		hconst.TagComNameBegin, comName, hconst.TagComNameEnd))
+}
+
+// logMsOut logs that missile fell out of range
+func logMsOut(id, tID, name, tName, comName, point string) {
+	logOut(fmt.Sprintf("0,%d,%s,%s,%s%s島%sが%s%s島%s%s地点に向けて%s%s%sを行いましたが、<B>領域外の海</B>に落ちた模様です。",
+		variable.IslandTurn, id, tID,
+		hconst.TagNameBegin, name, hconst.TagNameEnd,
+		hconst.TagNameBegin, tName, point, hconst.TagNameEnd,
+		hconst.TagComNameBegin, comName, hconst.TagComNameEnd))
+}
+
+// logMsOutS logs that stealth missile fell out of range
+func logMsOutS(id, tID, name, tName, comName, point string) {
+	logSecret(fmt.Sprintf("0,%d,%s,%s,%s%s島%sが%s%s島%s%s地点に向けて%s%s%sを行いましたが、<B>領域外の海</B>に落ちた模様です。",
+		variable.IslandTurn, id, tID,
+		hconst.TagNameBegin, name, hconst.TagNameEnd,
+		hconst.TagNameBegin, tName, point, hconst.TagNameEnd,
+		hconst.TagComNameBegin, comName, hconst.TagComNameEnd))
+}
+
+// logMsCaught logs that missile was caught by defense facility
+func logMsCaught(id, tID, name, tName, comName, point, tPoint string) {
+	logOut(fmt.Sprintf("0,%d,%s,%s,%s%s島%sが%s%s島%s%s地点に向けて%s%s%sを行いましたが、%s%s%s地点上空にて力場に捉えられ、<B>空中爆発</B>しました。",
+		variable.IslandTurn, id, tID,
+		hconst.TagNameBegin, name, hconst.TagNameEnd,
+		hconst.TagNameBegin, tName, point, hconst.TagNameEnd,
+		hconst.TagComNameBegin, comName, hconst.TagComNameEnd,
+		hconst.TagNameBegin, tPoint, hconst.TagNameEnd))
+}
+
+// logMsCaughtS logs that stealth missile was caught by defense facility
+func logMsCaughtS(id, tID, name, tName, comName, point, tPoint string) {
+	logSecret(fmt.Sprintf("0,%d,%s,%s,%s%s島%sが%s%s島%s%s地点に向けて%s%s%sを行いましたが、%s%s%s地点上空にて力場に捉えられ、<B>空中爆発</B>しました。",
+		variable.IslandTurn, id, tID,
+		hconst.TagNameBegin, name, hconst.TagNameEnd,
+		hconst.TagNameBegin, tName, point, hconst.TagNameEnd,
+		hconst.TagComNameBegin, comName, hconst.TagComNameEnd,
+		hconst.TagNameBegin, tPoint, hconst.TagNameEnd))
+}
+
+// logMsNoDamage logs that missile had no effect
+func logMsNoDamage(id, tID, name, tName, comName, tLname, point, tPoint string) {
+	logOut(fmt.Sprintf("0,%d,%s,%s,%s%s島%sが%s%s島%s%s地点に向けて%s%s%sを行いましたが、%s%s%sの<B>%s</B>に落ちたので被害がありませんでした。",
+		variable.IslandTurn, id, tID,
+		hconst.TagNameBegin, name, hconst.TagNameEnd,
+		hconst.TagNameBegin, tName, point, hconst.TagNameEnd,
+		hconst.TagComNameBegin, comName, hconst.TagComNameEnd,
+		hconst.TagNameBegin, tPoint, hconst.TagNameEnd, tLname))
+}
+
+// logMsNoDamageS logs that stealth missile had no effect
+func logMsNoDamageS(id, tID, name, tName, comName, tLname, point, tPoint string) {
+	logSecret(fmt.Sprintf("0,%d,%s,%s,%s%s島%sが%s%s島%s%s地点に向けて%s%s%sを行いましたが、%s%s%sの<B>%s</B>に落ちたので被害がありませんでした。",
+		variable.IslandTurn, id, tID,
+		hconst.TagNameBegin, name, hconst.TagNameEnd,
+		hconst.TagNameBegin, tName, point, hconst.TagNameEnd,
+		hconst.TagComNameBegin, comName, hconst.TagComNameEnd,
+		hconst.TagNameBegin, tPoint, hconst.TagNameEnd, tLname))
+}
+
+// logMsLDMountain logs land destruction missile hit mountain
+func logMsLDMountain(id, tID, name, tName, comName, tLname, point, tPoint string) {
+	logOut(fmt.Sprintf("0,%d,%s,%s,%s%s島%sが%s%s島%s%s地点に向けて%s%s%sを行い、%s%s%sの<B>%s</B>に命中。<B>%s</B>は消し飛び、荒地と化しました。",
+		variable.IslandTurn, id, tID,
+		hconst.TagNameBegin, name, hconst.TagNameEnd,
+		hconst.TagNameBegin, tName, point, hconst.TagNameEnd,
+		hconst.TagComNameBegin, comName, hconst.TagComNameEnd,
+		hconst.TagNameBegin, tPoint, hconst.TagNameEnd, tLname, tLname))
+}
+
+// logMsLDSbase logs land destruction missile hit submarine base
+func logMsLDSbase(id, tID, name, tName, comName, tLname, point, tPoint string) {
+	logOut(fmt.Sprintf("0,%d,%s,%s,%s%s島%sが%s%s島%s%s地点に向けて%s%s%sを行い、%s%s%sに着水後爆発、同地点にあった<B>%s</B>は跡形もなく吹き飛びました。",
+		variable.IslandTurn, id, tID,
+		hconst.TagNameBegin, name, hconst.TagNameEnd,
+		hconst.TagNameBegin, tName, point, hconst.TagNameEnd,
+		hconst.TagComNameBegin, comName, hconst.TagComNameEnd,
+		hconst.TagNameBegin, tPoint, hconst.TagNameEnd, tLname))
+}
+
+// logMsLDMonster logs land destruction missile hit monster
+func logMsLDMonster(id, tID, name, tName, comName, tLname, point, tPoint string) {
+	logOut(fmt.Sprintf("0,%d,%s,%s,%s%s島%sが%s%s島%s%s地点に向けて%s%s%sを行い、%s%s%sに着弾し爆発。陸地は<B>怪獣%s</B>もろとも水没しました。",
+		variable.IslandTurn, id, tID,
+		hconst.TagNameBegin, name, hconst.TagNameEnd,
+		hconst.TagNameBegin, tName, point, hconst.TagNameEnd,
+		hconst.TagComNameBegin, comName, hconst.TagComNameEnd,
+		hconst.TagNameBegin, tPoint, hconst.TagNameEnd, tLname))
+}
+
+// logMsLDSea1 logs land destruction missile hit shallow sea
+func logMsLDSea1(id, tID, name, tName, comName, tLname, point, tPoint string) {
+	logOut(fmt.Sprintf("0,%d,%s,%s,%s%s島%sが%s%s島%s%s地点に向けて%s%s%sを行い、%s%s%sの<B>%s</B>に着弾。海底がえぐられました。",
+		variable.IslandTurn, id, tID,
+		hconst.TagNameBegin, name, hconst.TagNameEnd,
+		hconst.TagNameBegin, tName, point, hconst.TagNameEnd,
+		hconst.TagComNameBegin, comName, hconst.TagComNameEnd,
+		hconst.TagNameBegin, tPoint, hconst.TagNameEnd, tLname))
+}
+
+// logMsLDLand logs land destruction missile hit other terrain
+func logMsLDLand(id, tID, name, tName, comName, tLname, point, tPoint string) {
+	logOut(fmt.Sprintf("0,%d,%s,%s,%s%s島%sが%s%s島%s%s地点に向けて%s%s%sを行い、%s%s%sの<B>%s</B>に着弾。陸地は水没しました。",
+		variable.IslandTurn, id, tID,
+		hconst.TagNameBegin, name, hconst.TagNameEnd,
+		hconst.TagNameBegin, tName, point, hconst.TagNameEnd,
+		hconst.TagComNameBegin, comName, hconst.TagComNameEnd,
+		hconst.TagNameBegin, tPoint, hconst.TagNameEnd, tLname))
+}
+
+// logMsWaste logs missile hit wasteland
+func logMsWaste(id, tID, name, tName, comName, tLname, point, tPoint string) {
+	logOut(fmt.Sprintf("0,%d,%s,%s,%s%s島%sが%s%s島%s%s地点に向けて%s%s%sを行いましたが、%s%s%sの<B>%s</B>に落ちました。",
+		variable.IslandTurn, id, tID,
+		hconst.TagNameBegin, name, hconst.TagNameEnd,
+		hconst.TagNameBegin, tName, point, hconst.TagNameEnd,
+		hconst.TagComNameBegin, comName, hconst.TagComNameEnd,
+		hconst.TagNameBegin, tPoint, hconst.TagNameEnd, tLname))
+}
+
+// logMsWasteS logs stealth missile hit wasteland
+func logMsWasteS(id, tID, name, tName, comName, tLname, point, tPoint string) {
+	logSecret(fmt.Sprintf("0,%d,%s,%s,%s%s島%sが%s%s島%s%s地点に向けて%s%s%sを行いましたが、%s%s%sの<B>%s</B>に落ちました。",
+		variable.IslandTurn, id, tID,
+		hconst.TagNameBegin, name, hconst.TagNameEnd,
+		hconst.TagNameBegin, tName, point, hconst.TagNameEnd,
+		hconst.TagComNameBegin, comName, hconst.TagComNameEnd,
+		hconst.TagNameBegin, tPoint, hconst.TagNameEnd, tLname))
+}
+
+// logMsMonNoDamage logs missile hit hardened monster (no damage)
+func logMsMonNoDamage(id, tID, name, tName, comName, mName, point, tPoint string) {
+	logOut(fmt.Sprintf("0,%d,%s,%s,%s%s島%sが%s%s島%s%s地点に向けて%s%s%sを行い、%s%s%sの<B>怪獣%s</B>に命中、しかし硬化状態だったため効果がありませんでした。",
+		variable.IslandTurn, id, tID,
+		hconst.TagNameBegin, name, hconst.TagNameEnd,
+		hconst.TagNameBegin, tName, point, hconst.TagNameEnd,
+		hconst.TagComNameBegin, comName, hconst.TagComNameEnd,
+		hconst.TagNameBegin, tPoint, hconst.TagNameEnd, mName))
+}
+
+// logMsMonNoDamageS logs stealth missile hit hardened monster (no damage)
+func logMsMonNoDamageS(id, tID, name, tName, comName, mName, point, tPoint string) {
+	logSecret(fmt.Sprintf("0,%d,%s,%s,%s%s島%sが%s%s島%s%s地点に向けて%s%s%sを行い、%s%s%sの<B>怪獣%s</B>に命中、しかし硬化状態だったため効果がありませんでした。",
+		variable.IslandTurn, id, tID,
+		hconst.TagNameBegin, name, hconst.TagNameEnd,
+		hconst.TagNameBegin, tName, point, hconst.TagNameEnd,
+		hconst.TagComNameBegin, comName, hconst.TagComNameEnd,
+		hconst.TagNameBegin, tPoint, hconst.TagNameEnd, mName))
+}
+
+// logMsMonKill logs missile killed monster
+func logMsMonKill(id, tID, name, tName, comName, mName, point, tPoint string) {
+	logOut(fmt.Sprintf("0,%d,%s,%s,%s%s島%sが%s%s島%s%s地点に向けて%s%s%sを行い、%s%s%sの<B>怪獣%s</B>に命中。<B>怪獣%s</B>は力尽き、倒れました。",
+		variable.IslandTurn, id, tID,
+		hconst.TagNameBegin, name, hconst.TagNameEnd,
+		hconst.TagNameBegin, tName, point, hconst.TagNameEnd,
+		hconst.TagComNameBegin, comName, hconst.TagComNameEnd,
+		hconst.TagNameBegin, tPoint, hconst.TagNameEnd, mName, mName))
+}
+
+// logMsMonKillS logs stealth missile killed monster
+func logMsMonKillS(id, tID, name, tName, comName, mName, point, tPoint string) {
+	logSecret(fmt.Sprintf("0,%d,%s,%s,%s%s島%sが%s%s島%s%s地点に向けて%s%s%sを行い、%s%s%sの<B>怪獣%s</B>に命中。<B>怪獣%s</B>は力尽き、倒れました。",
+		variable.IslandTurn, id, tID,
+		hconst.TagNameBegin, name, hconst.TagNameEnd,
+		hconst.TagNameBegin, tName, point, hconst.TagNameEnd,
+		hconst.TagComNameBegin, comName, hconst.TagComNameEnd,
+		hconst.TagNameBegin, tPoint, hconst.TagNameEnd, mName, mName))
+}
+
+// logMsMonster logs missile damaged monster
+func logMsMonster(id, tID, name, tName, comName, mName, point, tPoint string) {
+	logOut(fmt.Sprintf("0,%d,%s,%s,%s%s島%sが%s%s島%s%s地点に向けて%s%s%sを行い、%s%s%sの<B>怪獣%s</B>に命中。<B>怪獣%s</B>は苦しそうに咆哮しました。",
+		variable.IslandTurn, id, tID,
+		hconst.TagNameBegin, name, hconst.TagNameEnd,
+		hconst.TagNameBegin, tName, point, hconst.TagNameEnd,
+		hconst.TagComNameBegin, comName, hconst.TagComNameEnd,
+		hconst.TagNameBegin, tPoint, hconst.TagNameEnd, mName, mName))
+}
+
+// logMsMonsterS logs stealth missile damaged monster
+func logMsMonsterS(id, tID, name, tName, comName, mName, point, tPoint string) {
+	logSecret(fmt.Sprintf("0,%d,%s,%s,%s%s島%sが%s%s島%s%s地点に向けて%s%s%sを行い、%s%s%sの<B>怪獣%s</B>に命中。<B>怪獣%s</B>は苦しそうに咆哮しました。",
+		variable.IslandTurn, id, tID,
+		hconst.TagNameBegin, name, hconst.TagNameEnd,
+		hconst.TagNameBegin, tName, point, hconst.TagNameEnd,
+		hconst.TagComNameBegin, comName, hconst.TagComNameEnd,
+		hconst.TagNameBegin, tPoint, hconst.TagNameEnd, mName, mName))
+}
+
+// logMsMonMoney logs monster corpse value
+func logMsMonMoney(tID, mName string, value int) {
+	logOut(fmt.Sprintf("0,%d,%s,0,<B>怪獣%s</B>の残骸には、<B>%d%s</B>の値が付きました。",
+		variable.IslandTurn, tID, mName, value, hconst.UnitMoney))
+}
+
+// logMsNormal logs missile hit normal terrain
+func logMsNormal(id, tID, name, tName, comName, tLname, point, tPoint string) {
+	logOut(fmt.Sprintf("0,%d,%s,%s,%s%s島%sが%s%s島%s%s地点に向けて%s%s%sを行い、%s%s%sの<B>%s</B>に命中、一帯が壊滅しました。",
+		variable.IslandTurn, id, tID,
+		hconst.TagNameBegin, name, hconst.TagNameEnd,
+		hconst.TagNameBegin, tName, point, hconst.TagNameEnd,
+		hconst.TagComNameBegin, comName, hconst.TagComNameEnd,
+		hconst.TagNameBegin, tPoint, hconst.TagNameEnd, tLname))
+}
+
+// logMsNormalS logs stealth missile hit normal terrain
+func logMsNormalS(id, tID, name, tName, comName, tLname, point, tPoint string) {
+	logSecret(fmt.Sprintf("0,%d,%s,%s,%s%s島%sが%s%s島%s%s地点に向けて%s%s%sを行い、%s%s%sの<B>%s</B>に命中、一帯が壊滅しました。",
+		variable.IslandTurn, id, tID,
+		hconst.TagNameBegin, name, hconst.TagNameEnd,
+		hconst.TagNameBegin, tName, point, hconst.TagNameEnd,
+		hconst.TagComNameBegin, comName, hconst.TagComNameEnd,
+		hconst.TagNameBegin, tPoint, hconst.TagNameEnd, tLname))
 }
 
 //======================================================================
