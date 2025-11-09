@@ -462,23 +462,26 @@ func myrmtree(dirName string) {
 }
 
 // income processes income for an island
-// Ref: perl/lib/Hako/Turn.pm:518
+// Ref: perl/lib/Hako/Turn.pm:518-540
 func income(island *types.Island) {
-	// Food consumption
-	if island.Pop > island.Food {
-		// Starvation
-		logStarve(island.ID, island.Name, island.Pop-island.Food)
-		island.Pop -= (island.Pop - island.Food) * 2 / 3
-		island.Food = 0
+	pop := island.Pop
+	farm := island.Farm * 10      // Farm capacity
+	factory := island.Factory     // Factory capacity
+	mountain := island.Mountain   // Mining site capacity
+
+	// Income phase
+	if pop > farm {
+		// Farm fully operational
+		island.Food += farm
+		// Remaining population works in factories/mines
+		island.Money += min((pop-farm)/10, factory+mountain)
 	} else {
-		island.Food -= island.Pop
+		// All population works in farming
+		island.Food += pop
 	}
 
-	// Money income
-	island.Money += island.Pop * 10
-
-	// Food income (each farm produces 5 food units)
-	island.Food += island.Farm * 5
+	// Food consumption
+	island.Food -= int(float64(pop) * hconst.EatenFood)
 }
 
 // doCommand executes a command for an island
@@ -1290,29 +1293,138 @@ func doCommand(island *types.Island) int {
 }
 
 // doEachHex processes each hex on an island
-// Ref: perl/lib/Hako/Turn.pm:1669
+// Ref: perl/lib/Hako/Turn.pm:1669-1920
 func doEachHex(island *types.Island) {
-	// Phase 1: Simplified implementation
-	// Process growth for forests and towns
+	// Monster move tracking (for Phase 2)
+	monsterMove := make([][]int, hconst.IslandSize)
+	for i := 0; i < hconst.IslandSize; i++ {
+		monsterMove[i] = make([]int, hconst.IslandSize)
+	}
 
+	// Derived values
+	name := island.Name
+	id := island.ID
+	land := island.Land
+	landValue := island.LandValue
+
+	// Population growth seed values
+	addpop := 10  // Villages and towns
+	addpop2 := 0  // Cities
+	if island.Food < 0 {
+		// Food shortage
+		addpop = -30
+	} else if island.Propaganda == 1 {
+		// Propaganda active
+		addpop = 30
+		addpop2 = 3
+	}
+
+	// Loop through all hexes
 	for i := 0; i < hconst.PointNumber; i++ {
 		x := variable.Rpx[i]
 		y := variable.Rpy[i]
+		landKind := land[x][y]
+		lv := landValue[x][y]
 
-		land := island.Land[x][y]
-		lv := island.LandValue[x][y]
+		if landKind == hconst.LandTown {
+			// Town system
+			if addpop < 0 {
+				// Food shortage
+				lv -= (rand.Intn(-addpop) + 1)
+				if lv <= 0 {
+					// Revert to plains
+					land[x][y] = hconst.LandPlains
+					landValue[x][y] = 0
+					continue
+				}
+			} else {
+				// Growth
+				if lv < 100 {
+					lv += rand.Intn(addpop) + 1
+					if lv > 100 {
+						lv = 100
+					}
+				} else {
+					// Cities grow slower
+					if addpop2 > 0 {
+						lv += rand.Intn(addpop2) + 1
+					}
+				}
+			}
+			if lv > 200 {
+				lv = 200
+			}
+			landValue[x][y] = lv
 
-		switch land {
-		case hconst.LandForest:
-			// Forest growth
-			if lv < 200 && rand.Intn(10) < 5 {
-				island.LandValue[x][y]++
+		} else if landKind == hconst.LandPlains {
+			// Plains
+			if rand.Intn(5) == 0 {
+				// If farms or towns around, this becomes a town
+				if countGrow(land, landValue, x, y) {
+					land[x][y] = hconst.LandTown
+					landValue[x][y] = 1
+				}
 			}
 
-		case hconst.LandTown:
-			// Town growth
-			if lv < 200 && rand.Intn(10) < 3 {
-				island.LandValue[x][y]++
+		} else if landKind == hconst.LandForest {
+			// Forest
+			if lv < 200 {
+				// Grow trees
+				landValue[x][y]++
+			}
+
+		} else if landKind == hconst.LandDefence {
+			// Defense facility
+			if lv == 1 {
+				// Self-destruct
+				lName := landName(landKind, lv)
+				logBombFire(id, name, lName, fmt.Sprintf("(%d,%d)", x, y))
+
+				// Wide damage routine (Phase 1: Simplified - just make it wasteland)
+				land[x][y] = hconst.LandWaste
+				landValue[x][y] = 0
+			}
+
+		} else if landKind == hconst.LandOil {
+			// Submarine oil field
+			lName := landName(landKind, lv)
+			value := hconst.OilMoney
+			island.Money += value
+			str := fmt.Sprintf("%d%s", value, hconst.UnitMoney)
+
+			// Income log
+			logOilMoney(id, name, lName, fmt.Sprintf("(%d,%d)", x, y), str)
+
+			// Depletion check
+			if rand.Intn(1000) < hconst.OilRatio {
+				// Depleted
+				logOilEnd(id, name, lName, fmt.Sprintf("(%d,%d)", x, y))
+				land[x][y] = hconst.LandSea
+				landValue[x][y] = 0
+			}
+
+		} else if landKind == hconst.LandMonster {
+			// Monster (Phase 1: Skip monster movement processing)
+			// Phase 2 will implement full monster movement
+		}
+
+		// Fire check
+		if ((landKind == hconst.LandTown) && (lv > 30)) ||
+			(landKind == hconst.LandHaribote) ||
+			(landKind == hconst.LandFactory) {
+			if rand.Intn(1000) < hconst.DisFire {
+				// Count surrounding forests and monuments
+				if (countAround(land, x, y, hconst.LandForest, 7) +
+					countAround(land, x, y, hconst.LandMonument, 7)) == 0 {
+					// No forests or monuments - fire destroys everything
+					l := land[x][y]
+					lv := landValue[x][y]
+					point := fmt.Sprintf("(%d,%d)", x, y)
+					lName := landName(l, lv)
+					logFire(id, name, lName, point)
+					land[x][y] = hconst.LandWaste
+					landValue[x][y] = 0
+				}
 			}
 		}
 	}
@@ -1453,6 +1565,33 @@ func countAround(land [][]int, x, y, landType, radius int) int {
 		}
 	}
 	return count
+}
+
+// countGrow checks if there are farms or towns around a hex
+// Ref: perl/lib/Hako/Turn.pm:1922-1953
+func countGrow(land [][]int, landValue [][]int, x, y int) bool {
+	for i := 1; i < 7; i++ {
+		sx := x + ax[i]
+		sy := y + ay[i]
+
+		// Adjust position based on row parity
+		if (sy%2) == 0 && (y%2) == 1 {
+			sx--
+		}
+
+		// Range check
+		if sx < 0 || sx >= hconst.IslandSize || sy < 0 || sy >= hconst.IslandSize {
+			continue
+		}
+
+		// Check if town or farm
+		if (land[sx][sy] == hconst.LandTown) || (land[sx][sy] == hconst.LandFarm) {
+			if landValue[sx][sy] != 1 {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func isValidCoord(x, y int) bool {
@@ -1984,6 +2123,34 @@ func logPropaganda(id, name, comName string) {
 	logOut(fmt.Sprintf("0,%d,%s,0,%s%s島%sで%s%s%sが行われました。",
 		variable.IslandTurn, id, hconst.TagNameBegin, name, hconst.TagNameEnd,
 		hconst.TagComNameBegin, comName, hconst.TagComNameEnd))
+}
+
+// logBombFire logs defense facility self-destruct
+// Ref: perl/lib/Hako/Turn.pm:2681
+func logBombFire(id, name, lName, point string) {
+	logOut(fmt.Sprintf("0,%d,%s,0,%s%s島%s%sの<B>%s</B>が<B>自爆装置の発動</B>により爆発しました。",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, point, hconst.TagNameEnd, lName))
+}
+
+// logOilMoney logs oil field income
+// Ref: perl/lib/Hako/Turn.pm:3084
+func logOilMoney(id, name, lName, point, str string) {
+	logOut(fmt.Sprintf("0,%d,%s,0,%s%s島%s%sの<B>%s</B>から、<B>%s</B>の収益が上がりました。",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, point, hconst.TagNameEnd, lName, str))
+}
+
+// logOilEnd logs oil field depletion
+// Ref: perl/lib/Hako/Turn.pm:3097
+func logOilEnd(id, name, lName, point string) {
+	logOut(fmt.Sprintf("0,%d,%s,0,%s%s島%s%sの<B>%s</B>は、<B>枯渇</B>したようです。",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, point, hconst.TagNameEnd, lName))
+}
+
+// logFire logs fire disaster
+// Ref: perl/lib/Hako/Turn.pm:3421
+func logFire(id, name, lName, point string) {
+	logOut(fmt.Sprintf("0,%d,%s,0,%s%s島%s%sの<B>%s</B>が<B>火災</B>により壊滅しました。",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, point, hconst.TagNameEnd, lName))
 }
 
 //======================================================================
