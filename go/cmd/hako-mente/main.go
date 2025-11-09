@@ -1,36 +1,32 @@
-// Package main provides the maintenance tool entry point.
-// This is the HTTP server for Hakoniwa maintenance, equivalent to Perl's hako-mente.cgi
+// hako-mente is the maintenance tool entry point for the Hakoniwa game.
+// This file is translated from Perl cgi/hako-mente.cgi
 //
 // Ref: perl/cgi/hako-mente.cgi
 package main
 
 import (
-	"fmt"
+	"flag"
 	"log"
 	"net/http"
 
-	"github.com/neguse/hakoniwa/internal/hako/maintenance"
-	"github.com/neguse/hakoniwa/internal/hako/variable"
+	"github.com/neguse/hakoniwa/internal/web"
 )
 
-func menteHandler(w http.ResponseWriter, r *http.Request) {
-	// Clear output buffer
-	variable.OutputBuffer.Reset()
-
-	// Set content type
-	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
-
-	// Run maintenance tool
-	maintenance.RunMaintenance(r)
-
-	// Write output
-	w.Write(variable.OutputBuffer.Bytes())
-}
-
 func main() {
-	http.HandleFunc("/", menteHandler)
+	// Parse command line flags
+	addr := flag.String("addr", ":8081", "HTTP server address")
+	flag.Parse()
 
-	port := ":8081"
-	fmt.Printf("Starting Hakoniwa maintenance server on http://localhost%s\n", port)
-	log.Fatal(http.ListenAndServe(port, nil))
+	log.Printf("箱庭諸島 Maintenance Tool (Go version)")
+	log.Printf("Starting maintenance server on %s", *addr)
+
+	// Setup routes
+	mux := http.NewServeMux()
+
+	// Maintenance handler with middleware
+	menteHandler := http.HandlerFunc(web.MaintenanceHandler)
+	mux.Handle("/", web.Chain(menteHandler, web.LoggingMiddleware, web.RecoveryMiddleware))
+
+	// Start server
+	log.Fatal(http.ListenAndServe(*addr, mux))
 }

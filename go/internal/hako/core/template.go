@@ -30,24 +30,46 @@ func tempFooter() {
 	out("</BODY></HTML>\n")
 }
 
-// tempLockFail outputs lock failure message
+// TempLockFail outputs lock failure message (exported for external use)
 // Ref: perl/lib/Hako/Main.pm:1133
+func TempLockFail() {
+	tempLockFail()
+}
+
+// tempLockFail outputs lock failure message (internal)
 func tempLockFail() {
 	out("<H1>ただいま、データ処理中です。</H1>\n")
 	out("しばらくしてから、リロードしてください。<P>\n")
 }
 
-// tempUnlock outputs forced unlock message
+// TempUnlock outputs forced unlock message (exported for external use)
 // Ref: perl/lib/Hako/Main.pm:1144
+func TempUnlock() {
+	tempUnlock()
+}
+
+// tempUnlock outputs forced unlock message (internal)
 func tempUnlock() {
 	out("<H1>強制ロック解除</H1>\n")
 	out("前回のCGI実行が異常終了しました。ロックを強制解除しました。<P>\n")
 }
 
-// tempNoDataFile outputs no data file message
+// TempNoDataFile outputs no data file message (exported for external use)
 // Ref: perl/lib/Hako/Main.pm:1154
+func TempNoDataFile() {
+	tempNoDataFile()
+}
+
+// tempNoDataFile outputs no data file message (internal)
 func tempNoDataFile() {
 	out("<H1>データファイルが存在しません。</H1>\n")
+}
+
+// TempInitialize initializes template system (exported for external use)
+// Ref: perl/lib/Hako/Main.pm (tempInitialize)
+func TempInitialize() {
+	// Phase 1: No special initialization needed
+	// Template variables would be initialized here in Phase 2
 }
 
 // TempWrongPassword outputs wrong password message (exported for external use)

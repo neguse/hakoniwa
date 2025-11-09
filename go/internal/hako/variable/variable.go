@@ -64,6 +64,15 @@ var Message string
 // Ref: perl/lib/Hako/Variable.pm:92
 var OldPassword string
 
+// InputComment はコメント入力
+var InputComment string
+
+// InputBbsName はBBS投稿者名入力
+var InputBbsName string
+
+// InputBbsMessage はBBS投稿メッセージ入力
+var InputBbsMessage string
+
 // デフォルト値（Cookieに保存され、あらかじめフォームなどに設定される）
 // Ref: perl/lib/Hako/Variable.pm:95-101
 

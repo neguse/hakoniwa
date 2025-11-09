@@ -14,8 +14,13 @@ import (
 	"github.com/neguse/hakoniwa/internal/hako/variable"
 )
 
-// hakoLock acquires a lock for data file access
+// HakoLock acquires a lock for data file access (exported for external use)
 // Ref: perl/lib/Hako/Main.pm:689
+func HakoLock() bool {
+	return hakoLock()
+}
+
+// hakoLock acquires a lock for data file access (internal)
 func hakoLock() bool {
 	switch hconst.LockMode {
 	case 1:

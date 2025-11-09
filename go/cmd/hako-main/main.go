@@ -1,36 +1,32 @@
-// Package main provides the main game server entry point.
-// This is the HTTP server for Hakoniwa game, equivalent to Perl's hako-main.cgi
+// hako-main is the main entry point for the Hakoniwa game server.
+// This file is translated from Perl cgi/hako-main.cgi
 //
 // Ref: perl/cgi/hako-main.cgi
 package main
 
 import (
-	"fmt"
+	"flag"
 	"log"
 	"net/http"
 
-	"github.com/neguse/hakoniwa/internal/hako/core"
-	"github.com/neguse/hakoniwa/internal/hako/variable"
+	"github.com/neguse/hakoniwa/internal/web"
 )
 
-func mainHandler(w http.ResponseWriter, r *http.Request) {
-	// Clear output buffer
-	variable.OutputBuffer.Reset()
-
-	// Set content type
-	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
-
-	// Run main game logic
-	core.RunMain(r)
-
-	// Write output
-	w.Write(variable.OutputBuffer.Bytes())
-}
-
 func main() {
-	http.HandleFunc("/", mainHandler)
+	// Parse command line flags
+	addr := flag.String("addr", ":8080", "HTTP server address")
+	flag.Parse()
 
-	port := ":8080"
-	fmt.Printf("Starting Hakoniwa server on http://localhost%s\n", port)
-	log.Fatal(http.ListenAndServe(port, nil))
+	log.Printf("箱庭諸島 ver2.30 (Go version)")
+	log.Printf("Starting server on %s", *addr)
+
+	// Setup routes
+	mux := http.NewServeMux()
+
+	// Main handler with middleware
+	mainHandler := http.HandlerFunc(web.Handler)
+	mux.Handle("/", web.Chain(mainHandler, web.LoggingMiddleware, web.RecoveryMiddleware))
+
+	// Start server
+	log.Fatal(http.ListenAndServe(*addr, mux))
 }
