@@ -26,9 +26,12 @@ type Island struct {
 	Score    int    // スコア（ソート用）
 
 	// Turn processing fields
-	OldPop     int  // ターン開始前の人口
-	Dead       bool // 死滅フラグ
-	BigMissile int  // 巨大ミサイル着弾予定数
+	OldPop      int  // ターン開始前の人口
+	Dead        bool // 死滅フラグ
+	BigMissile  int  // 巨大ミサイル着弾予定数
+	MonsterSend int  // 怪獣派遣カウンタ
+	Propaganda  int  // 誘致活動フラグ
+	Prepare2    int  // 地ならしカウンタ
 
 	// Land data (from island.{ID})
 	Land      [][]int // 地形タイプ (11x11 or 12x12)

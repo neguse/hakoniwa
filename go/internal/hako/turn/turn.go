@@ -496,11 +496,27 @@ func doCommand(island *types.Island) int {
 
 	switch com.Kind {
 	case hconst.ComDoNothing:
-		// Do nothing
+		// 資金繰り
+		// Ref: perl/lib/Hako/Turn.pm:570-588
+		logDoNothing(island.ID, island.Name, hconst.ComName[com.Kind])
+		island.Money += 10
+		island.Absent++
+
+		// 自動放棄
+		if island.Absent >= hconst.GiveupTurn {
+			island.Commands[0] = types.Command{
+				Kind:   hconst.ComGiveup,
+				Target: "",
+				X:      0,
+				Y:      0,
+				Arg:    0,
+			}
+		}
 		return 1
 
 	case hconst.ComPrepare, hconst.ComPrepare2:
-		// Land preparation
+		// 整地/地ならし
+		// Ref: perl/lib/Hako/Turn.pm:634-650
 		x, y := com.X, com.Y
 		if !isValidCoord(x, y) {
 			return 1
@@ -519,6 +535,25 @@ func doCommand(island *types.Island) int {
 			return 1
 		}
 
+		// 地ならし処理
+		if com.Kind == hconst.ComPrepare2 {
+			island.Prepare2++
+			// ターン消費せず
+			island.Money -= cost
+
+			if land == hconst.LandSea {
+				island.Land[x][y] = hconst.LandSea
+				island.LandValue[x][y] = 1 // Shallow
+				logLandSuc(island.ID, island.Name, hconst.ComName[com.Kind], x, y)
+			} else {
+				island.Land[x][y] = hconst.LandPlains
+				island.LandValue[x][y] = 0
+				logLandSuc(island.ID, island.Name, hconst.ComName[com.Kind], x, y)
+			}
+			return 0
+		}
+
+		// 通常の整地 - 埋蔵金の可能性
 		island.Money -= cost
 
 		if land == hconst.LandSea {
@@ -529,6 +564,13 @@ func doCommand(island *types.Island) int {
 			island.Land[x][y] = hconst.LandPlains
 			island.LandValue[x][y] = 0
 			logLandSuc(island.ID, island.Name, hconst.ComName[com.Kind], x, y)
+		}
+
+		// 埋蔵金判定
+		if rand.Intn(1000) < hconst.DisMaizo {
+			v := 100 + rand.Intn(901)
+			island.Money += v
+			logMaizo(island.ID, island.Name, hconst.ComName[com.Kind], v)
 		}
 		return 1
 
@@ -1142,6 +1184,103 @@ func doCommand(island *types.Island) int {
 
 		// Phase 1: Refugee processing simplified (skip)
 
+		return 1
+
+	case hconst.ComSendMonster:
+		// 怪獣派遣
+		// Ref: perl/lib/Hako/Turn.pm:1580-1601
+		targetID := com.Target
+		tn, ok := variable.IDToNumber[targetID]
+		if !ok {
+			// ターゲットがすでにない
+			logMsNoTarget(island.ID, island.Name, hconst.ComName[com.Kind])
+			return 0
+		}
+
+		tIsland := variable.Islands[tn]
+		tName := tIsland.Name
+
+		// メッセージ
+		logMonsSend(island.ID, targetID, island.Name, tName)
+		tIsland.MonsterSend++
+
+		cost := hconst.ComCost[com.Kind]
+		island.Money -= cost
+		return 1
+
+	case hconst.ComSell:
+		// 食料輸出
+		// Ref: perl/lib/Hako/Turn.pm:1602-1613
+		cost := hconst.ComCost[com.Kind]
+		arg := com.Arg
+		if arg == 0 {
+			arg = 1
+		}
+		value := min(arg*(-cost), island.Food)
+
+		// 輸出ログ
+		logSell(island.ID, island.Name, hconst.ComName[com.Kind], value)
+		island.Food -= value
+		island.Money += value / 10
+		return 0
+
+	case hconst.ComFood, hconst.ComMoney:
+		// 援助系
+		// Ref: perl/lib/Hako/Turn.pm:1614-1647
+		targetID := com.Target
+		tn, ok := variable.IDToNumber[targetID]
+		if !ok {
+			// ターゲットがない場合はスキップ
+			return 0
+		}
+
+		tIsland := variable.Islands[tn]
+		tName := tIsland.Name
+		cost := hconst.ComCost[com.Kind]
+		arg := com.Arg
+		if arg == 0 {
+			arg = 1
+		}
+
+		var value int
+		var str string
+		if cost < 0 {
+			// 食料援助
+			value = min(arg*(-cost), island.Food)
+			str = fmt.Sprintf("%d%s", value, hconst.UnitFood)
+		} else {
+			// 資金援助
+			value = min(arg*cost, island.Money)
+			str = fmt.Sprintf("%d%s", value, hconst.UnitMoney)
+		}
+
+		// 援助ログ
+		logAid(island.ID, targetID, island.Name, tName, hconst.ComName[com.Kind], str)
+
+		if cost < 0 {
+			island.Food -= value
+			tIsland.Food += value
+		} else {
+			island.Money -= value
+			tIsland.Money += value
+		}
+		return 0
+
+	case hconst.ComPropaganda:
+		// 誘致活動
+		// Ref: perl/lib/Hako/Turn.pm:1648-1655
+		cost := hconst.ComCost[com.Kind]
+		logPropaganda(island.ID, island.Name, hconst.ComName[com.Kind])
+		island.Propaganda = 1
+		island.Money -= cost
+		return 1
+
+	case hconst.ComGiveup:
+		// 放棄
+		// Ref: perl/lib/Hako/Turn.pm:1656-1663
+		logGiveup(island.ID, island.Name)
+		island.Dead = true
+		os.Remove(fmt.Sprintf("island.%s", island.ID))
 		return 1
 
 	default:
@@ -1793,6 +1932,58 @@ func logMsNormalS(id, tID, name, tName, comName, tLname, point, tPoint string) {
 		hconst.TagNameBegin, tName, point, hconst.TagNameEnd,
 		hconst.TagComNameBegin, comName, hconst.TagComNameEnd,
 		hconst.TagNameBegin, tPoint, hconst.TagNameEnd, tLname))
+}
+
+// logDoNothing logs do nothing command
+// Ref: perl/lib/Hako/Turn.pm:2646
+func logDoNothing(id, name, comName string) {
+	logSecret(fmt.Sprintf("0,%d,%s,0,%s%s島%sで%s%s%sが行われました。",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, hconst.TagNameEnd,
+		hconst.TagComNameBegin, comName, hconst.TagComNameEnd))
+}
+
+// logMaizo logs buried treasure discovery
+// Ref: perl/lib/Hako/Turn.pm:2661
+func logMaizo(id, name, comName string, value int) {
+	logOut(fmt.Sprintf("0,%d,%s,0,%s%s島%sで予定されていた%s%s%sが、<B>埋蔵金</B>を発見。<B>%d%s</B>の収益を得ました。",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, hconst.TagNameEnd,
+		hconst.TagComNameBegin, comName, hconst.TagComNameEnd, value, hconst.UnitMoney))
+}
+
+// logMonsSend logs monster send
+// Ref: perl/lib/Hako/Turn.pm:3027
+func logMonsSend(id, tID, name, tName string) {
+	logOut(fmt.Sprintf("0,%d,%s,%s,%s%s島%sが%s%s島%sへ<B>怪獣を派遣</B>しました。",
+		variable.IslandTurn, id, tID,
+		hconst.TagNameBegin, name, hconst.TagNameEnd,
+		hconst.TagNameBegin, tName, hconst.TagNameEnd))
+}
+
+// logSell logs food export
+// Ref: perl/lib/Hako/Turn.pm:3045
+func logSell(id, name, comName string, value int) {
+	logSecret(fmt.Sprintf("0,%d,%s,0,%s%s島%sで%s%s%sが行われ、<B>%d%s</B>の食料が輸出され、<B>%d%s</B>の収益が得られました。",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, hconst.TagNameEnd,
+		hconst.TagComNameBegin, comName, hconst.TagComNameEnd,
+		value, hconst.UnitFood, value/10, hconst.UnitMoney))
+}
+
+// logAid logs aid (food or money)
+// Ref: perl/lib/Hako/Turn.pm:3058
+func logAid(id, tID, name, tName, comName, str string) {
+	logOut(fmt.Sprintf("0,%d,%s,%s,%s%s島%sが%s%s島%sへ%s%s%sを行い、<B>%s</B>の援助を行いました。",
+		variable.IslandTurn, id, tID,
+		hconst.TagNameBegin, name, hconst.TagNameEnd,
+		hconst.TagNameBegin, tName, hconst.TagNameEnd,
+		hconst.TagComNameBegin, comName, hconst.TagComNameEnd, str))
+}
+
+// logPropaganda logs propaganda
+// Ref: perl/lib/Hako/Turn.pm:3073
+func logPropaganda(id, name, comName string) {
+	logOut(fmt.Sprintf("0,%d,%s,0,%s%s島%sで%s%s%sが行われました。",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, hconst.TagNameEnd,
+		hconst.TagComNameBegin, comName, hconst.TagComNameEnd))
 }
 
 //======================================================================
