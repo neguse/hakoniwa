@@ -1433,15 +1433,375 @@ func doEachHex(island *types.Island) {
 // doIslandProcess processes whole island events
 // Ref: perl/lib/Hako/Turn.pm:1956
 func doIslandProcess(num int, island *types.Island) {
-	// Phase 1: Simplified implementation
-	// Full implementation would include:
-	// - Monsters
-	// - Earthquakes
-	// - Typhoons
-	// - Tsunamis
-	// - Meteors
-	// - Eruptions
-	// etc.
+	// Ref: perl/lib/Hako/Turn.pm:1956-2428
+	name := island.Name
+	id := island.ID
+	land := island.Land
+	landValue := island.LandValue
+
+	// 地震判定
+	if rand.Intn(1000) < ((island.Prepare2+1)*hconst.DisEarthquake) {
+		// 地震発生
+		logEarthquake(id, name)
+
+		for i := 0; i < hconst.PointNumber; i++ {
+			x := variable.Rpx[i]
+			y := variable.Rpy[i]
+			landKind := land[x][y]
+			lv := landValue[x][y]
+
+			if ((landKind == hconst.LandTown) && (lv >= 100)) ||
+				(landKind == hconst.LandHaribote) ||
+				(landKind == hconst.LandFactory) {
+				// 1/4で壊滅
+				if rand.Intn(4) == 0 {
+					logEQDamage(id, name, getLandName(landKind, lv), fmt.Sprintf("(%d, %d)", x, y))
+					land[x][y] = hconst.LandWaste
+					landValue[x][y] = 0
+				}
+			}
+		}
+	}
+
+	// 食料不足
+	if island.Food <= 0 {
+		// 不足メッセージ
+		logStarve(id, name, 0)
+		island.Food = 0
+
+		for i := 0; i < hconst.PointNumber; i++ {
+			x := variable.Rpx[i]
+			y := variable.Rpy[i]
+			landKind := land[x][y]
+			lv := landValue[x][y]
+
+			if (landKind == hconst.LandFarm) ||
+				(landKind == hconst.LandFactory) ||
+				(landKind == hconst.LandBase) ||
+				(landKind == hconst.LandDefence) {
+				// 1/4で壊滅
+				if rand.Intn(4) == 0 {
+					logSvDamage(id, name, getLandName(landKind, lv), fmt.Sprintf("(%d, %d)", x, y))
+					land[x][y] = hconst.LandWaste
+					landValue[x][y] = 0
+				}
+			}
+		}
+	}
+
+	// 津波判定
+	if rand.Intn(1000) < hconst.DisTsunami {
+		// 津波発生
+		logTsunami(id, name)
+
+		for i := 0; i < hconst.PointNumber; i++ {
+			x := variable.Rpx[i]
+			y := variable.Rpy[i]
+			landKind := land[x][y]
+			lv := landValue[x][y]
+
+			if (landKind == hconst.LandTown) ||
+				(landKind == hconst.LandFarm) ||
+				(landKind == hconst.LandFactory) ||
+				(landKind == hconst.LandBase) ||
+				(landKind == hconst.LandDefence) ||
+				(landKind == hconst.LandHaribote) {
+				// 1d12 <= (周囲の海 - 1) で崩壊
+				seaCount := countAround(land, x, y, hconst.LandOil, 7) +
+					countAround(land, x, y, hconst.LandSbase, 7) +
+					countAround(land, x, y, hconst.LandSea, 7)
+				if rand.Intn(12) < (seaCount - 1) {
+					logTsunamiDamage(id, name, getLandName(landKind, lv), fmt.Sprintf("(%d, %d)", x, y))
+					land[x][y] = hconst.LandWaste
+					landValue[x][y] = 0
+				}
+			}
+		}
+	}
+
+	// 怪獣判定
+	r := rand.Intn(10000)
+	pop := island.Pop
+	for {
+		if ((r < (hconst.DisMonster * island.Area)) && (pop >= hconst.DisMonsBorder1)) ||
+			(island.MonsterSend > 0) {
+			// 怪獣出現
+			// 種類を決める
+			var lv, kind int
+			if island.MonsterSend > 0 {
+				// 人造
+				kind = 0
+				island.MonsterSend--
+			} else if pop >= hconst.DisMonsBorder3 {
+				// level3まで
+				kind = rand.Intn(hconst.MonsterLevel3) + 1
+			} else if pop >= hconst.DisMonsBorder2 {
+				// level2まで
+				kind = rand.Intn(hconst.MonsterLevel2) + 1
+			} else {
+				// level1のみ
+				kind = rand.Intn(hconst.MonsterLevel1) + 1
+			}
+
+			// lvの値を決める
+			lv = kind*10 + hconst.MonsterBHP[kind] + rand.Intn(hconst.MonsterDHP[kind])
+
+			// どこに現れるか決める
+			for i := 0; i < hconst.PointNumber; i++ {
+				bx := variable.Rpx[i]
+				by := variable.Rpy[i]
+				if land[bx][by] == hconst.LandTown {
+					// 地形名
+					lName := getLandName(hconst.LandTown, landValue[bx][by])
+
+					// そのヘックスを怪獣に
+					land[bx][by] = hconst.LandMonster
+					landValue[bx][by] = lv
+
+					// 怪獣情報
+					_, mName, _ := monsterSpec(lv)
+
+					// メッセージ
+					logMonsCome(id, name, mName, fmt.Sprintf("(%d, %d)", bx, by), lName)
+					break
+				}
+			}
+		}
+
+		if island.MonsterSend <= 0 {
+			break
+		}
+	}
+
+	// 地盤沈下判定
+	if (island.Area > hconst.DisFallBorder) && (rand.Intn(1000) < hconst.DisFalldown) {
+		// 地盤沈下発生
+		logFalldown(id, name)
+
+		for i := 0; i < hconst.PointNumber; i++ {
+			x := variable.Rpx[i]
+			y := variable.Rpy[i]
+			landKind := land[x][y]
+			lv := landValue[x][y]
+
+			if (landKind != hconst.LandSea) &&
+				(landKind != hconst.LandSbase) &&
+				(landKind != hconst.LandOil) &&
+				(landKind != hconst.LandMountain) {
+				// 周囲に海があれば、値を-1に
+				if countAround(land, x, y, hconst.LandSea, 7)+
+					countAround(land, x, y, hconst.LandSbase, 7) > 0 {
+					logFalldownLand(id, name, getLandName(landKind, lv), fmt.Sprintf("(%d, %d)", x, y))
+					land[x][y] = -1
+					landValue[x][y] = 0
+				}
+			}
+		}
+
+		for i := 0; i < hconst.PointNumber; i++ {
+			x := variable.Rpx[i]
+			y := variable.Rpy[i]
+			landKind := land[x][y]
+
+			if landKind == -1 {
+				// -1になっている所を浅瀬に
+				land[x][y] = hconst.LandSea
+				landValue[x][y] = 1
+			} else if landKind == hconst.LandSea {
+				// 浅瀬は海に
+				landValue[x][y] = 0
+			}
+		}
+	}
+
+	// 台風判定
+	if rand.Intn(1000) < hconst.DisTyphoon {
+		// 台風発生
+		logTyphoon(id, name)
+
+		for i := 0; i < hconst.PointNumber; i++ {
+			x := variable.Rpx[i]
+			y := variable.Rpy[i]
+			landKind := land[x][y]
+			lv := landValue[x][y]
+
+			if (landKind == hconst.LandFarm) || (landKind == hconst.LandHaribote) {
+				// 1d12 <= (6 - 周囲の森) で崩壊
+				forestCount := countAround(land, x, y, hconst.LandForest, 7) +
+					countAround(land, x, y, hconst.LandMonument, 7)
+				if rand.Intn(12) < (6 - forestCount) {
+					logTyphoonDamage(id, name, getLandName(landKind, lv), fmt.Sprintf("(%d, %d)", x, y))
+					land[x][y] = hconst.LandPlains
+					landValue[x][y] = 0
+				}
+			}
+		}
+	}
+
+	// 巨大隕石判定
+	if rand.Intn(1000) < hconst.DisHugeMeteo {
+		// 落下
+		x := rand.Intn(hconst.IslandSize)
+		y := rand.Intn(hconst.IslandSize)
+		point := fmt.Sprintf("(%d, %d)", x, y)
+
+		// メッセージ
+		logHugeMeteo(id, name, point)
+
+		// 広域被害ルーチン
+		wideDamage(id, name, land, landValue, x, y)
+	}
+
+	// 巨大ミサイル判定
+	for island.BigMissile > 0 {
+		island.BigMissile--
+
+		// 落下
+		x := rand.Intn(hconst.IslandSize)
+		y := rand.Intn(hconst.IslandSize)
+		point := fmt.Sprintf("(%d, %d)", x, y)
+
+		// メッセージ
+		logMonDamage(id, name, point)
+
+		// 広域被害ルーチン
+		wideDamage(id, name, land, landValue, x, y)
+	}
+
+	// 隕石判定
+	if rand.Intn(1000) < hconst.DisMeteo {
+		first := true
+		for (rand.Intn(2) == 0) || first {
+			first = false
+
+			// 落下
+			x := rand.Intn(hconst.IslandSize)
+			y := rand.Intn(hconst.IslandSize)
+			landKind := land[x][y]
+			lv := landValue[x][y]
+			point := fmt.Sprintf("(%d, %d)", x, y)
+
+			if (landKind == hconst.LandSea) && (lv == 0) {
+				// 海ポチャ
+				logMeteoSea(id, name, getLandName(landKind, lv), point)
+			} else if landKind == hconst.LandMountain {
+				// 山破壊
+				logMeteoMountain(id, name, getLandName(landKind, lv), point)
+				land[x][y] = hconst.LandWaste
+				landValue[x][y] = 0
+				continue
+			} else if landKind == hconst.LandSbase {
+				logMeteoSbase(id, name, getLandName(landKind, lv), point)
+			} else if landKind == hconst.LandMonster {
+				logMeteoMonster(id, name, getLandName(landKind, lv), point)
+			} else if landKind == hconst.LandSea {
+				// 浅瀬
+				logMeteoSea1(id, name, getLandName(landKind, lv), point)
+			} else {
+				logMeteoNormal(id, name, getLandName(landKind, lv), point)
+			}
+			land[x][y] = hconst.LandSea
+			landValue[x][y] = 0
+		}
+	}
+
+	// 噴火判定
+	if rand.Intn(1000) < hconst.DisEruption {
+		x := rand.Intn(hconst.IslandSize)
+		y := rand.Intn(hconst.IslandSize)
+		landKind := land[x][y]
+		lv := landValue[x][y]
+		point := fmt.Sprintf("(%d, %d)", x, y)
+		logEruption(id, name, getLandName(landKind, lv), point)
+		land[x][y] = hconst.LandMountain
+		landValue[x][y] = 0
+
+		for i := 1; i < 7; i++ {
+			sx := x + hconst.Ax[i]
+			sy := y + hconst.Ay[i]
+
+			// 行による位置調整
+			if ((sy % 2) == 0) && ((y % 2) == 1) {
+				sx--
+			}
+
+			if (sx < 0) || (sx >= hconst.IslandSize) || (sy < 0) || (sy >= hconst.IslandSize) {
+				continue
+			}
+
+			// 範囲内の場合
+			landKind = land[sx][sy]
+			lv = landValue[sx][sy]
+			point = fmt.Sprintf("(%d, %d)", sx, sy)
+
+			if (landKind == hconst.LandSea) || (landKind == hconst.LandOil) || (landKind == hconst.LandSbase) {
+				// 海の場合
+				if lv == 1 {
+					// 浅瀬
+					logEruptionSea1(id, name, getLandName(landKind, lv), point)
+				} else {
+					logEruptionSea(id, name, getLandName(landKind, lv), point)
+					land[sx][sy] = hconst.LandSea
+					landValue[sx][sy] = 1
+					continue
+				}
+			} else if (landKind == hconst.LandMountain) ||
+				(landKind == hconst.LandMonster) ||
+				(landKind == hconst.LandWaste) {
+				continue
+			} else {
+				// それ以外の場合
+				logEruptionNormal(id, name, getLandName(landKind, lv), point)
+			}
+			land[sx][sy] = hconst.LandWaste
+			landValue[sx][sy] = 0
+		}
+	}
+
+	// 食料があふれてたら換金
+	if island.Food > 9999 {
+		island.Money += (island.Food - 9999) / 10
+		island.Food = 9999
+	}
+
+	// 金があふれてたら切り捨て
+	if island.Money > 9999 {
+		island.Money = 9999
+	}
+
+	// 各種の値を計算
+	estimate(num)
+
+	// 繁栄、災難賞
+	pop = island.Pop
+	damage := island.OldPop - pop
+	flags := island.Prize
+
+	// 繁栄賞
+	if ((flags & 1) == 0) && pop >= 3000 {
+		flags |= 1
+		logPrize(id, name, hconst.Prize[1])
+	} else if ((flags & 2) == 0) && pop >= 5000 {
+		flags |= 2
+		logPrize(id, name, hconst.Prize[2])
+	} else if ((flags & 4) == 0) && pop >= 10000 {
+		flags |= 4
+		logPrize(id, name, hconst.Prize[3])
+	}
+
+	// 災難賞
+	if ((flags & 64) == 0) && damage >= 500 {
+		flags |= 64
+		logPrize(id, name, hconst.Prize[7])
+	} else if ((flags & 128) == 0) && damage >= 1000 {
+		flags |= 128
+		logPrize(id, name, hconst.Prize[8])
+	} else if ((flags & 256) == 0) && damage >= 2000 {
+		flags |= 256
+		logPrize(id, name, hconst.Prize[9])
+	}
+
+	island.Prize = flags
 
 	// Absent counter
 	if island.Pop > 0 {
@@ -1791,6 +2151,163 @@ func logOilFail(id, name string, x, y int, command, str string) {
 	logSecret(fmt.Sprintf("0,%d,%s,0,%s%s島%s%sで<B>%s</B>の予算をつぎ込んだ%s%s%sが行われましたが、油田は見つかりませんでした。",
 		variable.IslandTurn, id, hconst.TagNameBegin, name, point, hconst.TagNameEnd,
 		str, hconst.TagComNameBegin, command, hconst.TagComNameEnd))
+}
+
+// Disaster log functions
+
+func logEarthquake(id, name string) {
+	logOut(fmt.Sprintf("0,%d,%s,0,%s%s島%sで大規模な%s地震%sが発生！！",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, hconst.TagNameEnd,
+		hconst.TagDisasterBegin, hconst.TagDisasterEnd))
+}
+
+func logEQDamage(id, name, lName, point string) {
+	logOut(fmt.Sprintf("0,%d,%s,0,%s%s島%s%sの<B>%s</B>は%s地震%sにより壊滅しました。",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, point, hconst.TagNameEnd,
+		lName, hconst.TagDisasterBegin, hconst.TagDisasterEnd))
+}
+
+func logSvDamage(id, name, lName, point string) {
+	logOut(fmt.Sprintf("0,%d,%s,0,%s%s島%s%sの<B>%s</B>に<B>食料を求めて住民が殺到</B>。<B>%s</B>は壊滅しました。",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, point, hconst.TagNameEnd,
+		lName, lName))
+}
+
+func logTsunami(id, name string) {
+	logOut(fmt.Sprintf("0,%d,%s,0,%s%s島%s付近で%s津波%s発生！！",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, hconst.TagNameEnd,
+		hconst.TagDisasterBegin, hconst.TagDisasterEnd))
+}
+
+func logTsunamiDamage(id, name, lName, point string) {
+	logOut(fmt.Sprintf("0,%d,%s,0,%s%s島%s%sの<B>%s</B>は%s津波%sにより崩壊しました。",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, point, hconst.TagNameEnd,
+		lName, hconst.TagDisasterBegin, hconst.TagDisasterEnd))
+}
+
+func logMonsCome(id, name, mName, point, lName string) {
+	logOut(fmt.Sprintf("0,%d,%s,0,%s%s島%sに<B>怪獣%s</B>出現！！%s%s%sの<B>%s</B>が踏み荒らされました。",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, hconst.TagNameEnd,
+		mName, hconst.TagNameBegin, point, hconst.TagNameEnd, lName))
+}
+
+func logFalldown(id, name string) {
+	logOut(fmt.Sprintf("0,%d,%s,0,%s%s島%sで%s地盤沈下%sが発生しました！！",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, hconst.TagNameEnd,
+		hconst.TagDisasterBegin, hconst.TagDisasterEnd))
+}
+
+func logFalldownLand(id, name, lName, point string) {
+	logOut(fmt.Sprintf("0,%d,%s,0,%s%s島%s%sの<B>%s</B>は海の中へ沈みました。",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, point, hconst.TagNameEnd, lName))
+}
+
+func logTyphoon(id, name string) {
+	logOut(fmt.Sprintf("0,%d,%s,0,%s%s島%sに%s台風%s上陸！！",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, hconst.TagNameEnd,
+		hconst.TagDisasterBegin, hconst.TagDisasterEnd))
+}
+
+func logTyphoonDamage(id, name, lName, point string) {
+	logOut(fmt.Sprintf("0,%d,%s,0,%s%s島%s%sの<B>%s</B>は%s台風%sで飛ばされました。",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, point, hconst.TagNameEnd,
+		lName, hconst.TagDisasterBegin, hconst.TagDisasterEnd))
+}
+
+func logHugeMeteo(id, name, point string) {
+	logOut(fmt.Sprintf("0,%d,%s,0,%s%s島%s%s地点に%s巨大隕石%sが落下！！",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, point, hconst.TagNameEnd,
+		hconst.TagDisasterBegin, hconst.TagDisasterEnd))
+}
+
+func logMonDamage(id, name, point string) {
+	logOut(fmt.Sprintf("0,%d,%s,0,<B>何かとてつもないもの</B>が%s%s島%s%s地点に落下しました！！",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, point, hconst.TagNameEnd))
+}
+
+func logMeteoSea(id, name, lName, point string) {
+	logOut(fmt.Sprintf("0,%d,%s,0,%s%s島%s%sの<B>%s</B>に%s隕石%sが落下しました。",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, point, hconst.TagNameEnd,
+		lName, hconst.TagDisasterBegin, hconst.TagDisasterEnd))
+}
+
+func logMeteoMountain(id, name, lName, point string) {
+	logOut(fmt.Sprintf("0,%d,%s,0,%s%s島%s%sの<B>%s</B>に%s隕石%sが落下、<B>%s</B>は消し飛びました。",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, point, hconst.TagNameEnd,
+		lName, hconst.TagDisasterBegin, hconst.TagDisasterEnd, lName))
+}
+
+func logMeteoSbase(id, name, lName, point string) {
+	logOut(fmt.Sprintf("0,%d,%s,0,%s%s島%s%sの<B>%s</B>に%s隕石%sが落下、<B>%s</B>は崩壊しました。",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, point, hconst.TagNameEnd,
+		lName, hconst.TagDisasterBegin, hconst.TagDisasterEnd, lName))
+}
+
+func logMeteoMonster(id, name, lName, point string) {
+	logOut(fmt.Sprintf("0,%d,%s,0,<B>怪獣%s</B>がいた%s%s島%s%s地点に%s隕石%sが落下、陸地は<B>怪獣%s</B>もろとも水没しました。",
+		variable.IslandTurn, id, lName, hconst.TagNameBegin, name, point, hconst.TagNameEnd,
+		hconst.TagDisasterBegin, hconst.TagDisasterEnd, lName))
+}
+
+func logMeteoSea1(id, name, lName, point string) {
+	logOut(fmt.Sprintf("0,%d,%s,0,%s%s島%s%s地点に%s隕石%sが落下、海底がえぐられました。",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, point, hconst.TagNameEnd,
+		hconst.TagDisasterBegin, hconst.TagDisasterEnd))
+}
+
+func logMeteoNormal(id, name, lName, point string) {
+	logOut(fmt.Sprintf("0,%d,%s,0,%s%s島%s%s地点の<B>%s</B>に%s隕石%sが落下、一帯が水没しました。",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, point, hconst.TagNameEnd,
+		lName, hconst.TagDisasterBegin, hconst.TagDisasterEnd))
+}
+
+func logEruption(id, name, lName, point string) {
+	logOut(fmt.Sprintf("0,%d,%s,0,%s%s島%s%s地点で%s火山が噴火%s、<B>山</B>が出来ました。",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, point, hconst.TagNameEnd,
+		hconst.TagDisasterBegin, hconst.TagDisasterEnd))
+}
+
+func logEruptionSea1(id, name, lName, point string) {
+	logOut(fmt.Sprintf("0,%d,%s,0,%s%s島%s%s地点の<B>%s</B>は、%s噴火%sの影響で陸地になりました。",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, point, hconst.TagNameEnd,
+		lName, hconst.TagDisasterBegin, hconst.TagDisasterEnd))
+}
+
+func logEruptionSea(id, name, lName, point string) {
+	logOut(fmt.Sprintf("0,%d,%s,0,%s%s島%s%s地点の<B>%s</B>は、%s噴火%sの影響で海底が隆起、浅瀬になりました。",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, point, hconst.TagNameEnd,
+		lName, hconst.TagDisasterBegin, hconst.TagDisasterEnd))
+}
+
+func logEruptionNormal(id, name, lName, point string) {
+	logOut(fmt.Sprintf("0,%d,%s,0,%s%s島%s%s地点の<B>%s</B>は、%s噴火%sの影響で壊滅しました。",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, point, hconst.TagNameEnd,
+		lName, hconst.TagDisasterBegin, hconst.TagDisasterEnd))
+}
+
+func logWideDamageSea(id, name, lName, point string) {
+	logOut(fmt.Sprintf("0,%d,%s,0,%s%s島%s%sの<B>%s</B>は<B>水没</B>しました。",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, point, hconst.TagNameEnd, lName))
+}
+
+func logWideDamageSea2(id, name, lName, point string) {
+	logOut(fmt.Sprintf("0,%d,%s,0,%s%s島%s%sの<B>%s</B>は跡形もなくなりました。",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, point, hconst.TagNameEnd, lName))
+}
+
+func logWideDamageMonsterSea(id, name, lName, point string) {
+	logOut(fmt.Sprintf("0,%d,%s,0,%s%s島%s%sの陸地は<B>怪獣%s</B>もろとも水没しました。",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, point, hconst.TagNameEnd, lName))
+}
+
+func logWideDamageMonster(id, name, lName, point string) {
+	logOut(fmt.Sprintf("0,%d,%s,0,%s%s島%s%sの<B>怪獣%s</B>は消し飛びました。",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, point, hconst.TagNameEnd, lName))
+}
+
+func logWideDamageWaste(id, name, lName, point string) {
+	logOut(fmt.Sprintf("0,%d,%s,0,%s%s島%s%sの<B>%s</B>は一瞬にして<B>荒地</B>と化しました。",
+		variable.IslandTurn, id, hconst.TagNameBegin, name, point, hconst.TagNameEnd, lName))
 }
 
 // logPBSuc logs planting or base construction success
@@ -2198,4 +2715,134 @@ func tempChangeNoMoney() {
 
 func tempChangeNothing() {
 	out("<H1>変更する項目がありません。</H1>\n")
+}
+
+// getLandName returns the display name for a land type
+// Ref: perl/lib/Hako/Turn.pm:3445
+func getLandName(land, lv int) string {
+	switch land {
+	case hconst.LandSea:
+		if lv == 1 {
+			return "浅瀬"
+		}
+		return "海"
+	case hconst.LandWaste:
+		return "荒地"
+	case hconst.LandPlains:
+		return "平地"
+	case hconst.LandTown:
+		if lv < 30 {
+			return "村"
+		} else if lv < 100 {
+			return "町"
+		}
+		return "都市"
+	case hconst.LandForest:
+		return "森"
+	case hconst.LandFarm:
+		return "農場"
+	case hconst.LandFactory:
+		return "工場"
+	case hconst.LandBase:
+		return "ミサイル基地"
+	case hconst.LandDefence:
+		return "防衛施設"
+	case hconst.LandMountain:
+		return "山"
+	case hconst.LandMonster:
+		_, name, _ := monsterSpec(lv)
+		return name
+	case hconst.LandSbase:
+		return "海底基地"
+	case hconst.LandOil:
+		return "海底油田"
+	case hconst.LandMonument:
+		return hconst.MonumentName[lv]
+	case hconst.LandHaribote:
+		return "ハリボテ"
+	default:
+		return "不明"
+	}
+}
+
+// monsterSpec returns monster specifications from landValue
+// Returns: kind, name, hp
+// Ref: perl/lib/Hako/Main.pm:958
+func monsterSpec(lv int) (int, string, int) {
+	// 種類
+	kind := lv / 10
+
+	// 名前
+	name := hconst.MonsterName[kind]
+
+	// 体力
+	hp := lv - (kind * 10)
+
+	return kind, name, hp
+}
+
+// wideDamage applies wide area damage (meteor/missile impact)
+// Ref: perl/lib/Hako/Turn.pm:2444
+func wideDamage(id, name string, land [][]int, landValue [][]int, x, y int) {
+	for i := 0; i < 19; i++ {
+		sx := x + hconst.Ax[i]
+		sy := y + hconst.Ay[i]
+
+		// 行による位置調整
+		if (sy%2) == 0 && (y%2) == 1 {
+			sx--
+		}
+
+		// 範囲外判定
+		if sx < 0 || sx >= hconst.IslandSize || sy < 0 || sy >= hconst.IslandSize {
+			continue
+		}
+
+		landKind := land[sx][sy]
+		lv := landValue[sx][sy]
+		landName := getLandName(landKind, lv)
+		point := fmt.Sprintf("(%d, %d)", sx, sy)
+
+		// 範囲による分岐
+		if i < 7 {
+			// 中心、および1ヘックス
+			if landKind == hconst.LandSea {
+				landValue[sx][sy] = 0
+				continue
+			} else if landKind == hconst.LandSbase || landKind == hconst.LandOil {
+				logWideDamageSea2(id, name, landName, point)
+				land[sx][sy] = hconst.LandSea
+				landValue[sx][sy] = 0
+			} else {
+				if landKind == hconst.LandMonster {
+					logWideDamageMonsterSea(id, name, landName, point)
+				} else {
+					logWideDamageSea(id, name, landName, point)
+				}
+				land[sx][sy] = hconst.LandSea
+				if i == 0 {
+					// 海
+					landValue[sx][sy] = 0
+				} else {
+					// 浅瀬
+					landValue[sx][sy] = 1
+				}
+			}
+		} else {
+			// 2ヘックス
+			if landKind == hconst.LandSea || landKind == hconst.LandOil ||
+				landKind == hconst.LandWaste || landKind == hconst.LandMountain ||
+				landKind == hconst.LandSbase {
+				continue
+			} else if landKind == hconst.LandMonster {
+				logWideDamageMonster(id, name, landName, point)
+				land[sx][sy] = hconst.LandWaste
+				landValue[sx][sy] = 0
+			} else {
+				logWideDamageWaste(id, name, landName, point)
+				land[sx][sy] = hconst.LandWaste
+				landValue[sx][sy] = 0
+			}
+		}
+	}
 }
