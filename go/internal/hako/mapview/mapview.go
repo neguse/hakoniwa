@@ -111,22 +111,60 @@ func CommandMain() {
 		return
 	}
 
-	// Phase 1: Simplified command processing
-	// Handle basic command operations
+	// Branch by mode
+	commands := island.Commands
+
 	if variable.CommandMode == "delete" {
 		// Delete command
-		slideFront(island.Commands, variable.CommandPlanNumber)
+		slideFront(commands, variable.CommandPlanNumber)
+		tempCommandDelete()
+	} else if variable.CommandKind == hconst.ComAutoPrepare || variable.CommandKind == hconst.ComAutoPrepare2 {
+		// フル整地、フル地ならし
+		// 座標配列を作る
+		core.MakeRandomPointArray()
+		land := island.Land
+
+		// コマンドの種類決定
+		kind := hconst.ComPrepare
+		if variable.CommandKind == hconst.ComAutoPrepare2 {
+			kind = hconst.ComPrepare2
+		}
+
+		i := 0
+		j := 0
+		for j < hconst.IslandSize*hconst.IslandSize && i < hconst.CommandMax {
+			x := variable.Rpx[j]
+			y := variable.Rpy[j]
+			if land[x][y] == hconst.LandWaste {
+				slideBack(commands, variable.CommandPlanNumber)
+				commands[variable.CommandPlanNumber] = types.Command{
+					Kind:   kind,
+					Target: "",
+					X:      x,
+					Y:      y,
+					Arg:    0,
+				}
+				i++
+			}
+			j++
+		}
+		tempCommandAdd()
+	} else if variable.CommandKind == hconst.ComAutoDelete {
+		// 全消し
+		for i := 0; i < hconst.CommandMax; i++ {
+			slideFront(commands, variable.CommandPlanNumber)
+		}
 		tempCommandDelete()
 	} else {
-		// Add/insert command
+		// Normal command
 		if variable.CommandMode == "insert" {
-			slideBack(island.Commands, variable.CommandPlanNumber)
+			slideBack(commands, variable.CommandPlanNumber)
 		}
 		tempCommandAdd()
 
 		// Register command
-		if variable.CommandPlanNumber >= 0 && variable.CommandPlanNumber < len(island.Commands) {
-			island.Commands[variable.CommandPlanNumber] = types.Command{
+		if variable.CommandPlanNumber >= 0 && variable.CommandPlanNumber < len(commands) {
+			commands[variable.CommandPlanNumber] = types.Command{
 				Kind:   variable.CommandKind,
 				Target: variable.CommandTarget,
 				X:      variable.CommandX,
@@ -400,6 +438,11 @@ func islandMap(mode int) {
 
 	// Output terrain for each cell
 	for y := 0; y < hconst.IslandSize; y++ {
+		// 偶数行目なら番号を出力
+		if (y % 2) == 0 {
+			out(fmt.Sprintf("<IMG SRC=\"space%d.gif\" width=16 height=32>", y))
+		}
+
 		for x := 0; x < hconst.IslandSize; x++ {
 			l := land[x][y]
 			lv := landValue[x][y]
@@ -409,11 +452,15 @@ func islandMap(mode int) {
 			}
 			landString(l, lv, x, y, mode, comStrXY)
 		}
+
+		// 奇数行目なら番号を出力
+		if (y % 2) == 1 {
+			out(fmt.Sprintf("<IMG SRC=\"space%d.gif\" width=16 height=32>", y))
+		}
+
 		out("<BR>\n")
 	}
 
-	// Output coordinate bar (bottom)
-	out("<IMG SRC=\"xbar.gif\" width=400 height=16><BR>")
 	out("</TD></TR></TABLE></CENTER>\n")
 }
 
@@ -571,6 +618,8 @@ func tempPrintIslandHead() {
 }
 
 func tempOwner() {
+	island := variable.Islands[variable.CurrentNumber]
+
 	out(fmt.Sprintf(`<CENTER>
 %s%s%s島%s開発計画%s<BR>
 %s<BR>
@@ -597,11 +646,10 @@ function ns(x) {
 
 	islandInfo()
 
-	// Phase 1: Simplified command form
 	out(fmt.Sprintf(`<CENTER>
 <TABLE BORDER>
 <TR>
-<TD %s>
+<TD %s >
 <CENTER>
 <FORM action="%s" method=POST>
 <INPUT TYPE=submit VALUE="計画送信" NAME=CommandButton%s>
@@ -609,21 +657,220 @@ function ns(x) {
 <B>パスワード</B></BR>
 <INPUT TYPE=password NAME=PASSWORD VALUE="%s">
 <HR>
-<B>計画フォーム(Phase 1: 簡略版)</B>
-</FORM>
+<B>計画番号</B><SELECT NAME=NUMBER>
+`,
+		hconst.BgInputCell,
+		hconst.ThisFile,
+		island.ID,
+		variable.DefaultPassword,
+	))
+
+	// 計画番号
+	for i := 0; i < hconst.CommandMax; i++ {
+		j := i + 1
+		out(fmt.Sprintf("<OPTION VALUE=%d>%d\n", i, j))
+	}
+
+	out(`</SELECT><BR>
+<HR>
+<B>開発計画</B><BR>
+<SELECT NAME=COMMAND>
+`)
+
+	// コマンド
+	for i := 0; i < len(hconst.ComList); i++ {
+		kind := hconst.ComList[i]
+		cost := hconst.ComCost[kind]
+		costStr := ""
+		if cost == 0 {
+			costStr = "無料"
+		} else if cost < 0 {
+			costStr = fmt.Sprintf("%d%s", -cost, hconst.UnitFood)
+		} else {
+			costStr = fmt.Sprintf("%d%s", cost, hconst.UnitMoney)
+		}
+
+		selected := ""
+		if variable.DefaultKind != 0 && kind == variable.DefaultKind {
+			selected = "SELECTED"
+		}
+		out(fmt.Sprintf("<OPTION VALUE=%d %s>%s(%s)\n", kind, selected, hconst.ComName[kind], costStr))
+	}
+
+	out(`</SELECT>
+<HR>
+<B>座標(</B>
+<SELECT NAME=POINTX>
+
+`)
+
+	for i := 0; i < hconst.IslandSize; i++ {
+		if variable.DefaultX != 0 && i == variable.DefaultX {
+			out(fmt.Sprintf("<OPTION VALUE=%d SELECTED>%d\n", i, i))
+		} else {
+			out(fmt.Sprintf("<OPTION VALUE=%d>%d\n", i, i))
+		}
+	}
+
+	out(`</SELECT>, <SELECT NAME=POINTY>
+`)
+
+	for i := 0; i < hconst.IslandSize; i++ {
+		if variable.DefaultY != 0 && i == variable.DefaultY {
+			out(fmt.Sprintf("<OPTION VALUE=%d SELECTED>%d\n", i, i))
+		} else {
+			out(fmt.Sprintf("<OPTION VALUE=%d>%d\n", i, i))
+		}
+	}
+
+	out(`</SELECT><B>)</B>
+<HR>
+<B>数量</B><SELECT NAME=AMOUNT>
+`)
+
+	// 数量
+	for i := 0; i < 100; i++ {
+		out(fmt.Sprintf("<OPTION VALUE=%d>%d\n", i, i))
+	}
+
+	out(fmt.Sprintf(`</SELECT>
+<HR>
+<B>目標の島</B><BR>
+<SELECT NAME=TARGETID>
+%s<BR>
+</SELECT>
+<HR>
+<B>動作</B><BR>
+<INPUT TYPE=radio NAME=COMMANDMODE VALUE=insert CHECKED>挿入
+<INPUT TYPE=radio NAME=COMMANDMODE VALUE=write>上書き<BR>
+<INPUT TYPE=radio NAME=COMMANDMODE VALUE=delete>削除
+<HR>
+<INPUT TYPE=submit VALUE="計画送信" NAME=CommandButton%s>
+
 </CENTER>
+</FORM>
+</TD>
+<TD %s>
+`,
+		variable.TargetList,
+		island.ID,
+		hconst.BgMapCell,
+	))
+
+	islandMap(1) // 島の地図、所有者モード
+
+	out(fmt.Sprintf(`</TD>
+<TD %s>
+`, hconst.BgCommandCell))
+
+	// 入力済みコマンド表示
+	for i := 0; i < hconst.CommandMax; i++ {
+		tempCommand(i, island.Commands[i])
+	}
+
+	out(`
 </TD>
 </TR>
 </TABLE>
 </CENTER>
-`,
-		hconst.BgInputCell,
-		hconst.ThisFile,
-		variable.Islands[variable.CurrentNumber].ID,
-		variable.DefaultPassword,
-	))
+<HR>
+<CENTER>
+`)
 
-	islandMap(1)
+	out(fmt.Sprintf(`%sコメント更新%s<BR>
+<FORM action="%s" method="POST">
+コメント<INPUT TYPE=text NAME=MESSAGE SIZE=80><BR>
+パスワード<INPUT TYPE=password NAME=PASSWORD VALUE="%s">
+<INPUT TYPE=submit VALUE="コメント更新" NAME=MessageButton%s>
+</FORM>
+</CENTER>
+`,
+		hconst.TagBigBegin, hconst.TagBigEnd,
+		hconst.ThisFile,
+		variable.DefaultPassword,
+		island.ID,
+	))
+}
+
+// tempCommand displays a single command in the command list
+// Ref: perl/lib/Hako/Map.pm:837
+func tempCommand(number int, command types.Command) {
+	kind := command.Kind
+	target := command.Target
+	x := command.X
+	y := command.Y
+	arg := command.Arg
+
+	name := fmt.Sprintf("%s%s%s", hconst.TagComNameBegin, hconst.ComName[kind], hconst.TagComNameEnd)
+	point := fmt.Sprintf("%s(%d,%d)%s", hconst.TagNameBegin, x, y, hconst.TagNameEnd)
+
+	targetName := variable.IDToName[target]
+	if targetName != "" {
+		targetName = fmt.Sprintf("%s%s島%s", hconst.TagNameBegin, targetName, hconst.TagNameEnd)
+	} else if target != "" {
+		targetName = fmt.Sprintf("%s無人%s", hconst.TagNameBegin, hconst.TagNameEnd)
+	}
+
+	value := arg * hconst.ComCost[kind]
+	if value == 0 {
+		value = hconst.ComCost[kind]
+	}
+
+	valueStr := ""
+	if value < 0 {
+		valueStr = fmt.Sprintf("%d%s", -value, hconst.UnitFood)
+	} else {
+		valueStr = fmt.Sprintf("%d%s", value, hconst.UnitMoney)
+	}
+	valueStr = fmt.Sprintf("%s%s%s", hconst.TagNameBegin, valueStr, hconst.TagNameEnd)
+
+	j := fmt.Sprintf("%02d：", number+1)
+
+	out(fmt.Sprintf(`<A STYlE="text-decoration:none" HREF="JavaScript:void(0);" onClick="ns(%d)"><NOBR>%s%s%s<FONT COLOR="%s">`,
+		number, hconst.TagNumberBegin, j, hconst.TagNumberEnd, hconst.NormalColor))
+
+	if kind == hconst.ComDoNothing || kind == hconst.ComGiveup {
+		out(name)
+	} else if kind == hconst.ComMissileNM || kind == hconst.ComMissilePP ||
+		kind == hconst.ComMissileST || kind == hconst.ComMissileLD {
+		// ミサイル系
+		n := "無制限"
+		if arg != 0 {
+			n = fmt.Sprintf("%d発", arg)
+		}
+		out(fmt.Sprintf("%s%sへ%s(%s%s%s)", targetName, point, name, hconst.TagNameBegin, n, hconst.TagNameEnd))
+	} else if kind == hconst.ComSendMonster {
+		// 怪獣派遣
+		out(fmt.Sprintf("%sへ%s", targetName, name))
+	} else if kind == hconst.ComSell {
+		// 食料輸出
+		out(fmt.Sprintf("%s%s", name, valueStr))
+	} else if kind == hconst.ComPropaganda {
+		// 誘致活動
+		out(name)
+	} else if kind == hconst.ComMoney || kind == hconst.ComFood {
+		// 援助
+		out(fmt.Sprintf("%sへ%s%s", targetName, name, valueStr))
+	} else if kind == hconst.ComDestroy {
+		// 掘削
+		if arg != 0 {
+			out(fmt.Sprintf("%sで%s(予算%s)", point, name, valueStr))
+		} else {
+			out(fmt.Sprintf("%sで%s", point, name))
+		}
+	} else if kind == hconst.ComFarm || kind == hconst.ComFactory || kind == hconst.ComMountain {
+		// 回数付き
+		if arg == 0 {
+			out(fmt.Sprintf("%sで%s", point, name))
+		} else {
+			out(fmt.Sprintf("%sで%s(%d回)", point, name, arg))
+		}
+	} else {
+		// 座標付き
+		out(fmt.Sprintf("%sで%s", point, name))
+	}
+
+	out("</FONT></NOBR></A><BR>")
 }
 
 func tempRecent(mode int) {
@@ -637,42 +884,175 @@ func logPrintLocal(mode int) {
 }
 
 func tempLbbsHead() {
-	out(fmt.Sprintf("<H1>%s%s島ローカル掲示板%s</H1>\n",
-		hconst.TagHeaderBegin, variable.CurrentName, hconst.TagHeaderEnd))
+	out(fmt.Sprintf(`<HR>
+<CENTER>
+%s%s%s島%s観光者通信%s<BR>
+</CENTER>
+`,
+		hconst.TagBigBegin, hconst.TagNameBegin, variable.CurrentName, hconst.TagNameEnd, hconst.TagBigEnd))
 }
 
 func tempLbbsInput() {
-	out("<P>ローカル掲示板書き込み(観光者用)(Phase 1: 簡略版)</P>\n")
+	out(fmt.Sprintf(`<CENTER>
+<FORM action="%s" method="POST">
+<TABLE BORDER>
+<TR>
+<TH>名前</TH>
+<TH>内容</TH>
+<TH>動作</TH>
+</TR>
+<TR>
+<TD><INPUT TYPE="text" SIZE=32 MAXLENGTH=32 NAME="LBBSNAME" VALUE="%s"></TD>
+<TD><INPUT TYPE="text" SIZE=80 NAME="LBBSMESSAGE"></TD>
+<TD><INPUT TYPE="submit" VALUE="記帳する" NAME="LbbsButtonSS%s"></TD>
+</TR>
+</TABLE>
+</FORM>
+</CENTER>
+`,
+		hconst.ThisFile,
+		variable.DefaultName,
+		variable.CurrentID,
+	))
 }
 
 func tempLbbsInputOW() {
-	out("<P>ローカル掲示板書き込み(所有者用)(Phase 1: 簡略版)</P>\n")
+	out(fmt.Sprintf(`<CENTER>
+<FORM action="%s" method="POST">
+<TABLE BORDER>
+<TR>
+<TH>名前</TH>
+<TH COLSPAN=2>内容</TH>
+</TR>
+<TR>
+<TD><INPUT TYPE="text" SIZE=32 MAXLENGTH=32 NAME="LBBSNAME" VALUE="%s"></TD>
+<TD COLSPAN=2><INPUT TYPE="text" SIZE=80 NAME="LBBSMESSAGE"></TD>
+</TR>
+<TR>
+<TH>パスワード</TH>
+<TH COLSPAN=2>動作</TH>
+</TR>
+<TR>
+<TD><INPUT TYPE=password SIZE=32 MAXLENGTH=32 NAME=PASSWORD VALUE="%s"></TD>
+<TD align=right>
+<INPUT TYPE="submit" VALUE="記帳する" NAME="LbbsButtonOW%s">
+</TD>
+<TD align=right>
+番号
+<SELECT NAME=NUMBER>
+`,
+		hconst.ThisFile,
+		variable.DefaultName,
+		variable.DefaultPassword,
+		variable.CurrentID,
+	))
+
+	// 発言番号
+	for i := 0; i < hconst.LbbsMax; i++ {
+		j := i + 1
+		out(fmt.Sprintf("<OPTION VALUE=%d>%d\n", i, j))
+	}
+
+	out(fmt.Sprintf(`</SELECT>
+<INPUT TYPE="submit" VALUE="削除する" NAME="LbbsButtonDL%s">
+</TD>
+</TR>
+</TABLE>
+</FORM>
+</CENTER>
+`, variable.CurrentID))
 }
 
 func tempLbbsContents() {
-	out("<P>掲示板メッセージ一覧(Phase 1: 簡略版)</P>\n")
+	lbbs := variable.Islands[variable.CurrentNumber].Lbbs
+
+	out(`<CENTER>
+<TABLE BORDER>
+<TR>
+<TH>番号</TH>
+<TH>記帳内容</TH>
+</TR>
+`)
+
+	for i := 0; i < hconst.LbbsMax && i < len(lbbs); i++ {
+		line := lbbs[i].Message
+		// Parse format: "mode>name>message"
+		// mode: 0=tourist, 1=owner
+		var mode, name, message string
+		if len(line) > 0 {
+			// Simple parsing
+			parts := splitN(line, ">", 3)
+			if len(parts) >= 3 {
+				mode = parts[0]
+				name = parts[1]
+				message = parts[2]
+
+				j := i + 1
+				out(fmt.Sprintf("<TR><TD align=center>%s%d%s</TD>", hconst.TagNumberBegin, j, hconst.TagNumberEnd))
+
+				if mode == "0" {
+					// 観光者
+					out(fmt.Sprintf("<TD>%s%s > %s%s</TD></TR>", hconst.TagLbbsSSBegin, name, message, hconst.TagLbbsSSEnd))
+				} else {
+					// 島主
+					out(fmt.Sprintf("<TD>%s%s > %s%s</TD></TR>", hconst.TagLbbsOWBegin, name, message, hconst.TagLbbsOWEnd))
+				}
+			}
+		}
+	}
+
+	out(`</TD></TR></TABLE></CENTER>
+`)
+}
+
+// splitN splits a string by separator, limiting to n parts
+func splitN(s, sep string, n int) []string {
+	result := []string{}
+	for i := 0; i < n-1; i++ {
+		idx := -1
+		for j := 0; j < len(s); j++ {
+			if s[j:j+len(sep)] == sep {
+				idx = j
+				break
+			}
+		}
+		if idx == -1 {
+			result = append(result, s)
+			return result
+		}
+		result = append(result, s[:idx])
+		s = s[idx+len(sep):]
+	}
+	result = append(result, s)
+	return result
 }
 
 func tempLbbsNoMessage() {
-	out("<H1>名前かメッセージが入力されていません。</H1>\n")
+	out(fmt.Sprintf("%s名前または内容の欄が空欄です。%s%s",
+		hconst.TagBigBegin, hconst.TagBigEnd, hconst.TempBack))
 }
 
 func tempLbbsDelete() {
-	out("<H1>メッセージを削除しました。</H1>\n")
+	out(fmt.Sprintf("%s記帳内容を削除しました%s<HR>\n",
+		hconst.TagBigBegin, hconst.TagBigEnd))
 }
 
 func tempLbbsAdd() {
-	out("<H1>メッセージを追加しました。</H1>\n")
+	out(fmt.Sprintf("%s記帳を行いました%s<HR>\n",
+		hconst.TagBigBegin, hconst.TagBigEnd))
 }
 
 func tempCommandDelete() {
-	out("<H1>計画を削除しました。</H1>\n")
+	out(fmt.Sprintf("%sコマンドを削除しました%s<HR>\n",
+		hconst.TagBigBegin, hconst.TagBigEnd))
 }
 
 func tempCommandAdd() {
-	out("<H1>計画を追加しました。</H1>\n")
+	out(fmt.Sprintf("%sコマンドを登録しました%s<HR>\n",
+		hconst.TagBigBegin, hconst.TagBigEnd))
 }
 
 func tempComment() {
-	out("<H1>コメントを変更しました。</H1>\n")
+	out(fmt.Sprintf("%sコメントを更新しました%s<HR>\n",
+		hconst.TagBigBegin, hconst.TagBigEnd))
 }

@@ -152,10 +152,10 @@ func ExpToLevel(landKind int, exp int) int {
 	}
 }
 
-// makeRandomPointArray creates shuffled coordinate arrays
+// MakeRandomPointArray creates shuffled coordinate arrays (exported for external use)
 // Sets (@Hrpx, @Hrpy) so that numbers from (0,0) to (size-1, size-1) appear exactly once
 // Ref: perl/lib/Hako/Main.pm:1002
-func makeRandomPointArray() {
+func MakeRandomPointArray() {
 	// Initialize
 	variable.Rpx = make([]int, hconst.PointNumber)
 	variable.Rpy = make([]int, hconst.PointNumber)
