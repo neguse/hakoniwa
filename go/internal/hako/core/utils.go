@@ -1,0 +1,193 @@
+// Package core provides core utilities for the Hakoniwa game.
+// This file contains utility functions translated from Perl lib/Hako/Main.pm
+//
+// Ref: perl/lib/Hako/Main.pm
+package core
+
+import (
+	"crypto/des"
+	"fmt"
+	"math/rand"
+	"strings"
+
+	"github.com/neguse/hakoniwa/go/internal/hako/const"
+	"github.com/neguse/hakoniwa/go/internal/hako/variable"
+)
+
+// min returns the minimum of two integers
+// Ref: perl/lib/Hako/Main.pm:858
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+// encode encodes a password
+// Ref: perl/lib/Hako/Main.pm:863
+func encode(password string) string {
+	if const.CryptOn {
+		// Perl's crypt() with salt "h2"
+		// Phase 1: simplified implementation (will be improved in Phase 2)
+		return cryptCompat(password, "h2")
+	}
+	return password
+}
+
+// cryptCompat implements a simplified DES-based crypt compatible with Perl's crypt()
+// Phase 1: Basic implementation
+func cryptCompat(password, salt string) string {
+	// Phase 1: Simplified - just return a hash
+	// TODO: Implement proper DES crypt for full Perl compatibility
+	if len(password) == 0 {
+		return ""
+	}
+	// Placeholder: In Phase 1, we'll use a simple encoding
+	// This needs to be compatible with Perl's crypt()
+	return password // FIXME: Implement proper crypt
+}
+
+// checkPassword checks if a password matches
+// Ref: perl/lib/Hako/Main.pm:873
+func checkPassword(stored, input string) bool {
+	// null check
+	if input == "" {
+		return false
+	}
+
+	// Master password check
+	if const.MasterPassword == input {
+		return true
+	}
+
+	// Normal check
+	if stored == encode(input) {
+		return true
+	}
+
+	return false
+}
+
+// aboutMoney rounds money to 1000億単位
+// Ref: perl/lib/Hako/Main.pm:895
+func aboutMoney(m int) string {
+	if m < 500 {
+		return fmt.Sprintf("推定500%s未満", const.UnitMoney)
+	}
+	m = (m + 500) / 1000
+	return fmt.Sprintf("推定%d000%s", m, const.UnitMoney)
+}
+
+// htmlEscape escapes HTML special characters
+// Ref: perl/lib/Hako/Main.pm:907
+func htmlEscape(s string) string {
+	s = strings.ReplaceAll(s, "&", "&amp;")
+	s = strings.ReplaceAll(s, "<", "&lt;")
+	s = strings.ReplaceAll(s, ">", "&gt;")
+	s = strings.ReplaceAll(s, "\"", "&quot;")
+	return s
+}
+
+// cutColumn cuts string to specified column length
+// Ref: perl/lib/Hako/Main.pm:917
+func cutColumn(s string, c int) string {
+	// Phase 1: Simple implementation (works for ASCII and UTF-8)
+	runes := []rune(s)
+	if len(runes) <= c {
+		return s
+	}
+	return string(runes[:c])
+}
+
+// nameToNumber finds island number by name (not ID, but index in Islands array)
+// Ref: perl/lib/Hako/Main.pm:942
+func nameToNumber(name string) int {
+	// Search all islands
+	for i := 0; i < variable.IslandNumber; i++ {
+		// Phase 1: Islands is []interface{}, need type assertion
+		island := variable.Islands[i]
+		// TODO: access island name when Island type is defined
+		_ = island
+	}
+	// Not found
+	return -1
+}
+
+// monsterSpec returns monster information from level
+// Ref: perl/lib/Hako/Main.pm:958
+func monsterSpec(lv int) (kind int, name string, hp int) {
+	// Kind
+	kind = lv / 10
+
+	// Name
+	if kind < len(const.MonsterName) {
+		name = const.MonsterName[kind]
+	}
+
+	// HP
+	hp = lv - (kind * 10)
+
+	return kind, name, hp
+}
+
+// expToLevel calculates level from experience points
+// Ref: perl/lib/Hako/Main.pm:975
+func expToLevel(landKind int, exp int) int {
+	if landKind == const.LandBase {
+		// Missile base
+		for i := const.MaxBaseLevel; i > 1; i-- {
+			if exp >= const.BaseLevelUp[i-2] {
+				return i
+			}
+		}
+		return 1
+	} else {
+		// Sea base
+		for i := const.MaxSBaseLevel; i > 1; i-- {
+			if exp >= const.SBaseLevelUp[i-2] {
+				return i
+			}
+		}
+		return 1
+	}
+}
+
+// makeRandomPointArray creates shuffled coordinate arrays
+// Sets (@Hrpx, @Hrpy) so that numbers from (0,0) to (size-1, size-1) appear exactly once
+// Ref: perl/lib/Hako/Main.pm:1002
+func makeRandomPointArray() {
+	// Initialize
+	variable.Rpx = make([]int, const.PointNumber)
+	variable.Rpy = make([]int, const.PointNumber)
+
+	idx := 0
+	for y := 0; y < const.IslandSize; y++ {
+		for x := 0; x < const.IslandSize; x++ {
+			variable.Rpx[idx] = x
+			variable.Rpy[idx] = y
+			idx++
+		}
+	}
+
+	// Shuffle
+	for i := const.PointNumber - 1; i > 0; i-- {
+		j := rand.Intn(i + 1)
+		if i == j {
+			continue
+		}
+		variable.Rpx[i], variable.Rpx[j] = variable.Rpx[j], variable.Rpx[i]
+		variable.Rpy[i], variable.Rpy[j] = variable.Rpy[j], variable.Rpy[i]
+	}
+}
+
+// random returns a random integer in [0, n)
+// Ref: perl/lib/Hako/Main.pm:1022
+func random(n int) int {
+	if n <= 0 {
+		return 0
+	}
+	return rand.Intn(n)
+}
+
+// Suppress unused import warning for Phase 1
+var _ = des.BlockSize
