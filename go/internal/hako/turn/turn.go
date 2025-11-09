@@ -836,6 +836,86 @@ func doCommand(island *types.Island) int {
 
 		return 1
 
+	case hconst.ComMountain:
+		// Mining site (採掘場整備)
+		// Ref: perl/lib/Hako/Turn.pm:959-990
+		x, y := com.X, com.Y
+		if !isValidCoord(x, y) {
+			return 1
+		}
+
+		land := island.Land[x][y]
+		cost := hconst.ComCost[com.Kind]
+		comName := hconst.ComName[com.Kind]
+
+		// Check if money is sufficient
+		if island.Money < cost {
+			logNoMoney(island.ID, island.Name, comName, x, y)
+			return 1
+		}
+
+		// Can only build on mountain
+		if land != hconst.LandMountain {
+			logLandFail(island.ID, island.Name, comName, x, y)
+			return 0
+		}
+
+		// Increase scale by 5 (5000 people), max 200 (200000 people)
+		island.LandValue[x][y] += 5
+		if island.LandValue[x][y] > 200 {
+			island.LandValue[x][y] = 200
+		}
+		logLandSuc(island.ID, island.Name, comName, x, y)
+
+		// Deduct money
+		island.Money -= cost
+
+		// For repeating commands, put command back
+		if com.Arg > 1 {
+			com.Arg--
+			slideBack(island.Commands, 0)
+			island.Commands[0] = com
+		}
+		return 1
+
+	case hconst.ComSbase:
+		// Submarine base (海底基地建設)
+		// Ref: perl/lib/Hako/Turn.pm:991-1008
+		x, y := com.X, com.Y
+		if !isValidCoord(x, y) {
+			return 1
+		}
+
+		land := island.Land[x][y]
+		lv := island.LandValue[x][y]
+		cost := hconst.ComCost[com.Kind]
+		comName := hconst.ComName[com.Kind]
+
+		// Check if money is sufficient
+		if island.Money < cost {
+			logNoMoney(island.ID, island.Name, comName, x, y)
+			return 1
+		}
+
+		// Can only build on deep sea (sea with lv == 0)
+		if land != hconst.LandSea || lv != 0 {
+			logLandFail(island.ID, island.Name, comName, x, y)
+			return 0
+		}
+
+		// Build submarine base
+		island.Land[x][y] = hconst.LandSbase
+		island.LandValue[x][y] = 0 // Experience 0
+
+		// Log with hidden coordinates (secret base)
+		logSecret(fmt.Sprintf("0,%d,%s,0,%s%s島%s%sで%s%s%sが行われました。",
+			variable.IslandTurn, island.ID, hconst.TagNameBegin, island.Name, "(?, ?)", hconst.TagNameEnd,
+			hconst.TagComNameBegin, comName, hconst.TagComNameEnd))
+
+		// Deduct money
+		island.Money -= cost
+		return 1
+
 	default:
 		// Other commands: Phase 1 simplified - skip
 		return 1
